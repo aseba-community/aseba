@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -154,12 +154,12 @@ typedef enum
 	ASEBA_MESSAGE_BOOTLOADER_READ_PAGE,
 	ASEBA_MESSAGE_BOOTLOADER_WRITE_PAGE,
 	ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_WRITE,
-	
+
 	/* from node to bootloader control program */
 	ASEBA_MESSAGE_BOOTLOADER_DESCRIPTION,
 	ASEBA_MESSAGE_BOOTLOADER_PAGE_DATA_READ,
 	ASEBA_MESSAGE_BOOTLOADER_ACK,
-	
+
 	/* from a specific node */
 	ASEBA_MESSAGE_DESCRIPTION = 0x9000,
 	ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION,
@@ -174,10 +174,10 @@ typedef enum
 	ASEBA_MESSAGE_EXECUTION_STATE_CHANGED,
 	ASEBA_MESSAGE_BREAKPOINT_SET_RESULT,
 	ASEBA_MESSAGE_NODE_PRESENT,
-	
+
 	/* from IDE to all nodes */
 	ASEBA_MESSAGE_GET_DESCRIPTION = 0xA000,
-	
+
 	/* from IDE to a specific node */
 	ASEBA_MESSAGE_SET_BYTECODE,
 	ASEBA_MESSAGE_RESET,
@@ -195,10 +195,10 @@ typedef enum
 	ASEBA_MESSAGE_REBOOT,
 	ASEBA_MESSAGE_SUSPEND_TO_RAM,
 	ASEBA_MESSAGE_GET_NODE_DESCRIPTION,
-	
+
 	/* from IDE to all nodes, here because it was added later */
 	ASEBA_MESSAGE_LIST_NODES,
-	
+
 	ASEBA_MESSAGE_INVALID = 0xFFFF
 } AsebaSystemMessagesTypes;
 
@@ -222,7 +222,7 @@ typedef enum
 #define ASEBA_MAX_INNER_PACKET_SIZE (ASEBA_MAX_EVENT_ARG_SIZE+2)
 
 /*! Maximum size of an event (in bytes), including its type plus the source and the length */
-#define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE+4) 
+#define ASEBA_MAX_OUTER_PACKET_SIZE (ASEBA_MAX_INNER_PACKET_SIZE+4)
 
 /*! *DEPRECATED*, please use one of the more explicit defines above */
 #define ASEBA_MAX_PACKET_SIZE ASEBA_MAX_INNER_PACKET_SIZE

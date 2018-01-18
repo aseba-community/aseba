@@ -3,16 +3,16 @@
         Copyright (C) 2012:
                 Philippe Retornaz <philippe.retornaz@epfl.ch>
                 and other contributors, see authors.txt for details
-        
+
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU Lesser General Public License as published
         by the Free Software Foundation, version 3 of the License.
-        
+
         This program is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
         GNU Lesser General Public License for more details.
-        
+
         You should have received a copy of the GNU Lesser General Public License
         along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -118,15 +118,15 @@ class CanStream: public SelectableStream
 			fd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 			if(fd < 0)
 				throw DashelException(DashelException::ConnectionFailed, 0, "Socket creation failed", this);
-			
+
 			addr.can_family = AF_CAN;
 			if(strlen(ifName.c_str()) >= IFNAMSIZ)
 				throw DashelException(DashelException::ConnectionFailed, 0, "Interface name too long", this);
-			
+
 			strcpy(ifr.ifr_name, ifName.c_str());
 			if(ioctl(fd, SIOCGIFINDEX, &ifr) < 0)
 				throw DashelException(DashelException::ConnectionFailed, 0, "Unable to get interface", this);
-			
+
                         // Try to have 20Mb RX buffer
 			int options = 20*1024*1024;
 			if (setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &options, sizeof(options)))
@@ -196,8 +196,8 @@ class CanStream: public SelectableStream
 			unsigned int packet_len = tx_buffer[0] | (tx_buffer[1] << 8); // Little endian;
 			unsigned int nodeId = tx_buffer[2] | (tx_buffer[3] << 8);
 			unsigned int msgId = tx_buffer[4] | (tx_buffer[5] << 8);
-			
-			if(packet_len  <= 6) 
+
+			if(packet_len  <= 6)
 			{
 				// Small packet
 				frame.can_id = TO_CANID(TYPE_SMALL_PACKET, nodeId);
@@ -206,8 +206,8 @@ class CanStream: public SelectableStream
 				frame.data[1] = msgId >> 8;
 				memcpy(&frame.data[2], &tx_buffer[6], packet_len);
 				can_write_frame(&frame);
-			} 
-			else 
+			}
+			else
 			{
 				unsigned char * p = &tx_buffer[6];
 				frame.can_id = TO_CANID(TYPE_PACKET_START, nodeId);
@@ -248,7 +248,7 @@ class CanStream: public SelectableStream
 			}
 		}
 
-		virtual void flush() 
+		virtual void flush()
 		{
 		}
 	private:
@@ -270,7 +270,7 @@ class CanStream: public SelectableStream
 			int stopId;
 			int stopPos = -1;
 			int ignore = 0;
-			for(i = rx_consume; i != rx_insert; ) 
+			for(i = rx_consume; i != rx_insert; )
 			{
 				if(rx_fifo[i].used)
 				{
@@ -286,7 +286,7 @@ class CanStream: public SelectableStream
 						memcpy(&rx_buffer[4], rx_fifo[i].f.data, rx_fifo[i].f.can_dlc);
 						rx_p = 0;
 						rx_len = rx_fifo[i].f.can_dlc + 4;
-						 
+
 						rx_fifo[i].used = 0; // Free the frame (pack_fifo())
 						return 1;
 					}
@@ -303,13 +303,13 @@ class CanStream: public SelectableStream
 			}
 			if(stopPos < 0)
 				return 0;
-				
+
 			i = rx_consume;
 			// Len will be filled lated
 			rx_buffer[2] = stopId;
 			rx_buffer[3] = 0;
 			rx_len = 4;
-			while(1) 
+			while(1)
 			{
 				if(rx_fifo[i].used && CANID_TO_ID(rx_fifo[i].f.can_id) == stopId)
 				{
@@ -322,7 +322,7 @@ class CanStream: public SelectableStream
 
 					memcpy(&rx_buffer[rx_len], rx_fifo[i].f.data, rx_fifo[i].f.can_dlc);
 					rx_len += rx_fifo[i].f.can_dlc;
-					rx_fifo[i].used = 0;	
+					rx_fifo[i].used = 0;
 
 					if(i == stopPos)
 						break;
@@ -335,7 +335,7 @@ class CanStream: public SelectableStream
 				rx_len = 0;
 				rx_p = 0;
 				return -1;
-			} 
+			}
 			else
 			{
 				rx_buffer[0] = rx_len - 6;
@@ -344,7 +344,7 @@ class CanStream: public SelectableStream
 				return 1;
 			}
 		}
-		int fifo_full() 
+		int fifo_full()
 		{
 			int i = rx_insert + 1;
 			if(i == RX_CAN_SIZE)
@@ -367,7 +367,7 @@ class CanStream: public SelectableStream
 				if(recvmsg(fd, &msg, 0) < (int) sizeof(rframe))
 					throw DashelException(DashelException::IOError, 0, "Read error", this);
 
-				for(cmsg = CMSG_FIRSTHDR(&msg); 
+				for(cmsg = CMSG_FIRSTHDR(&msg);
 					cmsg && (cmsg->cmsg_level == SOL_SOCKET);
 					cmsg = CMSG_NXTHDR(&msg,cmsg))
 				{
@@ -378,7 +378,7 @@ class CanStream: public SelectableStream
 							throw DashelException(DashelException::IOError, 0, "Packet dropped", this);
 					}
 				}
-			
+
 				if(fifo_full())
 					throw DashelException(DashelException::IOError, 0, "Fifo full", this);
 
@@ -391,7 +391,7 @@ class CanStream: public SelectableStream
 			pack_fifo();
 		}
 	public:
-		virtual void read(void *data, size_t size) 
+		virtual void read(void *data, size_t size)
 		{
 			unsigned char * d = (unsigned char *) data;
 			while(size)
@@ -401,8 +401,8 @@ class CanStream: public SelectableStream
 					*d++ = rx_buffer[rx_p++];
 					rx_len--;
 					size--;
-				} 
-				else 
+				}
+				else
 				{
 					read_iface();
 				}
@@ -414,7 +414,7 @@ class CanStream: public SelectableStream
 			return false;
 		}
 
-		virtual bool isDataInRecvBuffer() const 
+		virtual bool isDataInRecvBuffer() const
 		{
 			struct can_frame f;
 			if(rx_len || rx_insert != rx_consume)

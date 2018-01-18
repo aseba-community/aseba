@@ -3,16 +3,16 @@
         Copyright (C) 2013:
                 Philippe Retornaz <philippe.retornaz@epfl.ch>
                 and other contributors, see authors.txt for details
-        
+
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU Lesser General Public License as published
         by the Free Software Foundation, version 3 of the License.
-        
+
         This program is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
         GNU Lesser General Public License for more details.
-        
+
         You should have received a copy of the GNU Lesser General Public License
         along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -185,7 +185,7 @@ bool AndroidStream::isDataInRecvBuffer() const
 
 void AndroidStream::lock_java()
 {
-    // Kind of mutex_lock();	    
+    // Kind of mutex_lock();
     if(s_javaVM->AttachCurrentThread(&env, nullptr)<0)
         throw DashelException(DashelException::ConnectionFailed, 0, "Java lock failed", this);
 }

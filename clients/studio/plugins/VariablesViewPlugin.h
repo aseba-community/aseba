@@ -14,47 +14,47 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	class TargetVariablesModel;
-	
+
 	class LinearCameraViewVariablesDialog : public QDialog
 	{
 		Q_OBJECT
-		
+
 	public:
 		QComboBox* redVariable;
 		QComboBox* greenVariable;
 		QComboBox* blueVariable;
 		QComboBox* valuesRanges;
-		
+
 		LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel);
 		virtual ~LinearCameraViewVariablesDialog() {}
 	};
-	
+
 	class LinearCameraViewPlugin: public QWidget, public NodeToolInterface, public VariableListener
 	{
 		Q_OBJECT
-		
+
 	public:
 		LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de);
-		
+
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
-	
+
 	signals:
 		void dialogBoxResult(bool ok);
-		
+
 	private slots:
 		void setEnabled(bool enabled);
-		
+
 	private:
 		void enablePlugin();
 		void disablePlugin();
-		
+
 		virtual void timerEvent ( QTimerEvent * event );
 		virtual void closeEvent ( QCloseEvent * event );
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
-		
+
 	private:
 		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		enum ValuesRange
@@ -71,7 +71,7 @@ namespace Aseba
 		unsigned componentsReceived;
 		int timerId;
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

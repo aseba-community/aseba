@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -36,7 +36,7 @@ using namespace std;
 namespace Aseba { namespace ThymioVPL
 {
 
-	Scene::Scene(ThymioVisualProgramming *vpl) : 
+	Scene::Scene(ThymioVisualProgramming *vpl) :
 		QGraphicsScene(vpl),
 		vpl(vpl),
 		warningGraphicsItem(new QGraphicsSvgItem(":/images/vpl/missing_block.svgz")),
@@ -54,22 +54,22 @@ namespace Aseba { namespace ThymioVPL
 		addItem(referredGraphicsItem);
 		referredGraphicsItem->setVisible(false);
 		referredLineItem->setVisible(false);
-		
+
 		// create initial set
 		EventActionsSet *p(createNewEventActionsSet());
 		buttonSetHeight = p->boundingRect().height();
-		
+
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
 		USAGE_LOG(setScene(this));
 	}
-	
+
 	Scene::~Scene()
 	{
 		clear(false);
 	}
-	
+
 	//! Add an action block of a given name to the scene, find the right place to put it
-	QGraphicsItem *Scene::addAction(const QString& name) 
+	QGraphicsItem *Scene::addAction(const QString& name)
 	{
 		Block* item(Block::createBlock(name, advancedMode));
 		EventActionsSet* selectedSet(getSelectedSet());
@@ -108,7 +108,7 @@ namespace Aseba { namespace ThymioVPL
 	}
 
 	//! Add an event block of a given name to the scene, find the right place to put it
-	QGraphicsItem *Scene::addEvent(const QString& name) 
+	QGraphicsItem *Scene::addEvent(const QString& name)
 	{
 		Block* item(Block::createBlock(name, advancedMode));
 		EventActionsSet* selectedSet(getSelectedSet());
@@ -141,7 +141,7 @@ namespace Aseba { namespace ThymioVPL
 			return eventActionsSet;
 		}
 	}
-	
+
 	//! Add a new event-actions set from a DOM Element, used by load
 	void Scene::addEventActionsSet(const QDomElement& element)
 	{
@@ -149,7 +149,7 @@ namespace Aseba { namespace ThymioVPL
 		eventActionsSet->deserialize(element);
 		addEventActionsSet(eventActionsSet);
 	}
-	
+
 	//! Makes sure that there is at least one empty event-actions set at the end of the scene
 	void Scene::ensureOneEmptySetAtEnd()
 	{
@@ -158,11 +158,11 @@ namespace Aseba { namespace ThymioVPL
 			newSet = createNewEventActionsSet();
 		else if (!eventActionsSets.last()->isEmpty())
 			newSet = createNewEventActionsSet();
-		
+
 		if (newSet)
 		{
 			relayout();
-		
+
 			// make sure the newly set is visible
 			QGraphicsView* view;
 			foreach (view, views())
@@ -177,19 +177,19 @@ namespace Aseba { namespace ThymioVPL
 		addEventActionsSet(eventActionsSet);
 		return eventActionsSet;
 	}
-	
+
 	//! Adds an existing event-actions set, *must not* be in the scene already
 	void Scene::addEventActionsSet(EventActionsSet *eventActionsSet)
 	{
 		eventActionsSets.push_back(eventActionsSet);
-		
+
 		addItem(eventActionsSet);
 		recomputeSceneRect();
-		
+
 		connect(eventActionsSet, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		connect(eventActionsSet, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
 	}
-	
+
 	//! Return whether we have to generate debug log information
 	bool Scene::debugLog() const
 	{
@@ -201,7 +201,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (eventActionsSets.isEmpty())
 			return true;
-			
+
 		if (eventActionsSets.size() > 1 ||
 			!eventActionsSets[0]->isEmpty())
 			return false;
@@ -216,7 +216,7 @@ namespace Aseba { namespace ThymioVPL
 		createNewEventActionsSet();
 		lastCompilationResult = compiler.compile(this);
 	}
-	
+
 	//! Remove everything from the scene, leaving it with no object (hence not usable directly), and set advanced mode or not
 	void Scene::clear(bool advanced)
 	{
@@ -235,14 +235,14 @@ namespace Aseba { namespace ThymioVPL
 		errorGraphicsItem->setVisible(false);
 		referredGraphicsItem->setVisible(false);
 		referredLineItem->setVisible(false);
-		
+
 		connect(this, SIGNAL(selectionChanged()), SIGNAL(highlightChanged()));
-		
+
 		setModified(false);
-		
+
 		advancedMode = advanced;
 	}
-	
+
 	//! Set the modified boolean to mod, emit status change
 	void Scene::setModified(bool mod)
 	{
@@ -263,13 +263,13 @@ namespace Aseba { namespace ThymioVPL
 				p->setAdvanced(advanced);
 				connect(p, SIGNAL(contentChanged()), SLOT(recompile()));
 			}
-			
+
 			recompile();
 			USAGE_LOG(logSetAdvanced(advanced));
 			emit undoCheckpoint();
 		}
 	}
-	
+
 	//! Return whether the scene is using any advanced feature
 	bool Scene::isAnyAdvancedFeature() const
 	{
@@ -278,25 +278,25 @@ namespace Aseba { namespace ThymioVPL
 				return true;
 		return false;
 	}
-	
+
 	//! Serialize the scene to DOM
 	QDomElement Scene::serialize(QDomDocument& document) const
 	{
 		QDomElement program = document.createElement("program");
 		program.setAttribute("advanced_mode", advancedMode);
-		
+
 		for (Scene::SetConstItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			program.appendChild((*itr)->serialize(document));
-		
+
 		return program;
 	}
-	
+
 	//! Clear the existing scene and deserialize from DOM
 	void Scene::deserialize(const QDomElement& programElement)
 	{
 		// remove current content and set mode
 		clear(programElement.attribute("advanced_mode", "false").toInt());
-		
+
 		// deserialize
 		QDomElement element(programElement.firstChildElement());
 		while (!element.isNull())
@@ -305,14 +305,14 @@ namespace Aseba { namespace ThymioVPL
 			{
 				addEventActionsSet(element);
 			}
-			
+
 			element = element.nextSiblingElement();
 		}
-		
+
 		// reset visuals
 		ensureOneEmptySetAtEnd();
 	}
-	
+
 	//! Serialize to string through DOM document
 	QString Scene::toString() const
 	{
@@ -320,7 +320,7 @@ namespace Aseba { namespace ThymioVPL
 		document.appendChild(serialize(document));
 		return document.toString();
 	}
-	
+
 	//! Deserialize from string through DOM document
 	void Scene::fromString(const QString& text)
 	{
@@ -332,54 +332,54 @@ namespace Aseba { namespace ThymioVPL
 	void Scene::removeSet(int row)
 	{
 		Q_ASSERT( row < eventActionsSets.size() );
-		
+
 		EventActionsSet *p(eventActionsSets[row]);
 		disconnect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		eventActionsSets.removeAt(row);
-		
+
 		removeItem(p);
 		p->deleteLater();
-		
+
 		rearrangeSets(row);
-		
+
 		ensureOneEmptySetAtEnd();
-		
+
 		recomputeSceneRect();
-	
+
 		recompile();
 		USAGE_LOG(logRemoveSet(row));
 		emit undoCheckpoint();
 	}
-	
-	void Scene::insertSet(int row) 
+
+	void Scene::insertSet(int row)
 	{
 		Q_ASSERT( row <= eventActionsSets.size() );
 
 		EventActionsSet *p(new EventActionsSet(row, advancedMode));
 		eventActionsSets.insert(row, p);
-		
+
 		addItem(p);
-		
+
 		connect(p, SIGNAL(contentChanged()), this, SLOT(recompile()));
 		connect(p, SIGNAL(undoCheckpoint()), this, SIGNAL(undoCheckpoint()));
-		
+
 		rearrangeSets(row+1);
 		relayout();
-		
+
 		recompile();
 		USAGE_LOG(logInsertSet(row));
-		
+
 		emit undoCheckpoint();
-		
+
 		p->setSoleSelection();
-		
+
 		QGraphicsView* view;
 		foreach (view, views())
 			view->ensureVisible(p);
 
 		setModified(true);
 	}
-	
+
 	void Scene::recomputeSceneRect()
 	{
 		QRectF r;
@@ -391,7 +391,7 @@ namespace Aseba { namespace ThymioVPL
 		setSceneRect(r.adjusted(-(40+errorGraphicsItem->boundingRect().width()+40),-40,40,Style::addRemoveButtonHeight+Style::blockSpacing+40));
 		emit sceneSizeChanged();
 	}
-	
+
 	//! Is a set, given by its id, the last non-empty set of the scene?
 	bool Scene::isSetLast(unsigned setId) const
 	{
@@ -402,7 +402,7 @@ namespace Aseba { namespace ThymioVPL
 				return false;
 		return true;
 	}
-	
+
 	/*void Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		Scene::dragEnterEvent(event);
@@ -412,7 +412,7 @@ namespace Aseba { namespace ThymioVPL
 			event->accept();
 		}
 	}
-	
+
 	void Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		Scene::dragMoveEvent(event);
@@ -422,7 +422,7 @@ namespace Aseba { namespace ThymioVPL
 			event->accept();
 		}
 	}
-	
+
 	void Scene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	{
 		Scene::dropEvent(event);
@@ -432,7 +432,7 @@ namespace Aseba { namespace ThymioVPL
 			event->accept();
 		}
 	}
-	
+
 	bool Scene::isDnDValid(QGraphicsSceneDragDropEvent *event) const
 	{
 		if (event->mimeData()->hasFormat("EventActionsSet") ||
@@ -447,37 +447,37 @@ namespace Aseba { namespace ThymioVPL
 
 	void Scene::rearrangeSets(int row)
 	{
-		for(int i=row; i<eventActionsSets.size(); ++i) 
+		for(int i=row; i<eventActionsSets.size(); ++i)
 			eventActionsSets.at(i)->setRow(i);
 	}
-	
+
 	void Scene::relayout()
 	{
 		for(SetItr itr(setsBegin()); itr != setsEnd(); ++itr)
 			(*itr)->repositionElements();
 		recomputeSceneRect();
 	}
-	
+
 	QList<QString> Scene::getCode() const
 	{
 		QList<QString> out;
-		
+
 		for (std::vector<std::wstring>::const_iterator itr = compiler.beginCode();
 			itr != compiler.endCode(); ++itr)
 			out.push_back(QString::fromStdWString(*itr));
-	
+
 		return out;
 	}
 
-	int Scene::getSelectedSetCodeId() const 
-	{ 
+	int Scene::getSelectedSetCodeId() const
+	{
 		EventActionsSet* selectedSet(getSelectedSet());
 		if (selectedSet)
 			return compiler.getSetToCodeIdMap(selectedSet->getRow());
 		else
 			return -1;
 	}
-	
+
 	EventActionsSet *Scene::getSelectedSet() const
 	{
 		if (selectedItems().empty())
@@ -491,28 +491,28 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return 0;
 	}
-	
+
 	EventActionsSet *Scene::getSetRow(int row) const
 	{
 		return eventActionsSets.at(row);
 	}
-	
+
 	void Scene::recompile()
 	{
 		setModified(true);
 		recompileWithoutSetModified();
 	}
-	
+
 	void Scene::recompileWithoutSetModified()
 	{
 		//qDebug() << "recompiling";
 		lastCompilationResult = compiler.compile(this);
-		
+
 		const bool isWarning(
 			isSetLast(lastCompilationResult.errorLine) &&
 			((lastCompilationResult.errorType == Compiler::MISSING_ACTION) || (lastCompilationResult.errorType == Compiler::MISSING_EVENT))
 		);
-		
+
 		warningGraphicsItem->setVisible(isWarning);
 		errorGraphicsItem->setVisible(!isWarning && lastCompilationResult.errorLine != -1);
 		referredGraphicsItem->setVisible(lastCompilationResult.referredLine != -1);
@@ -550,7 +550,7 @@ namespace Aseba { namespace ThymioVPL
 		if (warningEventActionsSet)
 		{
 			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
-			
+
 			qreal errorY(warningEventActionsSet->scenePos().y() + warningEventActionsSet->innerBoundingRect().height() / 2);
 			qreal oldPosY(warningGraphicsItem->pos().y());
 			warningGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
@@ -560,13 +560,13 @@ namespace Aseba { namespace ThymioVPL
 		if (errorEventActionsSet)
 		{
 			QSizeF errorSize(errorGraphicsItem->boundingRect().size());
-			
+
 			qreal errorY(errorEventActionsSet->scenePos().y() + errorEventActionsSet->innerBoundingRect().height() / 2);
 			qreal oldPosY(errorGraphicsItem->pos().y());
 			errorGraphicsItem->setPos(-(errorSize.width() + 40), errorY - errorSize.height() / 2);
 			if (errorGraphicsItem->pos().y() != oldPosY)
 				forceUpdate = true;
-			
+
 			if (referredEventActionsSet)
 			{
 				qreal referredY(referredEventActionsSet->scenePos().y() + referredEventActionsSet->innerBoundingRect().height() / 2);
@@ -574,14 +574,14 @@ namespace Aseba { namespace ThymioVPL
 				referredGraphicsItem->setPos(-(errorSize.width() + 40), referredY - errorSize.height() / 2);
 				if (referredGraphicsItem->pos().y() != oldPosY)
 					forceUpdate = true;
-				
+
 				referredLineItem->setLine(-(errorSize.width() / 2 + 40), referredY + errorSize.height() / 2 + 10, -(errorSize.width() / 2 + 40), errorY - errorSize.height() / 2 - 10);
 			}
 		}
-		
+
 		if (forceUpdate)
 			update();
-		
+
 		emit contentRecompiled();
 	}
 } } // namespace ThymioVPL / namespace Aseba

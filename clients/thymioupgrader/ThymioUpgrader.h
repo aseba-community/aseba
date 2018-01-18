@@ -23,33 +23,33 @@ namespace Aseba
 {
 	/** \addtogroup thymioupdater */
 	/*@{*/
-	
+
 	class MessageHub;
-	
+
 	class QtBootloaderInterface:public QObject, public BootloaderInterface
 	{
 		Q_OBJECT
-		
+
 	public:
 		QtBootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
-		
+
 	protected:
 		virtual void writeHexGotDescription(unsigned pagesCount);
 		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple);
 		virtual void errorWritePageNonFatal(unsigned pageNumber);
-	
+
 	protected:
 		unsigned pagesCount;
 		unsigned pagesDoneCount;
-		
+
 	signals:
 		void flashProgress(int percentage);
 	};
-	
+
 	class ThymioUpgraderDialog : public QWidget
 	{
 		Q_OBJECT
-		
+
 	private:
 		struct FlashResult
 		{
@@ -61,20 +61,20 @@ namespace Aseba
 			} status;
 			QString title;
 			QString text;
-			
+
 			FlashResult():status(SUCCESS) {}
 			FlashResult(Status status, const QString& title, const QString& text):status(status), title(title), text(text) {}
 		};
-		
+
 	private:
 		std::string target;
-		
+
 		unsigned currentVersion;
 		unsigned currentDevStatus;
 		unsigned officialVersion;
 		unsigned officialDevStatus;
 		QTemporaryFile  officialHexFile;
-		
+
 		QGroupBox* officialGroupBox;
 		QGroupBox* fileGroupBox;
 		QVBoxLayout* mainLayout;
@@ -95,7 +95,7 @@ namespace Aseba
 	public:
 		ThymioUpgraderDialog(const std::string& target);
 		~ThymioUpgraderDialog();
-		
+
 	private:
 		unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
 		void readIdVersion();
@@ -104,7 +104,7 @@ namespace Aseba
 		QString versionDevStatusToString(unsigned version, unsigned devStatus) const;
 		void selectOfficialFirmware();
 		void selectUserFirmware();
-	
+
 	private slots:
 		void officialGroupChecked(bool on);
 		void fileGroupChecked(bool on);
@@ -115,7 +115,7 @@ namespace Aseba
 		void flashFinished();
 		void networkReplyFinished(QNetworkReply*);
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -78,26 +78,26 @@ namespace Aseba
 		Node(sourcePos),
 		eventId(eventId)
 	{
-	
+
 	}
-	
+
 	//! Constructor
 	SubDeclNode::SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId) :
 		Node(sourcePos),
 		subroutineId(subroutineId)
 	{
-	
+
 	}
-	
+
 	//! Constructor
 	CallSubNode::CallSubNode(const SourcePos& sourcePos, std::wstring  subroutineName) :
 		Node(sourcePos),
 		subroutineName(std::move(subroutineName)),
 		subroutineId(-1)
 	{
-	
+
 	}
-	
+
 	//! Constructor
 	BinaryArithmeticNode::BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right) :
 		Node(sourcePos),
@@ -106,7 +106,7 @@ namespace Aseba
 		children.push_back(left);
 		children.push_back(right);
 	}
-	
+
 	//! Create a binary arithmetic node for comparaison operation op
 	BinaryArithmeticNode *BinaryArithmeticNode::fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right)
 	{
@@ -117,7 +117,7 @@ namespace Aseba
 			right
 		);
 	}
-	
+
 	//! Create a binary arithmetic node for shift operation op
 	BinaryArithmeticNode *BinaryArithmeticNode::fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right)
 	{
@@ -128,7 +128,7 @@ namespace Aseba
 			right
 		);
 	}
-	
+
 	//! Create a binary arithmetic node for add/sub operation op
 	BinaryArithmeticNode *BinaryArithmeticNode::fromAddExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right)
 	{
@@ -139,7 +139,7 @@ namespace Aseba
 			right
 		);
 	}
-	
+
 	//! Create a binary arithmetic node for mult/div/mod operation op
 	BinaryArithmeticNode *BinaryArithmeticNode::fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right)
 	{
@@ -161,7 +161,7 @@ namespace Aseba
 			right
 		);
 	}
-	
+
 	//! Constructor
 	UnaryArithmeticNode::UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child) :
 		Node(sourcePos),
@@ -169,7 +169,7 @@ namespace Aseba
 	{
 		children.push_back(child);
 	}
-	
+
 	//! Constructor
 	ArrayWriteNode::ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName) :
 		Node(sourcePos),
@@ -177,9 +177,9 @@ namespace Aseba
 		arraySize(arraySize),
 		arrayName(std::move(arrayName))
 	{
-	
+
 	}
-	
+
 	//! Constructor
 	ArrayReadNode::ArrayReadNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName) :
 		Node(sourcePos),
@@ -187,9 +187,9 @@ namespace Aseba
 		arraySize(arraySize),
 		arrayName(std::move(arrayName))
 	{
-	
+
 	}
-	
+
 	//! Constructor, delete the provided memoryNode
 	LoadNativeArgNode::LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr):
 		Node(memoryNode->sourcePos),
@@ -203,7 +203,7 @@ namespace Aseba
 		assert(memoryNode->children.size() == 1);
 		assert(memoryNode->children[0]);
 		assert(!dynamic_cast<TupleVectorNode*>(memoryNode->children[0]));
-		
+
 		// get the child from memoryNode
 		children.push_back(memoryNode->children[0]);
 		memoryNode->children[0] = nullptr;
@@ -220,13 +220,13 @@ namespace Aseba
 	{
 
 	}
-	
+
 	//! Constructor
 	CallNode::CallNode(const SourcePos& sourcePos, unsigned funcId) :
 		Node(sourcePos),
 		funcId(funcId)
 	{
-	
+
 	}
 
 	//! Constructor
@@ -269,7 +269,7 @@ namespace Aseba
 
 		children.push_back(memory);
 	}
-	
+
 	/*@}*/
-	
+
 } // namespace Aseba

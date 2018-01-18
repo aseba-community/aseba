@@ -1,7 +1,7 @@
 /*
  asebahttp - a switch to bridge HTTP to Aseba
  2014-12-01 David James Sherman <david dot sherman at inria dot fr>
- 
+
  Provide a simple REST interface with introspection for Aseba devices.
 
  Unit tests:
@@ -56,7 +56,7 @@ TEST_CASE( "HttpRequest using default constructor", "[init]" ) {
 
 SCENARIO( "HttpRequest should be initialized", "[init]" ) {
     Dashel::Stream* cxn = dummy->instream;
-    
+
     GIVEN( "HttpRequest initialized by string" ) {
         req.initialize("GET /uri/a/b/c HTTP/1.1\r\n", cxn);
         REQUIRE( req.method.find("GET")==0 );

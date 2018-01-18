@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -57,13 +57,13 @@ namespace Aseba { namespace ThymioVPL
 	{
 		colors.push_back(qMakePair(initBrushColor, initPenColor));
 	}
-	
+
 	//! Return the number of states
 	unsigned GeometryShapeButton::valuesCount() const
 	{
 		return colors.size();
 	}
-	
+
 	void GeometryShapeButton::setValue(int state)
 	{
 		if (state < colors.size())
@@ -72,7 +72,7 @@ namespace Aseba { namespace ThymioVPL
 			update();
 		}
 	}
-	
+
 	void GeometryShapeButton::setStateCountLimit(int limit)
 	{
 		stateCountLimit = limit;
@@ -82,17 +82,17 @@ namespace Aseba { namespace ThymioVPL
 			emit stateChanged();
 		}
 	}
-	
+
 	void GeometryShapeButton::addState(const QColor& brushColor, const QColor& penColor)
 	{
 		colors.push_back(qMakePair(brushColor, penColor));
 	}
-	
+
 	void GeometryShapeButton::paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
 	{
 		painter->setBrush(colors[curState].first);
 		painter->setPen(QPen(colors[curState].second, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)); // outline
-		
+
 		switch (buttonType)
 		{
 			case CIRCULAR_BUTTON:
@@ -127,14 +127,14 @@ namespace Aseba { namespace ThymioVPL
 
 	void GeometryShapeButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
-		if( event->button() == Qt::LeftButton ) 
+		if( event->button() == Qt::LeftButton )
 		{
 			if( toggleState )
 			{
 				int stateCount(stateCountLimit > 0 ? qMin(colors.size(), stateCountLimit) : colors.size());
 				curState = (curState + 1) % stateCount;
 			}
-			else 
+			else
 			{
 				curState = 1;
 				for( QList<GeometryShapeButton*>::iterator itr = siblings.begin();
@@ -145,15 +145,15 @@ namespace Aseba { namespace ThymioVPL
 			emit stateChanged();
 		}
 	}
-	
-	
-	AddRemoveButton::AddRemoveButton(bool add, QGraphicsItem *parent) : 
+
+
+	AddRemoveButton::AddRemoveButton(bool add, QGraphicsItem *parent) :
 		QGraphicsObject(parent),
 		add(add)
 	{
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
-	
+
 	void AddRemoveButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
@@ -178,29 +178,29 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawLine(hx+-11,hy+11,hx+11,hy+-11);
 		}
 	}
-	
+
 	QRectF AddRemoveButton::boundingRect() const
 	{
 		return QRectF(0, 0, Style::addRemoveButtonWidth, Style::addRemoveButtonHeight);
 	}
-	
+
 	void AddRemoveButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
 	}
-	
-	void AddRemoveButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
+
+	void AddRemoveButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 	{
 		if (boundingRect().contains(event->pos()))
 			emit clicked();
 	}
-	
-	
-	RemoveBlockButton::RemoveBlockButton(QGraphicsItem *parent) : 
+
+
+	RemoveBlockButton::RemoveBlockButton(QGraphicsItem *parent) :
 		QGraphicsObject(parent)
 	{
 		setAcceptedMouseButtons(Qt::LeftButton);
 	}
-	
+
 	void RemoveBlockButton::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
@@ -217,53 +217,53 @@ namespace Aseba { namespace ThymioVPL
 		painter->drawLine(hx+-11,hy+-11,hx+11,hy+11);
 		painter->drawLine(hx+-11,hy+11,hx+11,hy+-11);
 	}
-	
+
 	QRectF RemoveBlockButton::boundingRect() const
 	{
 		return QRectF(0, 0, Style::removeBlockButtonWidth, Style::removeBlockButtonHeight);
 	}
-	
+
 	void RemoveBlockButton::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	{
 	}
-	
-	void RemoveBlockButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) 
+
+	void RemoveBlockButton::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 	{
 		if (boundingRect().contains(event->pos()))
 			emit clicked();
 	}
-	
-	
-	BlockButton::BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) : 
-		QPushButton(parent), 
+
+
+	BlockButton::BlockButton(const QString& name, ThymioVisualProgramming* vpl, QWidget *parent) :
+		QPushButton(parent),
 		block(Block::createBlock(name)),
 		vpl(vpl)
 	{
 		setToolTip(block->getTranslatedName());
-		
+
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-		
+
 		setStyleSheet("QPushButton {border: none; }");
-		
+
 		updateBlockImage(false);
-		
+
 		setAcceptDrops(true);
 	}
-	
+
 	BlockButton::~BlockButton()
 	{
 		assert(block);
-		delete(block); 
+		delete(block);
 	}
-	
+
 	QString BlockButton::getName() const
 	{
 		assert(block);
 		return block->getName();
 	}
-	
+
 	//! Re-render the block image
-	void BlockButton::updateBlockImage(bool advanced) 
+	void BlockButton::updateBlockImage(bool advanced)
 	{
 		block->setAdvanced(advanced);
 		setIcon(QPixmap::fromImage(block->image(1.)));
@@ -273,7 +273,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		#ifndef ANDROID
 		assert(block);
-		
+
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(block->mimeData());
 		drag->setPixmap(QPixmap::fromImage(block->translucidImage(vpl->getViewScale())));

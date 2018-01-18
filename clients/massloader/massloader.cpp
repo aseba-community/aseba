@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -34,36 +34,36 @@
 #include <QFile>
 #include <QDomDocument>
 
-namespace Aseba 
+namespace Aseba
 {
 	using namespace Dashel;
 	using namespace std;
-	
+
 	class MassLoader: public Hub, public NodesManager
 	{
 	protected:
 		QString fileName;
 		bool once;
 		Stream* stream;
-		
+
 	public:
 		MassLoader(const QString& fileName, bool once):fileName(fileName),once(once),stream(nullptr) {}
 		void loadToTarget(const std::string& target);
-		
+
 	protected:
 		// from Hub
 		virtual void connectionCreated(Stream *stream);
 		virtual void incomingData(Stream *stream);
 		virtual void connectionClosed(Stream *stream, bool abnormal);
-	
+
 		// from NodesManager
 		virtual void sendMessage(const Message& message);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
-		
+
 		// self
 		void waitMs(int duration);
 	};
-	
+
 	void MassLoader::loadToTarget(const std::string& target)
 	{
 		bool first(true);
@@ -73,7 +73,7 @@ namespace Aseba
 				first = false;
 			else
 				UnifiedTime(100).sleep();
-			
+
 			try
 			{
 				// attempt to open stream
@@ -81,15 +81,15 @@ namespace Aseba
 				// verify that stream is valid
 				if (!stream)
 					continue;
-				
+
 				// TODO: make this timeout a parameter
 				// wait 1 s
 				waitMs(1000);
-				
+
 				// verify that stream is still valid
 				if (!stream)
 					continue;
-				
+
 				// requests descriptions
 				pingNetwork();
 				// then run
@@ -108,15 +108,15 @@ namespace Aseba
 			{
 				// ignore Dsahel exceptions
 			}
-			
+
 		}
 	}
-	
+
 	void MassLoader::connectionCreated(Stream *stream)
 	{
 		//cerr << "Connection created to " << stream->getTargetName() << endl;
 	}
-	
+
 	void MassLoader::incomingData(Stream *stream)
 	{
 		try
@@ -134,7 +134,7 @@ namespace Aseba
 			wcerr << L"Error while reading data: " << e.what() << endl;
 		}
 	}
-	
+
 	void MassLoader::connectionClosed(Stream *stream, bool abnormal)
 	{
 		//cerr << "Connection closed to " << stream->getTargetName() << endl;
@@ -143,21 +143,21 @@ namespace Aseba
 		stop();
 		reset();
 	}
-	
+
 	void MassLoader::sendMessage(const Message& message)
 	{
 		message.serialize(stream);
 		stream->flush();
 	}
-	
+
 	void MassLoader::nodeDescriptionReceived(unsigned nodeId)
 	{
 		//cerr << "Description received" << endl;
 		assert(stream);
-		
+
 		// we have a new node description, load file to see if there is code for it
 		CommonDefinitions commonDefinitions;
-		
+
 		// open file
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))
@@ -175,7 +175,7 @@ namespace Aseba
 			wcerr << QString("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn).toStdWString() << endl;
 			return;
 		}
-		
+
 		// FIXME: this code depends on event and contants being before any code
 		QDomNode domNode = document.documentElement().firstChild();
 		while (!domNode.isNull())
@@ -193,12 +193,12 @@ namespace Aseba
 						Error error;
 						BytecodeVector bytecode;
 						unsigned allocatedVariablesCount;
-						
+
 						Compiler compiler;
 						compiler.setTargetDescription(getDescription(nodeId));
 						compiler.setCommonDefinitions(&commonDefinitions);
 						bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
-						
+
 						if (result)
 						{
 							sendBytecode(stream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
@@ -237,7 +237,7 @@ namespace Aseba
 			domNode = domNode.nextSibling();
 		}
 	}
-	
+
 	void MassLoader::waitMs(int duration)
 	{
 		UnifiedTime now;
@@ -255,22 +255,22 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
 	Dashel::initPlugins();
-	
+
 	QString target(ASEBA_DEFAULT_TARGET);
-	
+
 	if (app.arguments().size() < 2)
 	{
 		std::wcerr << L"Usage: " << app.arguments().first().toStdWString() << L" [--once] filename [target]" << std::endl;
 		return 1;
 	}
-	
+
 	const bool once = (app.arguments().at(1) == "--once");
 	const int fileNameArgPos(once ? 2 : 1);
 	const int targeetArgPos(once ? 3 : 2);
-	
+
 	if (app.arguments().size() > targeetArgPos)
 		target = app.arguments().at(targeetArgPos);
-	
+
 	Aseba::MassLoader massLoader(app.arguments().at(fileNameArgPos), once);
 	massLoader.loadToTarget(target.toStdString());
 	return 0;

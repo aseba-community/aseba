@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -33,26 +33,26 @@ namespace Aseba
 {
 	using namespace Dashel;
 	using namespace std;
-	
+
 	/**
 	\defgroup play Message replayer
 	*/
 	/*@{*/
-	
+
 	//! A message player
 	//! This class replay saved user messages
 	class Player : public Hub
 	{
 	private:
 		typedef deque<string> StringList;
-		
+
 		bool respectTimings;
 		int speedFactor;
 		Stream* in;
 		string line;
 		UnifiedTime lastTimeStamp;
 		UnifiedTime lastEventTime;
-	
+
 	public:
 		Player(const char* inputFile, bool respectTimings, int speedFactor) :
 			respectTimings(respectTimings),
@@ -64,12 +64,12 @@ namespace Aseba
 			else
 				in = connect("stdin:");
 		}
-		
+
 		StringList tokenize(const string& input)
 		{
 			StringList list;
 			const size_t inputSize(input.size());
-			
+
 			size_t pos(0);
 			while ((pos != string::npos) && (pos < inputSize))
 			{
@@ -83,37 +83,37 @@ namespace Aseba
 					list.push_back(word);
 				pos = next + 1;
 			}
-			
+
 			return list;
 		}
-		
+
 		void sendLine()
 		{
 			// parse line
 			StringList tokenizedLine(tokenize(line));
-			
+
 			UnifiedTime timeStamp(UnifiedTime::fromRawTimeString(tokenizedLine.front()));
 			tokenizedLine.pop_front();
-			
+
 			const uint16_t source = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
-			
+
 			const uint16_t type = strtol(tokenizedLine.front().c_str(), 0, 16);
 			tokenizedLine.pop_front();
-			
+
 			Message::SerializationBuffer buffer;
 			buffer.rawData.reserve(atoi(tokenizedLine.front().c_str()));
 			tokenizedLine.pop_front();
-			
+
 			while (!tokenizedLine.empty())
 			{
 				buffer.rawData.push_back(strtol(tokenizedLine.front().c_str(), 0, 16));
 				tokenizedLine.pop_front();
 			}
-			
+
 			// build message
 			Message* message(Message::create(source, type, buffer));
-			
+
 			// if required, sleep
 			if ((respectTimings) && (lastTimeStamp.value != 0))
 			{
@@ -126,7 +126,7 @@ namespace Aseba
 					waitTime.sleep();
 				}
 			}
-			
+
 			// write message on all connected streams
 			for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 			{
@@ -137,21 +137,21 @@ namespace Aseba
 					destStream->flush();
 				}
 			}
-			
+
 			lastEventTime = UnifiedTime();
 			lastTimeStamp = timeStamp;
-			
+
 			line.clear();
 			delete message;
 		}
-		
+
 	protected:
-		
+
 		void connectionCreated(Stream *stream)
 		{
 			//cerr << "got connection " << stream->getTargetName()  << endl;
 		}
-		
+
 		void incomingData(Stream *stream)
 		{
 			char c(stream->read<char>());
@@ -163,14 +163,14 @@ namespace Aseba
 					line += c;
 			}
 		}
-		
+
 		void connectionClosed(Stream *stream, bool abnormal)
 		{
 			if (stream == in)
 				stop();
 		}
 	};
-	
+
 	/*@}*/
 }
 
@@ -206,13 +206,13 @@ int main(int argc, char *argv[])
 	int speedFactor = 1;
 	std::vector<std::string> targets;
 	const char* inputFile = 0;
-	
+
 	int argCounter = 1;
-	
+
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
-		
+
 		if (strcmp(arg, "--fastest") == 0)
 		{
 			respectTimings = false;
@@ -252,10 +252,10 @@ int main(int argc, char *argv[])
 		}
 		argCounter++;
 	}
-	
+
 	if (targets.empty())
 		targets.push_back(ASEBA_DEFAULT_TARGET);
-	
+
 	try
 	{
 		Aseba::Player player(inputFile, respectTimings, speedFactor);
@@ -267,6 +267,6 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	
+
 	return 0;
 }

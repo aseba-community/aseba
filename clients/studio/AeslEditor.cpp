@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -28,13 +28,13 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	AeslHighlighter::AeslHighlighter(AeslEditor *editor, QTextDocument *parent) :
 		QSyntaxHighlighter(parent),
 		editor(editor)
 	{
 		HighlightingRule rule;
-		
+
 		// keywords
 		QTextCharFormat keywordFormat;
 		keywordFormat.setForeground(Qt::darkRed);
@@ -52,14 +52,14 @@ namespace Aseba
 			rule.format = keywordFormat;
 			highlightingRules.append(rule);
 		}
-		
+
 		// literals
 		QTextCharFormat literalsFormat;
 		literalsFormat.setForeground(Qt::darkBlue);
 		rule.pattern = QRegExp("\\b(-{0,1}\\d+|0x([0-9]|[a-f]|[A-F])+|0b[0-1]+)\\b");
 		rule.format = literalsFormat;
 		highlightingRules.append(rule);
-		
+
 		// comments #
 		QTextCharFormat commentFormat;
 		commentFormat.setForeground(Qt::darkGreen);
@@ -75,7 +75,7 @@ namespace Aseba
 		rule.pattern = QRegExp("#\\*.*\\*#");
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
-		
+
 		// multilines block of comments #* ... [\n]* ... *#
 		commentBlockRules.begin = QRegExp("#\\*(?!.*\\*#)");    // '#*' with no corresponding '*#'
 		commentBlockRules.end = QRegExp(".*\\*#");
@@ -89,17 +89,17 @@ namespace Aseba
 		rule.format = todoFormat;
 		highlightingRules.append(rule);
 	}
-	
+
 	void AeslHighlighter::highlightBlock(const QString &text)
 	{
 		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(currentBlockUserData());
-		
+
 		// current line background blue
 		bool isActive = uData && uData->properties.contains("active");
 		bool isExecutionError = uData && uData->properties.contains("executionError");
 		bool isBreakpointPending = uData && uData->properties.contains("breakpointPending");
 		bool isBreakpoint = uData && uData->properties.contains("breakpoint");
-		
+
 		QColor breakpointPendingColor(255, 240, 178);
 		QColor breakpointColor(255, 211, 178);
 		QColor activeColor(220, 220, 255);
@@ -130,12 +130,12 @@ namespace Aseba
 			if (isExecutionError)
 				selection.format.setBackground(errorColor);
 		}
-		
+
 		// we are done
 		extraSelections.append(selection);
 		editor->setExtraSelections(extraSelections);
 		*/
-		
+
 		// This is backup code in case the ExtraSelection creates trashes
 		QColor specialBackground("white");
 		if (isBreakpointPending)
@@ -155,7 +155,7 @@ namespace Aseba
 			format.setBackground(specialBackground);
 			setFormat(0, text.length(), format);
 		}
-		
+
 		// syntax highlight
 		foreach (HighlightingRule rule, highlightingRules)
 		{
@@ -165,16 +165,16 @@ namespace Aseba
 			{
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
-				
+
 				// This is backup code in case the ExtraSelection creates trashes
 				if (specialBackground != "white")
 					format.setBackground(specialBackground);
-				
+
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
 			}
 		}
-		
+
 		// Prepare the format for multilines comment block
 		int index;
 		QTextCharFormat format = commentBlockRules.format;
@@ -334,7 +334,7 @@ namespace Aseba
 		painter.setPen(Qt::darkGray);
 		// set font from editor
 		painter.setFont(editor->font());
-		
+
 		// iterate over all text blocks
 		// FIXME: do clever painting
 		while(block.isValid())
@@ -371,13 +371,13 @@ namespace Aseba
 		AeslEditorSidebar(editor),
 		borderSize(1)
 	{
-		
+
 	}
 
 	void AeslBreakpointSidebar::paintEvent(QPaintEvent *event)
 	{
 		AeslEditorSidebar::paintEvent(event);
-		
+
 		// define the breakpoint geometry, according to the font metrics from the editor
 		const int lineSpacing = editor->fontMetrics().lineSpacing();
 		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
@@ -479,7 +479,7 @@ namespace Aseba
 		completer->setCompletionMode(QCompleter::PopupCompletion);
 		QObject::connect(completer, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
 	}
-	
+
 	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )
 	{
 		// create menu
@@ -488,22 +488,22 @@ namespace Aseba
 		{
 			QAction *breakpointAction;
 			menu->addSeparator();
-			
+
 			// check for breakpoint
 			QTextBlock block = cursorForPosition(e->pos()).block();
 			//AeslEditorUserData *uData = polymorphic_downcast<AeslEditorUserData *>(block.userData());
 			bool breakpointPresent = isBreakpoint(block);
-			
+
 			// add action
 			if (breakpointPresent)
 				breakpointAction = menu->addAction(tr("Clear breakpoint"));
 			else
 				breakpointAction = menu->addAction(tr("Set breakpoint"));
 			QAction *breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
-			
+
 			// execute menu
 			QAction* selectedAction = menu->exec(e->globalPos());
-			
+
 			// do actions
 			if (selectedAction == breakpointAction)
 			{
@@ -671,7 +671,7 @@ namespace Aseba
 		// end of editing block
 		cursor.endEditBlock();
 	}
-	
+
 	//! Replace current code using a sequence of elements (each can be multiple sloc) and highlight one of these elements
 	void AeslEditor::replaceAndHighlightCode(const QList<QString>& code, int elementToHighlight)
 	{
@@ -682,7 +682,7 @@ namespace Aseba
 		cursor.removeSelectedText();
 		int posStart = 0;
 		int posEnd =0;
-		
+
 		for (int i=0; i<code.size(); i++)
 		{
 			if (i == elementToHighlight)
@@ -691,14 +691,14 @@ namespace Aseba
 				posStart = cursor.position();
 				cursor.insertText(code[i], format);
 				posEnd = cursor.position();
-			} 
+			}
 			else
 			{
 				format.setBackground(QBrush(Qt::white));
 				cursor.insertText(code[i], format);
 			}
 		}
-		
+
 		cursor.endEditBlock();
 		cursor.setPosition(posEnd);
 		setTextCursor(cursor);
@@ -706,7 +706,7 @@ namespace Aseba
 		setTextCursor(cursor);
 		ensureCursorVisible();
 	}
-	
+
 	void AeslEditor::wheelEvent(QWheelEvent * event)
 	{
 		// handle zooming of text
@@ -973,6 +973,6 @@ namespace Aseba
 		completer->setCompletionRole(Qt::DisplayRole);
 	}
 
-	
+
 	/*@}*/
 } // namespace Aseba

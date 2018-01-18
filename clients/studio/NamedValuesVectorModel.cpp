@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -27,7 +27,7 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
@@ -37,7 +37,7 @@ namespace Aseba
 	{
 		Q_ASSERT(namedValues);
 	}
-	
+
 	NamedValuesVectorModel::NamedValuesVectorModel(NamedValuesVector* namedValues, QObject *parent) :
 		QAbstractTableModel(parent),
 		namedValues(namedValues),
@@ -46,24 +46,24 @@ namespace Aseba
 	{
 		Q_ASSERT(namedValues);
 	}
-	
+
 	int NamedValuesVectorModel::rowCount(const QModelIndex & parent) const
 	{
 		Q_UNUSED(parent)
 		return namedValues->size();
 	}
-	
+
 	int NamedValuesVectorModel::columnCount(const QModelIndex & parent) const
 	{
 		Q_UNUSED(parent)
 		return 2;
 	}
-	
+
 	QVariant NamedValuesVectorModel::data(const QModelIndex &index, int role) const
 	{
 		if (!index.isValid())
 			return QVariant();
-		
+
 		if (role == Qt::DisplayRole || role == Qt::EditRole)
 		{
 			if (index.column() == 0)
@@ -78,7 +78,7 @@ namespace Aseba
 		else
 			return QVariant();
 	}
-	
+
 	QVariant NamedValuesVectorModel::headerData(int section, Qt::Orientation orientation, int role) const
 	{
 		Q_UNUSED(section)
@@ -86,7 +86,7 @@ namespace Aseba
 		Q_UNUSED(role)
 		return QVariant();
 	}
-	
+
 	Qt::ItemFlags NamedValuesVectorModel::flags(const QModelIndex & index) const
 	{
 		if (!index.isValid())
@@ -112,7 +112,7 @@ namespace Aseba
 			types << privateMimeType;
 		return types;
 	}
-	
+
 	QMimeData * NamedValuesVectorModel::mimeData ( const QModelIndexList & indexes ) const
 	{
 		QMimeData *mimeData = new QMimeData();
@@ -181,7 +181,7 @@ namespace Aseba
 	{
 		return Qt::CopyAction | Qt::MoveAction;
 	}
-	
+
 	bool NamedValuesVectorModel::setData(const QModelIndex &index, const QVariant &value, int role)
 	{
 		Q_ASSERT(namedValues);
@@ -235,21 +235,21 @@ namespace Aseba
 		wasModified = true;
 		emit publicRowsInserted();
 	}
-	
+
 	void NamedValuesVectorModel::delNamedValue(int index)
 	{
 		Q_ASSERT(namedValues);
 		Q_ASSERT(index < (int)namedValues->size());
-		
+
 		beginRemoveRows(QModelIndex(), index, index);
-		
+
 		namedValues->erase(namedValues->begin() + index);
 		wasModified = true;
-		
+
 		endRemoveRows();
 		emit publicRowsRemoved();
 	}
-	
+
 	bool NamedValuesVectorModel::moveRow(int oldRow, int& newRow)
 	{
 		if (oldRow == newRow || namedValues->size() <= 1)
@@ -272,55 +272,55 @@ namespace Aseba
 	void NamedValuesVectorModel::clear()
 	{
 		Q_ASSERT(namedValues);
-		
+
 		if (namedValues->size() == 0)
 			return;
-		
+
 		beginRemoveRows(QModelIndex(), 0, namedValues->size()-1);
-		
+
 		namedValues->clear();
 		wasModified = true;
 
 		endRemoveRows();
 	}
-	
+
 	//! Validate name, returns true if valid, false and displays an error message otherwise
 	bool NamedValuesVectorModel::validateName(const QString& name) const
 	{
 		return true;
 	}
-	
+
 	// ****************************************************************************** //
-	
+
 	ConstantsModel::ConstantsModel(NamedValuesVector* namedValues, const QString &tooltipText, QObject *parent):
 		NamedValuesVectorModel(namedValues, tooltipText, parent)
 	{
-		
+
 	}
-	
+
 	ConstantsModel::ConstantsModel(NamedValuesVector* namedValues, QObject *parent):
 		NamedValuesVectorModel(namedValues, parent)
 	{
-		
+
 	}
-	
+
 	//! Name is valid if not already existing and not a keyword
 	bool ConstantsModel::validateName(const QString& name) const
 	{
 		Q_ASSERT(namedValues);
-		
+
 		if (namedValues->contains(name.toStdWString()))
 		{
 			QMessageBox::warning(0, tr("Constant already defined"), tr("Constant %0 is already defined.").arg(name));
 			return false;
 		}
-		
+
 		if (Compiler::isKeyword(name.toStdWString()))
 		{
 			QMessageBox::warning(0, tr("The name is a keyword"), tr("The name <tt>%0</tt> cannot be used as a constant, because it is a language keyword.").arg(name));
 			return false;
 		}
-		
+
 		return true;
 	}
 

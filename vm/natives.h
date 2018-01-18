@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -53,7 +53,7 @@ typedef struct
 /*! Description of all variable */
 typedef struct
 {
-	const char* name;		/*!< name of the microcontroller */	
+	const char* name;		/*!< name of the microcontroller */
 	AsebaVariableDescription variables[];	/*!< named variables, terminated by a variable of size 0 */
 } AsebaVMDescription;
 
@@ -75,7 +75,7 @@ typedef struct
 } AsebaNativeFunctionArgumentDescription;
 
 /*! Description of a native function */
-typedef struct 
+typedef struct
 {
 	const char* name;	/*!< name of the function */
 	const char* doc;	/*!< documentation of the function */
@@ -205,7 +205,7 @@ uint16_t AsebaGetRandom(void);
 void AsebaNative_rand(AsebaVMState *vm);
 /*! Description of AsebaNative_rand */
 extern const AsebaNativeFunctionDescription AsebaNativeDescription_rand;
-	
+
 /*! Function that reports size of deque dest in size */
 void AsebaNative_deqsize(AsebaVMState *vm);
 /*! Description of AsebaNative_deqsize */

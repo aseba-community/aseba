@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -33,27 +33,27 @@ namespace Aseba
 		nativeFunctionReceptionCounter(0)
 	{
 	}
-	
+
 	bool NodesManager::Node::isComplete() const
 	{
 		return (namedVariablesReceptionCounter == namedVariables.size()) &&
 			(localEventsReceptionCounter == localEvents.size()) &&
 			(nativeFunctionReceptionCounter == nativeFunctions.size());
 	}
-	
+
 	void NodesManager::pingNetwork()
 	{
 		// check whether there are new nodes in the network, for new targets (protocol >= 5)
 		ListNodes listNodes;
 		sendMessage(listNodes);
-		
+
 		// check nodes that have not been seen for long, mark them as disconnected
 		const UnifiedTime now;
 		const UnifiedTime delayToDisconnect(3000);
 		bool isAnyConnected(false);
 		for (auto & node : nodes)
 		{
-			// if node supports listing, 
+			// if node supports listing,
 			if (node.second.protocolVersion >= 5 && (now - node.second.lastSeen) > delayToDisconnect && node.second.connected)
 			{
 				node.second.connected = false;
@@ -62,7 +62,7 @@ namespace Aseba
 			// is this node connected?
 			isAnyConnected = isAnyConnected || node.second.connected;
 		}
-		
+
 		// if no node is connected, broadcast get description as well, for old targets (protocol 4)
 		if (!isAnyConnected)
 		{
@@ -70,14 +70,14 @@ namespace Aseba
 			sendMessage(getDescription);
 		}
 	}
-	
+
 	void NodesManager::processMessage(const Message* message)
 	{
 		// check whether the node is known
 		auto nodeIt(nodes.find(message->source));
 		if (nodeIt == nodes.end())
 		{
-			// node is not known, so ignore excepted if the message type 
+			// node is not known, so ignore excepted if the message type
 			// is node present and it is not a known mismatch protocol,
 			// in that case, request description...
 			if ((message->type == ASEBA_MESSAGE_NODE_PRESENT) &&
@@ -106,7 +106,7 @@ namespace Aseba
 			// update last seen time
 			nodeIt->second.lastSeen = UnifiedTime();
 		}
-		
+
 		// if we have a disconnection message
 		{
 			// FIXME: handle disconnected state
@@ -118,18 +118,18 @@ namespace Aseba
 				nodes.erase(nodeIt);
 			}
 		}
-		
+
 		// if we have an initial description
 		{
 			const auto *description = dynamic_cast<const Description *>(message);
 			if (description)
 			{
 				auto nodeIt = nodes.find(description->source);
-				
+
 				// We can receive a description twice, for instance if there is another IDE connected
 				if (nodeIt != nodes.end() || (mismatchingNodes.find(description->source) != mismatchingNodes.end()))
 					return;
-				
+
 				// Call a user function when a node protocol version mismatches
 				if ((description->protocolVersion < ASEBA_MIN_TARGET_PROTOCOL_VERSION) ||
 					(description->protocolVersion > ASEBA_PROTOCOL_VERSION))
@@ -138,13 +138,13 @@ namespace Aseba
 					mismatchingNodes.insert(description->source);
 					return;
 				}
-				
+
 				// create node and copy description into it
 				nodes[description->source] = Node(*description);
 				checkIfNodeDescriptionComplete(description->source, nodes[description->source]);
 			}
 		}
-		
+
 		// if we have a named variable description
 		{
 			const auto *description = dynamic_cast<const NamedVariableDescription *>(message);
@@ -152,7 +152,7 @@ namespace Aseba
 			{
 				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
-				
+
 				// copy description into array if array is empty
 				if (nodeIt->second.namedVariablesReceptionCounter < nodeIt->second.namedVariables.size())
 				{
@@ -161,7 +161,7 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		// if we have a local event description
 		{
 			const auto *description = dynamic_cast<const LocalEventDescription *>(message);
@@ -169,7 +169,7 @@ namespace Aseba
 			{
 				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
-				
+
 				// copy description into array if array is empty
 				if (nodeIt->second.localEventsReceptionCounter < nodeIt->second.localEvents.size())
 				{
@@ -178,7 +178,7 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		// if we have a native function description
 		{
 			const auto *description = dynamic_cast<const NativeFunctionDescription *>(message);
@@ -186,7 +186,7 @@ namespace Aseba
 			{
 				auto nodeIt = nodes.find(description->source);
 				assert (nodeIt != nodes.end());
-				
+
 				// copy description into array
 				if (nodeIt->second.nativeFunctionReceptionCounter < nodeIt->second.nativeFunctions.size())
 				{
@@ -206,7 +206,7 @@ namespace Aseba
 			nodeConnected(id);
 		}
 	}
-	
+
 	std::wstring NodesManager::getNodeName(unsigned nodeId) const
 	{
 		auto nodeIt = nodes.find(nodeId);
@@ -219,7 +219,7 @@ namespace Aseba
 			return L"";
 		}
 	}
-	
+
 	unsigned NodesManager::getNodeId(const std::wstring& name, unsigned preferedId, bool *ok) const
 	{
 		// search for the first node with a given name
@@ -231,30 +231,30 @@ namespace Aseba
 			{
 				if (ok)
 					*ok = true;
-				
+
 				if (node.first == preferedId)
 					return node.first;
 				else if (!found)
 					foundId = node.first;
-				
+
 				found = true;
 			}
 		}
-		
+
 		// node found, but with another id than prefered
 		if (found)
 			return foundId;
-		
+
 		// node not found
 		if (ok)
 			*ok = false;
 		return 0xFFFFFFFF;
 	}
-	
+
 	const TargetDescription * NodesManager::getDescription(unsigned nodeId, bool *ok) const
 	{
 		auto nodeIt = nodes.find(nodeId);
-		
+
 		// node not found
 		if (nodeIt == nodes.end())
 		{
@@ -262,16 +262,16 @@ namespace Aseba
 				*ok = false;
 			return nullptr;
 		}
-		
+
 		if (ok)
 			*ok = true;
 		return &(nodeIt->second);
 	}
-	
+
 	unsigned NodesManager::getVariablePos(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
 		auto nodeIt = nodes.find(nodeId);
-		
+
 		// node not found
 		if (nodeIt != nodes.end())
 		{
@@ -287,17 +287,17 @@ namespace Aseba
 				pos += namedVariable.size;
 			}
 		}
-		
+
 		// node not found or variable not found
 		if (ok)
 			*ok = false;
 		return 0xFFFFFFFF;
 	}
-	
+
 	unsigned NodesManager::getVariableSize(unsigned nodeId, const std::wstring& name, bool *ok) const
 	{
 		auto nodeIt = nodes.find(nodeId);
-		
+
 		// node not found
 		if (nodeIt != nodes.end())
 		{
@@ -311,13 +311,13 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		// node not found or variable not found
 		if (ok)
 			*ok = false;
 		return 0xFFFFFFFF;
 	}
-	
+
 	void NodesManager::reset()
 	{
 		nodes.clear();

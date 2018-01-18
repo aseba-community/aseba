@@ -111,7 +111,7 @@ namespace Aseba { namespace Http
 			virtual bool getVariableInfo(const Node& node, const std::string& variableName, unsigned& position, unsigned& size);
 			virtual void sendMessage(const Message& message);
 			virtual void nodeDescriptionReceived(unsigned localNodeId);
-			
+
 
 		private:
 			HttpInterface *interface;

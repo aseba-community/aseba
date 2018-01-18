@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -53,21 +53,21 @@ void usage(const char *execName)
 int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(asebaqtabout);
-	
+
 	bool autoRefresh(false);
 	bool showDoc(false);
 	QApplication app(argc, argv);
 	Dashel::initPlugins();
-	
+
 	// Information used by QSettings with default constructor
 	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	QCoreApplication::setApplicationName("Aseba Studio");
-	
+
 	// override dashel signal handling
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
-	
+
 	QString commandLineTarget;
 	for (int i = 1; i < argc; ++i)
 	{
@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
 	if (showDoc)
 	{
 		const QString language(QLocale::system().name());
-		
+
 		// load translations
 		qtTranslator.load(QString("qt_") + language, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 		qtTranslator.load(QString(":/asebastudio_") + language);
-		
+
 		// directly show doc browser
 		Aseba::HelpViewer helpViewer;
 		helpViewer.setupWidgets();
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 		app.installTranslator(&compilerTranslator);
 		QTranslator aboutTranslator;
 		app.installTranslator(&aboutTranslator);
-	
+
 		// start normal aseba studio
 		try
 		{

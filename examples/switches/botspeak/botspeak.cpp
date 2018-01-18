@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -32,7 +32,7 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	static bool isNumber(const std::string& s)
 	{
 		std::string::const_iterator it(s.begin());
@@ -42,7 +42,7 @@ namespace Aseba
 			++it;
 		return !s.empty() && (it == s.end());
 	}
-	
+
 	static struct OperationMap: public map<string, string>
 	{
 		OperationMap()
@@ -75,13 +75,13 @@ namespace Aseba
 				return b;
 		}
 	} operationMap;
-	
-	
+
+
 	BotSpeakBridge::Value::Value(BotSpeakBridge* bridge, const std::string& arg)
 	{
 		const StringVector parts(split<string>(arg, "[] "));
 		assert(parts.size() >= 1);
-		
+
 		if (parts.size() == 2)
 		{
 			if (isNumber(parts[1]))
@@ -126,7 +126,7 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	bool BotSpeakBridge::Value::update(BotSpeakBridge* bridge, unsigned addr, int val)
 	{
 		if (state == PENDING_INDIRECT_VALUE && addr == indirectAddress)
@@ -145,13 +145,13 @@ namespace Aseba
 		}
 		return false;
 	}
-	
+
 	BotSpeakBridge::Operation::Operation(BotSpeakBridge* bridge, const std::string& op, const std::string& lhs, const std::string& rhs):
 		op(op),
 		lhs(bridge, lhs),
 		rhs(bridge, rhs)
 	{}
-	
+
 	//! Update operation, exec if ready, return whether was executed
 	bool BotSpeakBridge::Operation::update(BotSpeakBridge* bridge, unsigned addr, int val)
 	{
@@ -164,12 +164,12 @@ namespace Aseba
 		}
 		return false;
 	}
-	
+
 	bool BotSpeakBridge::Operation::isReady()
 	{
 		return (lhs.state == Value::RESOLVED) && (rhs.state == Value::RESOLVED);
 	}
-	
+
 	void BotSpeakBridge::Operation::exec(BotSpeakBridge* bridge)
 	{
 		assert(isReady());
@@ -183,8 +183,8 @@ namespace Aseba
 		bridge->asebaStream->flush();
 		if (bridge->verbose) cout << "Set address " << lhs.address << " to value " << result << endl;
 	}
-	
-	
+
+
 	BotSpeakBridge::BotSpeakBridge(unsigned botSpeakPort, const char* asebaTarget):
 		botSpeakStream(0),
 		asebaStream(0),
@@ -200,21 +200,21 @@ namespace Aseba
 		commonDefinitions.events.push_back(NamedValue(L"running_ping", 0));
 		commonDefinitions.events.push_back(NamedValue(L"update_inputs", 0));
 		commonDefinitions.events.push_back(NamedValue(L"update_outputs", 0));
-		
+
 		// connect to the Aseba target
 		connect(asebaTarget);
-		
+
 		// connect a server stream for BotSpeak
 		ostringstream oss;
 		oss << "tcpin:port=" << botSpeakPort;
 		connect(oss.str());
-		
+
 		// request a description for aseba target
 		GetDescription getDescription;
 		getDescription.serialize(asebaStream);
 		asebaStream->flush();
 	}
-	
+
 	bool BotSpeakBridge::run1s()
 	{
 		int timeout(1000);
@@ -229,7 +229,7 @@ namespace Aseba
 		}
 		return true;
 	}
-	
+
 	void BotSpeakBridge::connectionCreated(Dashel::Stream *stream)
 	{
 		if (!asebaStream)
@@ -249,7 +249,7 @@ namespace Aseba
 			botSpeakStream = stream;
 		}
 	}
-	
+
 	void BotSpeakBridge::connectionClosed(Stream * stream, bool abnormal)
 	{
 		if (stream == asebaStream)
@@ -266,13 +266,13 @@ namespace Aseba
 		else
 			abort();
 	}
-	
+
 	void BotSpeakBridge::sendMessage(const Message& message)
 	{
 		message.serialize(asebaStream);
 		asebaStream->flush();
 	}
-	
+
 	void BotSpeakBridge::nodeDescriptionReceived(unsigned nodeId)
 	{
 		if (verbose)
@@ -292,7 +292,7 @@ namespace Aseba
 		// Generate an empty script
 		compileAndRunScript();
 	}
-	
+
 	void BotSpeakBridge::incomingData(Stream *stream)
 	{
 		// dispatch to correct method in function of stream
@@ -303,16 +303,16 @@ namespace Aseba
 		else
 			abort();
 	}
-	
+
 	void BotSpeakBridge::incomingAsebaData(Stream *stream)
 	{
 		// receive message
 		Message *message(Message::receive(stream));
-		
+
 		// pass message to description manager, which builds
 		// the node descriptions in background
 		NodesManager::processMessage(message);
-		
+
 		// if variables, check for pending requests
 		const Variables *variables(dynamic_cast<Variables *>(message));
 		if (variables)
@@ -340,7 +340,7 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		// if event
 		const UserMessage *userMsg(dynamic_cast<UserMessage *>(message));
 		if (userMsg)
@@ -358,10 +358,10 @@ namespace Aseba
 				outputBotspeak(".", true);
 			}
 		}
-		
+
 		delete message;
 	}
-	
+
 	void BotSpeakBridge::incomingBotspeakData(Stream *stream)
 	{
 		uint8_t c;
@@ -383,7 +383,7 @@ namespace Aseba
 				FormatableString("Invalid BotSpeak protocol, expecting '\\n' but got character 0x%0 instead").arg(unsigned(c),2,16,'0')
 			);
 	}
-	
+
 	void BotSpeakBridge::processCommand(const string& command)
 	{
 		if (command.empty())
@@ -406,7 +406,7 @@ namespace Aseba
 			interpreteCommand(command);
 		}
 	}
-	
+
 	template<typename T>
 	static bool isSize(const T& name);
 	template<>
@@ -419,13 +419,13 @@ namespace Aseba
 	{
 		return (name.length() > 5 && name.rfind(L"_SIZE") == name.length()-5);
 	}
-	
+
 	template<typename T>
 	static T baseNameSize(const T& name)
 	{
 		return name.substr(0, name.length()-5);
 	}
-	
+
 	void BotSpeakBridge::interpreteCommand(const string& command)
 	{
 		const StringVector cmd(split<string>(command));
@@ -484,7 +484,7 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	void BotSpeakBridge::compileAndRunScript()
 	{
 		// extraction of basic blocks and variable definitions
@@ -531,7 +531,7 @@ namespace Aseba
 				cout << *it << " ";
 			cout << endl;
 		}
-		
+
 		// build basic block lookup table
 		vector<unsigned> blocToLineTable(script.size(), 0);
 		unsigned line(0); unsigned bb(0);
@@ -543,10 +543,10 @@ namespace Aseba
 		}
 		while (line < script.size())
 			blocToLineTable[line++] = bb;
-		
+
 		// generate aseba source
 		wstring asebaSource;
-		
+
 		// generate variable definition
 		for (vector<NamedVariable>::const_iterator it(botspeakVariables.begin()); it!=botspeakVariables.end(); ++it)
 		{
@@ -557,10 +557,10 @@ namespace Aseba
 		}
 		// and initialization header
 		asebaSource += asebaCodeHeader();
-		
+
 		// macro acting like a local function
 		#define args1 (isSize(args.at(1)) ? FormatableString("%0").arg(variablesMap.at(UTF8ToWString(baseNameSize(args.at(1)))).second) : args.at(1))
-		
+
 		// subroutines for basic blocks
 		set<unsigned>::const_iterator bbIt(splits.begin());
 		asebaSource += L"sub bb0\n";
@@ -604,7 +604,7 @@ namespace Aseba
 				const unsigned destLine(atoi(cmd.back().c_str()));
 				if (cmd.size() == 4)
 				{
-					// direct goto 
+					// direct goto
 					asebaSource += WFormatableString(L"\t_currentBasicBlock = %0\n").arg(blocToLineTable[destLine]);
 				}
 				else if (cmd.size() == 6)
@@ -634,7 +634,7 @@ namespace Aseba
 			asebaSource += WFormatableString(L"\t_currentBasicBlock = %0\n").arg(bb+1);
 			asebaSource += L"\temit stopped\n";
 		}
-		
+
 		// basic block dispatch
 		asebaSource += L"\nsub dispatchBB\n";
 		asebaSource += L"\ttimer.period[0] = 0\n";
@@ -651,13 +651,13 @@ namespace Aseba
 		}
 		asebaSource += L"\tend\n";
 		asebaSource += L"\tcallsub updateOutputs\n";
-		
+
 		// rest of code
 		asebaSource += asebaCodeFooter();
-		
+
 		// print source
 		if (verbose) wcerr << "Aseba source:\n" << asebaSource;
-		
+
 		// compile
 		Error error;
 		BytecodeVector bytecode;
@@ -667,7 +667,7 @@ namespace Aseba
 		compiler.setTargetDescription(getDescription(nodeId));
 		compiler.setCommonDefinitions(&commonDefinitions);
 		const bool result(compiler.compile(is, bytecode, allocatedVariablesCount, error));
-		
+
 		if (result)
 		{
 			sendBytecode(asebaStream, nodeId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
@@ -680,7 +680,7 @@ namespace Aseba
 			wcerr << L"Compilation failed: " << error.toWString() << endl;
 		}
 	}
-	
+
 	void BotSpeakBridge::scheduleOperation(const string& op, const string& arg0, const string& arg1)
 	{
 		if (verbose) cout << "Scheduling operation " << op << " " << arg0 << "," << arg1 << "" <<endl;
@@ -689,7 +689,7 @@ namespace Aseba
 		nextOperationsArg1.push(arg1);
 		startNextOperationIfPossible();
 	}
-	
+
 	void BotSpeakBridge::scheduleGet(const string& arg)
 	{
 		if (verbose) cout << "Scheduling GET " << arg << endl;
@@ -698,7 +698,7 @@ namespace Aseba
 		nextOperationsArg1.push("");
 		startNextOperationIfPossible();
 	}
-	
+
 	void BotSpeakBridge::startNextOperationIfPossible()
 	{
 		if (!currentOperation.get() && !getValue.get() && !nextOperationsOp.empty())
@@ -722,7 +722,7 @@ namespace Aseba
 			nextOperationsArg1.pop();
 		}
 	}
-	
+
 	std::wstring BotSpeakBridge::asebaCodeHeader() const
 	{
 		std::wstring code;
@@ -755,7 +755,7 @@ namespace Aseba
 		code += L"\n";
 		return code;
 	}
-	
+
 	std::wstring BotSpeakBridge::asebaCodeFooter() const
 	{
 		std::wstring code;
@@ -779,7 +779,7 @@ namespace Aseba
 		code += L"\tcallsub updateOutputs\n";
 		return code;
 	}
-	
+
 	//! define a new Aseba variable
 	void BotSpeakBridge::defineVar(const wstring& varName, unsigned varSize)
 	{
@@ -795,7 +795,7 @@ namespace Aseba
 		freeVariableIndex += varSize;
 		if (verbose) wcout << L"Allocating variable " << varName << " of size " << varSize << endl;
 	}
-	
+
 	//! create an Aseba variable for the corresponding BotSpeak variable, manage _SIZE, optionally give a size
 	void BotSpeakBridge::createBotspeakVarIfUndefined(const wstring& varName, unsigned varSize)
 	{
@@ -810,7 +810,7 @@ namespace Aseba
 				defineVar(varName, 1);
 		}
 	}
-	
+
 	//! return the address of a variable, make an exception if not found
 	unsigned BotSpeakBridge::getVarAddress(const string& varName)
 	{
@@ -819,7 +819,7 @@ namespace Aseba
 			throw runtime_error("Variable " + varName + " is not defined");
 		return varIt->second.first;
 	}
-	
+
 	//! return the size of a variable, make an exception if not found
 	unsigned BotSpeakBridge::getVarSize(const std::string& varName)
 	{
@@ -828,7 +828,7 @@ namespace Aseba
 			throw runtime_error("Variable " + varName + " is not defined");
 		return varIt->second.second;
 	}
-	
+
 	//! return the identifier of a global event given by name, the event must exist
 	unsigned BotSpeakBridge::eventId(const std::wstring& eventName) const
 	{
@@ -838,7 +838,7 @@ namespace Aseba
 		ASEBA_UNUSED(ok);
 		return id;
 	}
-	
+
 	//! output a value to the Botspeak client, if any
 	void BotSpeakBridge::outputBotspeak(int value)
 	{
@@ -854,7 +854,7 @@ namespace Aseba
 			if (verbose) cout << "Cannot write to BotSpeak, connection closed" << endl;
 		}
 	}
-	
+
 	//! output a value to the Botspeak client, if any
 	void BotSpeakBridge::outputBotspeak(const std::string& message, bool noEol)
 	{
@@ -870,7 +870,7 @@ namespace Aseba
 			if (verbose) cout << "Cannot write to BotSpeak, connection closed" << endl;
 		}
 	}
-	
+
 } // namespace Aseba
 
 int showHelp(const char* programName)
@@ -882,16 +882,16 @@ int showHelp(const char* programName)
 int main(int argc, char *argv[])
 {
 	unsigned botSpeakPort(9999);
-	
+
 	// process command line
 	if (argc < 2)
 		return showHelp(argv[0]);
 	if (argc > 2)
 		botSpeakPort = atoi(argv[2]);
-	
+
 	// initialize Dashel plugins
 	Dashel::initPlugins();
-	
+
 	// create and run bridge, catch Dashel exceptions
 	try
 	{
@@ -909,6 +909,6 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << "Unhandled Dashel exception: " << e.what() << std::endl;
 	}
-	
+
 	return 0;
 }

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -43,15 +43,15 @@ namespace Aseba { namespace ThymioBlockly
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	class ThymioBlockly : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
-	
+
 	public:
 		ThymioBlockly(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true, bool debugLog = false, bool execFeedback = false);
 		~ThymioBlockly();
-		
+
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
 
@@ -59,28 +59,28 @@ namespace Aseba { namespace ThymioBlockly
 		virtual void loadFromDom(const QDomDocument& content, bool fromFile);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
-		
+
 		bool isModified() const;
 		qreal getViewScale() const;
 
 	signals:
 		void modifiedStatusChanged(bool modified);
 		void compilationOutcome(bool success);
-		
+
 	protected slots:
 		bool closeFile();
-		
+
 	private slots:
 		void openHelp() const;
 		void saveSnapshot() const;
-		
+
 		void newFile();
 		void openFile();
 		bool save();
 		bool saveAs();
 		void run();
 		void stop();
-		
+
 		void initAsebaJavascriptInterface();
 		void codeUpdated(const QString& code);
 		void workspaceSaved(const QString& xml);
@@ -89,7 +89,7 @@ namespace Aseba { namespace ThymioBlockly
 	private:
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
-		
+
 	protected:
 		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		QWebView *webview;
@@ -116,16 +116,16 @@ namespace Aseba { namespace ThymioBlockly
 		QSpacerItem *spacer4;
 		QSpacerItem *spacer5;
 		QSpacerItem *spacer6;
-		
+
 		QVBoxLayout *mainLayout;
 		QHBoxLayout *horizontalLayout;
 		QVBoxLayout *sceneLayout;
-		
+
 	protected:
 		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);
 		void closeEvent(QCloseEvent * event);
-		
+
 		virtual void resizeEvent( QResizeEvent *event );
 	};
 

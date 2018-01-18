@@ -15,12 +15,12 @@ namespace Aseba
 {
 	/** \addtogroup thymiownetconfig */
 	/*@{*/
-	
-	
+
+
 	class ThymioWNetConfigDialog : public QWidget
 	{
 		Q_OBJECT
-		
+
 	private:
 		std::string target;
 		QVBoxLayout* mainLayout;
@@ -33,24 +33,24 @@ namespace Aseba
 		QPushButton* pairButton;
 		QPushButton* flashButton;
 		QPushButton* quitButton;
-		
+
 		Dashel::Hub hub;
 		Dashel::Stream* stream;
-		
+
 		bool pairing;
 
 	public:
 		ThymioWNetConfigDialog(const std::string& target);
 		~ThymioWNetConfigDialog();
-		
+
 	private slots:
 		void updateSettings();
 		void flashSettings();
 		void togglePairingMode();
 		void quit();
-	
+
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

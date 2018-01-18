@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -29,7 +29,7 @@ namespace Enki
 {
 	using namespace std;
 	using namespace Aseba;
-	
+
 	AsebaThymio2::AsebaThymio2(std::string robotName, int16_t nodeId):
 		SingleVMNodeGlue(std::move(robotName), nodeId),
 		sdCardFileNumber(-1),
@@ -42,32 +42,32 @@ namespace Enki
 	{
 		oldTimerPeriod[0] = 0;
 		oldTimerPeriod[1] = 0;
-		
+
 		bytecode.resize(766+768);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(32);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
+
 		vm.variables = reinterpret_cast<int16_t *>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
-		
+
 		AsebaVMInit(&vm);
-		
+
 		variables.id = vm.nodeId;
 		variables.fwversion[0] = 11; // this simulated Thymio complies with firmware 11 public API
 		variables.fwversion[1] = 0;
 		variables.productId = ASEBA_PID_THYMIO2;
-		
+
 		variables.temperature = 220;
-		
+
 		variables.sdPresent = openSDCardFile(0) ? 1 : 0;
 		if (variables.sdPresent)
 			openSDCardFile(-1);
 	}
-	
+
 	void AsebaThymio2::collisionEvent(PhysicalObject *o)
 	{
 		thisStepCollided = true;
@@ -114,7 +114,7 @@ namespace Enki
 			}
 		}
 	}
-	
+
 	void AsebaThymio2::mouseReleaseEvent(unsigned button)
 	{
 		if (button == MOUSE_BUTTON_LEFT)
@@ -146,7 +146,7 @@ namespace Enki
 			}
 		}
 	}
-	
+
 	void AsebaThymio2::controlStep(double dt)
 	{
 		// get physical variables
@@ -163,19 +163,19 @@ namespace Enki
 		variables.proxGroundDelta[1] = static_cast<int16_t>(groundSensor1.getValue());
 		variables.motorLeftSpeed = leftSpeed * 500. / 16.6;
 		variables.motorRightSpeed = rightSpeed * 500. / 16.6;
-		
+
 		// run timers
 		timer0.step(dt);
 		timer1.step(dt);
 		timer100Hz.step(dt);
-		
+
 		// process external inputs (incoming event from network or environment, etc.)
 		externalInputStep(dt);
-		
+
 		// set physical variables
 		leftSpeed = double(variables.motorLeftTarget) * 16.6 / 500.;
 		rightSpeed = double(variables.motorRightTarget) * 16.6 / 500.;
-		
+
 		// reset a timer if its period changed
 		if (variables.timerPeriod[0] != oldTimerPeriod[0])
 		{
@@ -187,28 +187,28 @@ namespace Enki
 			oldTimerPeriod[1] = variables.timerPeriod[1];
 			timer1.setPeriod(variables.timerPeriod[1] / 1000.);
 		}
-		
+
 		// set motion
 		Thymio2::controlStep(dt);
-		
+
 		// trigger tap event
 		if (thisStepCollided && !lastStepCollided)
 			execLocalEvent(EVENT_TAP);
 		lastStepCollided = thisStepCollided;
 		thisStepCollided = false;
 	}
-	
+
 	// robot description
-	
+
 	extern "C" AsebaVMDescription PlaygroundThymio2VMDescription;
-	
+
 	const AsebaVMDescription* AsebaThymio2::getDescription() const
 	{
 		return &PlaygroundThymio2VMDescription;
 	}
-	
+
 	// local events, static so only visible in this file
-	
+
 	static const AsebaLocalEventDescription localEvents[] = {
 		{ "button.backward", "Backward button status changed"},
 		{ "button.left", "Left button status changed"},
@@ -229,15 +229,15 @@ namespace Enki
 		{ "timer1", "Timer 1"},
 		{ nullptr, nullptr }
 	};
-	
+
 	const AsebaLocalEventDescription * AsebaThymio2::getLocalEventsDescriptions() const
 	{
 		return localEvents;
 	}
-	
-	
+
+
 	// array of descriptions of native functions, static so only visible in this file
-	
+
 	static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
 	{
 		ASEBA_NATIVES_STD_DESCRIPTIONS,
@@ -249,20 +249,20 @@ namespace Enki
 	{
 		return nativeFunctionsDescriptions;
 	}
-	
+
 	// array of native functions, static so only visible in this file
-	
+
 	static AsebaNativeFunctionPointer nativeFunctions[] =
 	{
 		ASEBA_NATIVES_STD_FUNCTIONS,
 		PLAYGROUND_THYMIO2_NATIVES_FUNCTIONS
 	};
-	
+
 	void AsebaThymio2::callNativeFunction(uint16_t id)
 	{
 		nativeFunctions[id](&vm);
 	}
-	
+
 	//! Open the virtual SD card file number, if -1, close current one
 	bool AsebaThymio2::openSDCardFile(int number)
 	{
@@ -272,7 +272,7 @@ namespace Enki
 			sdCardFile.close();
 			sdCardFileNumber = -1;
 		}
-		
+
 		// if we have to open another file
 		if (number >= 0)
 		{
@@ -299,21 +299,21 @@ namespace Enki
 		}
 		return true;
 	}
-	
+
 	void AsebaThymio2::timer0Timeout()
 	{
 		execLocalEvent(EVENT_TIMER0);
 	}
-	
+
 	void AsebaThymio2::timer1Timeout()
 	{
 		execLocalEvent(EVENT_TIMER1);
 	}
-		
+
 	void AsebaThymio2::timer100HzTimeout()
 	{
 		++counter100Hz;
-		
+
 		execLocalEvent(EVENT_MOTOR);
 		if (counter100Hz % 5 == 0)
 			execLocalEvent(EVENT_BUTTONS);
@@ -324,7 +324,7 @@ namespace Enki
 		if (counter100Hz % 100 == 0)
 			execLocalEvent(EVENT_TEMPERATURE);
 	}
-	
+
 	//! Simulate the behaviour of the Thymio firmware, that is, returning 0 when objects are out of range
 	int16_t AsebaThymio2::getSaturatedProxHorizontal(unsigned i) const
 	{
@@ -341,7 +341,7 @@ namespace Enki
 			default: break;
 		}
 		assert(sensor);
-		
+
 		double dist(0);
 		for (unsigned j = 0; j < sensor->getRayCount(); ++j)
 			dist += sensor->getRayDist(j);
@@ -350,17 +350,17 @@ namespace Enki
 			return 0;
 		return static_cast<int16_t>(sensor->getValue());
 	}
-	
+
 	//! Execute a local event, killing the execution of the current one if not in step-by-step mode
 	void AsebaThymio2::execLocalEvent(uint16_t number)
 	{
 		// in step-by-step, only setup an event if none is being executed currently
 		if (AsebaMaskIsSet(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) && AsebaMaskIsSet(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 			return;
-		
+
 		variables.source = vm.nodeId;
 		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-number);
 		AsebaVMRun(&vm, 1000);
 	}
-	
+
 } // Enki

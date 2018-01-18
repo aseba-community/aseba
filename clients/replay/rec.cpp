@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -32,27 +32,27 @@ namespace Aseba
 {
 	using namespace Dashel;
 	using namespace std;
-	
+
 	/**
 	\defgroup rec Message recorder
 	*/
 	/*@{*/
-	
+
 	//! A message recorder.
 	//! This class saves user messages
 	class Recorder : public Hub
 	{
 	protected:
-		
+
 		void incomingData(Stream *stream)
 		{
 			dumpTime(cout, true);
-			
+
 			// receive and deserialize message
 			Message *message = Message::receive(stream);
 			Message::SerializationBuffer buffer;
 			message->serializeSpecific(buffer);
-			
+
 			// system messages have their arguments as bytes in hexadecimal
 			cout << hex << setw(4) << setfill('0') << message->source << " ";
 			cout << hex << setw(4) << setfill('0') << message->type << dec << " ";
@@ -63,7 +63,7 @@ namespace Aseba
 			cout << dec << endl;
 		}
 	};
-	
+
 	/*@}*/
 }
 
@@ -92,13 +92,13 @@ int main(int argc, char *argv[])
 {
 	Dashel::initPlugins();
 	std::vector<std::string> targets;
-	
+
 	int argCounter = 1;
-	
+
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
-		
+
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 		{
 			dumpHelp(std::cout, argv[0]);
@@ -115,10 +115,10 @@ int main(int argc, char *argv[])
 		}
 		argCounter++;
 	}
-	
+
 	if (targets.empty())
 		targets.push_back(ASEBA_DEFAULT_TARGET);
-	
+
 	try
 	{
 		Aseba::Recorder recorder;
@@ -130,6 +130,6 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	
+
 	return 0;
 }

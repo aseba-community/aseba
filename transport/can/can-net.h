@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -29,16 +29,16 @@ extern "C" {
 
 /**
 	\defgroup can Transport layer over CAN bus
-	
+
 	This layer is able to transmit messages of arbitrary length
 	(up to the available amount of memory) over a serie of 8 bytes
 	CAN frames. If the message is under 8 bytes, the layer uses
 	a single frame.
-	
+
 	The layer does not uses acknowledgment, instead it trusts the
 	CAN checksum mechanism to ensure that other nodes on the CAN bus
 	received the data correctly.
-	
+
 	This transport layer only works on little-endian systems for now,
 	as it does not perform endian correction.
 */
@@ -105,11 +105,11 @@ uint16_t AsebaCanRecv(uint8_t *data, size_t size, uint16_t *source);
 */
 void AsebaCanFlushQueue(void);
 
-/*! Free everything in the Rx queue. Warning, this is a low-level function which should 
+/*! Free everything in the Rx queue. Warning, this is a low-level function which should
 	only be called if the underlaying CAN driver is disabled. */
 void AsebaCanRecvFreeQueue(void);
 
-// to be implemented by the glue 
+// to be implemented by the glue
 
 /*! Busy wait until the can buffer has room. At worst, can be an empty function */
 void AsebaIdle(void);

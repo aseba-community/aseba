@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -114,7 +114,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 	// pass message to description manager, which builds
 	// the node descriptions in background
 	NodesManager::processMessage(message);
-	
+
 	// if variables, print
 	const Variables *variables(dynamic_cast<Variables *>(message));
 	if (variables)
@@ -131,7 +131,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		wcerr << endl;
 		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
-	
+
 	// if user event, print
 	const UserMessage *userMessage(dynamic_cast<UserMessage *>(message));
 	if (userMessage)
@@ -147,7 +147,7 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		wcerr << endl;
 		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
-	
+
 	delete message;
 }
 
@@ -156,13 +156,13 @@ void Shell::incomingShellData(Dashel::Stream *stream)
 	// read one character
 	char c;
 	stream->read(&c, 1);
-	
+
 	// ignore \r on Windows
 	#ifdef WIN32
 	if (c == '\r')
 		return;
 	#endif // WIN32
-	
+
 	// if end of line, execute command, else store character
 	if (c == '\n')
 		processShellCmd();
@@ -176,7 +176,7 @@ void Shell::processShellCmd()
 	const strings args(split(curShellCmd));
 	if (args.empty())
 		return;
-	
+
 	// following command, do different things
 	if (args[0] == "ls")
 	{
@@ -234,7 +234,7 @@ void Shell::processShellCmd()
 		wcerr << "  quit           quit shell" << endl;
 		wcerr << "  help           show this summary" << endl;
 	}
-	
+
 	// read for new command
 	curShellCmd = "";
 	wcerr << endl << "> ";
@@ -264,10 +264,10 @@ void Shell::listVariables(const strings& args)
 	const TargetDescription* desc(getDescription(nodeId));
 	if (!desc)
 		return;
-	
+
 	// dump target description
 	wcerr << "Target name " << desc->name << endl;
-	wcerr << "protocol version " << desc->protocolVersion << endl; 
+	wcerr << "protocol version " << desc->protocolVersion << endl;
 	wcerr << "bytecode size " << desc->bytecodeSize << endl;
 	wcerr << "variables size " << desc->variablesSize << endl;
 	wcerr << "stack size " << desc->stackSize << endl;
@@ -327,7 +327,7 @@ void Shell::getVariable(const strings& args)
 		wcerr << "wrong number of arguments, usage: get NODE_NAME VAR_NAME" << endl;
 		return;
 	}
-	
+
 	// get node id, variable position and length
 	unsigned nodeId, pos;
 	const bool exists(getNodeAndVarPos(args[1], args[2], nodeId, pos));
@@ -352,13 +352,13 @@ void Shell::setVariable(const strings& args)
 		wcerr << "missing argument, usage: set NODE_NAME VAR_NAME VAR_DATA+" << endl;
 		return;
 	}
-	
+
 	// get node id, variable position and length
 	unsigned nodeId, pos;
 	const bool exists(getNodeAndVarPos(args[1], args[2], nodeId, pos));
 	if (!exists)
 		return;
-	
+
 	// send the message
 	VariablesDataVector data;
 	for (size_t i=3; i<args.size(); ++i)
@@ -382,7 +382,7 @@ void Shell::emit(const strings& args)
 		wcerr << "event " << UTF8ToWString(args[1]) << " is unknown" << endl;
 		return;
 	}
-	
+
 	// build event and emit
 	VariablesDataVector data;
 	for (size_t i=2; i<args.size(); ++i)
@@ -400,7 +400,7 @@ void Shell::load(const strings& args)
 		wcerr << "wrong number of arguments, usage: load FILENAME" << endl;
 		return;
 	}
-	
+
 	// open document
 	const string& fileName(args[1]);
 	xmlDoc *doc(xmlReadFile(fileName.c_str(), nullptr, 0));
@@ -410,12 +410,12 @@ void Shell::load(const strings& args)
 		return;
 	}
     xmlNode *domRoot(xmlDocGetRootElement(doc));
-	
+
 	// clear existing data
 	commonDefinitions.events.clear();
 	commonDefinitions.constants.clear();
 	allVariables.clear();
-	
+
 	// load new data
 	int noNodeCount(0);
 	bool wasError(false);
@@ -461,7 +461,7 @@ void Shell::load(const strings& args)
 						}
 						else
 							noNodeCount++;
-						
+
 						// free attribute and content
 						xmlFree(text);
 					}
@@ -475,7 +475,7 @@ void Shell::load(const strings& args)
 				xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
 				if (!name)
 					wcerr << "missing \"name\" attribute in \"event\" entry" << endl;
-				xmlChar *size(xmlGetProp(domNode, BAD_CAST("size"))); 
+				xmlChar *size(xmlGetProp(domNode, BAD_CAST("size")));
 				if (!size)
 					wcerr << "missing \"size\" attribute in \"event\" entry" << endl;
 				// add event
@@ -506,7 +506,7 @@ void Shell::load(const strings& args)
 				xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
 				if (!name)
 					wcerr << "missing \"name\" attribute in \"constant\" entry" << endl;
-				xmlChar *value(xmlGetProp(domNode, BAD_CAST("value"))); 
+				xmlChar *value(xmlGetProp(domNode, BAD_CAST("value")));
 				if (!value)
 					wcerr << "missing \"value\" attribute in \"constant\" entry" << endl;
 				// add constant if attributes are valid
@@ -527,7 +527,7 @@ void Shell::load(const strings& args)
 
 	// release memory
 	xmlFreeDoc(doc);
-	
+
 	// check if there was an error
 	if (wasError)
 	{
@@ -536,7 +536,7 @@ void Shell::load(const strings& args)
 		commonDefinitions.constants.clear();
 		allVariables.clear();
 	}
-	
+
 	// check if there was some matching problem
 	if (noNodeCount)
 	{
@@ -551,12 +551,12 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 	Error error;
 	BytecodeVector bytecode;
 	unsigned allocatedVariablesCount;
-	
+
 	Compiler compiler;
 	compiler.setTargetDescription(getDescription(nodeId));
 	compiler.setCommonDefinitions(&commonDefinitions);
 	bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
-	
+
 	if (result)
 	{
 		// send bytecode
@@ -591,7 +591,7 @@ void Shell::stop(const strings& args)
 		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
-	
+
 	// build stop message and send
 	Stop stopMsg(nodeId);
 	stopMsg.serialize(targetStream);
@@ -613,7 +613,7 @@ void Shell::run(const strings& args)
 		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
-	
+
 	// build run message and send
 	Run runMsg(nodeId);
 	runMsg.serialize(targetStream);
@@ -641,7 +641,7 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 		if (varIt != varMap.end())
 			pos = varIt->second.first;
 	}
-	
+
 	// if variable is not user-defined, check whether it is provided by this node
 	if (pos == unsigned(-1))
 	{
@@ -664,10 +664,10 @@ int main(int argc, char *argv[])
 		wcerr << "Usage: " << argv[0] << " TARGET" << endl;
 		return 1;
 	}
-	
+
 	// initialize Dashel plugins
 	Dashel::initPlugins();
-	
+
 	// create the shell
 	Shell shell(argv[1]);
 	// check whether connection was successful
@@ -676,11 +676,11 @@ int main(int argc, char *argv[])
 		wcerr << "Connection failure" << endl;
 		return 2;
 	}
-	
+
 	// run the Dashel Hub
 	do {
 		shell.pingNetwork();
 	} while (shell.run1s());
-	
+
 	return 0;
 }

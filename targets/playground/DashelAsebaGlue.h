@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -42,18 +42,18 @@ namespace Aseba
 
 	public:
 		SimpleDashelConnection(unsigned port);
-		
+
 		void sendBuffer(uint16_t nodeId, const uint8_t* data, uint16_t length) override;
-		
+
 		void connectionCreated(Dashel::Stream *stream) override;
 		void incomingData(Dashel::Stream *stream) override;
 		void connectionClosed(Dashel::Stream *stream, bool abnormal) override;
-		
+
 	protected:
 		void clearBreakpoints();
 		void closeOldStreams();
 	};
-	
+
 } // namespace Aseba
 
 
@@ -83,40 +83,40 @@ namespace Enki
 			updateZeroconfStatus();
 #endif // ZEROCONF_SUPPORT
 		}
-		
+
 		virtual ~DashelConnected()
 		{
 			Aseba::vmStateToEnvironment.erase(&this->vm);
 		}
-		
+
 	protected:
 		// from AbstractNodeGlue
-		
+
 		virtual void externalInputStep(double dt) override
 		{
 			// do a network step, if there are some events from the network, they will be executed
 			Hub::step();
-			
+
 			// disconnect old streams
 			closeOldStreams();
 		}
-		
+
 #ifdef ZEROCONF_SUPPORT
 		Aseba::Zeroconf& zeroconf;
 		std::string robotTypeName;
-		
+
 		void connectionCreated(Dashel::Stream *stream) override
 		{
 			Aseba::SimpleDashelConnection::connectionCreated(stream);
 			updateZeroconfStatus();
 		}
-		
+
 		void connectionClosed(Dashel::Stream *stream, bool abnormal) override
 		{
 			Aseba::SimpleDashelConnection::connectionClosed(stream, abnormal);
 			updateZeroconfStatus();
 		}
-		
+
 		void updateZeroconfStatus()
 		{
 			try
@@ -135,7 +135,7 @@ namespace Enki
 		}
 #endif // ZEROCONF_SUPPORT
 	};
-	
+
 } // namespace Enki
 
 

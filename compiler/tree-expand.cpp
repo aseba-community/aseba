@@ -540,7 +540,7 @@ namespace Aseba
 			// full array access
 			return arraySize;
 	}
-	
+
 
 	/*
 	 * Convenience functions

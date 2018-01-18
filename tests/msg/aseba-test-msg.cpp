@@ -33,10 +33,10 @@ void testMessage(function<void(T&)> initFunc, initializer_list<function<void(T&)
 {
 	// create first object
 	unique_ptr<T> m1(new T(forward<Args>(args)...));
-	
+
 	// set values
 	initFunc(*m1);
-	
+
 	// serialize and deserialize...
 	unique_ptr<T> m2;
 	{
@@ -50,27 +50,27 @@ void testMessage(function<void(T&)> initFunc, initializer_list<function<void(T&)
 		}
 		m2.reset(dynamic_cast<T*>(m2super.release()));
 	}
-	
+
 	// check for equality
 	if (!(*m1 == *m2))
 	{
 		cerr << "Message type " << typeid(T).name() << " changed content after serialization" << endl;
 		throw logic_error("Serialization failed");
 	}
-	
+
 	// count the current function, to display proper error message
 	unsigned count(0);
 	for (auto& modifyFunc: modifyFuncs)
 	{
 		// create a new object
 		m2.reset(new T(forward<Args>(args)...));
-		
+
 		// set values
 		initFunc(*m2);
-		
+
 		// modify values
 		modifyFunc(*m2);
-		
+
 		// serialize and deserialize...
 		{
 			Message::SerializationBuffer buffer;
@@ -83,14 +83,14 @@ void testMessage(function<void(T&)> initFunc, initializer_list<function<void(T&)
 			}
 			m2.reset(dynamic_cast<T*>(m2super.release()));
 		}
-		
+
 		// check for inequality
 		if (*m1 == *m2)
 		{
 			cerr << "Message type " << typeid(T).name() << " are still equal while content changed (function " << count << ") after serialization" << endl;
 			throw logic_error("Serialization failed");
 		}
-		
+
 		++count;
 	}
 }
@@ -112,13 +112,13 @@ void testMessageNoInitNoFunc(Args&&... args)
 int main()
 {
 	// Test the serialization and deserialization of all messages
-	
+
 	// The concept is that, for each message, we create and instance
 	// and call an init function.
 	// Then, we serialize and deserialize and check for equality.
 	// Then, for every modifier function in a list, we re-create and re-init
 	// an object, modify it, we serialize and deserialize, and check for inequality.
-	
+
 	testMessageNoInit<UserMessage>(
 		{
 			[](UserMessage& m) { m.data[0] = 4; },
@@ -127,7 +127,7 @@ int main()
 		},
 		0, VariablesDataVector{1, 2, 3}
 	);
-	
+
 	testMessage<BootloaderDescription>(
 		[](BootloaderDescription& m) { m.pageSize = 128; m.pagesStart = 10; m.pagesCount = 20; },
 		{
@@ -136,7 +136,7 @@ int main()
 			[](BootloaderDescription& m) { m.pagesCount = 10; }
 		}
 	);
-	
+
 	testMessage<BootloaderDataRead>(
 		[](BootloaderDataRead& m) { m.data = {{1, 2, 3, 4}}; },
 		{
@@ -146,32 +146,32 @@ int main()
 			[](BootloaderDataRead& m) { m.data[3] = 1; }
 		}
 	);
-	
+
 	testMessage<BootloaderAck>(
 		[](BootloaderAck& m) { m.errorCode = BootloaderAck::ErrorCode::PROGRAMMING_FAILED; m.errorAddress = 0xff; },
 		{
 			[](BootloaderAck& m) { m.errorCode = BootloaderAck::ErrorCode::SUCCESS; m.errorAddress = 0; }
 		}
 	);
-	
+
 	testMessageNoInit<ListNodes>(
 		{
 			[](ListNodes& m) { m.version = 1; }
 		}
 	);
-	
+
 	testMessageNoInit<NodePresent>(
 		{
 			[](NodePresent& m) { m.version = 1; }
 		}
 	);
-	
+
 	testMessageNoInit<GetDescription>(
 		{
 			[](GetDescription& m) { m.version = 1; }
 		}
 	);
-	
+
 	testMessage<GetNodeDescription>(
 		[](GetNodeDescription& m) {
 			m.dest = 1;
@@ -181,7 +181,7 @@ int main()
 			[](GetNodeDescription& m) { m.version = 1; }
 		}
 	);
-	
+
 	testMessage<Description>(
 		[](Description& m) {
 			m.name = L"test";
@@ -198,7 +198,7 @@ int main()
 			[](Description& m) { m.variablesSize = 512; }
 		}
 	);
-	
+
 	testMessage<NamedVariableDescription>(
 		[](NamedVariableDescription& m) {
 			m.name = L"test";
@@ -209,7 +209,7 @@ int main()
 			[](NamedVariableDescription& m) { m.size = 1; }
 		}
 	);
-	
+
 	testMessage<LocalEventDescription>(
 		[](LocalEventDescription& m) {
 			m.name = L"ontimer0";
@@ -220,7 +220,7 @@ int main()
 			[](LocalEventDescription& m) { m.description = L"another test event"; }
 		}
 	);
-	
+
 	testMessage<NativeFunctionDescription>(
 		[](NativeFunctionDescription& m) {
 			m.name = L"math.null";
@@ -232,9 +232,9 @@ int main()
 			[](NativeFunctionDescription& m) { m.parameters.emplace_back(L"param0", 1); }
 		}
 	);
-	
+
 	testMessageNoInitNoFunc<Disconnected>();
-	
+
 	testMessage<Variables>(
 		[](Variables& m) {
 			m.start = 10;
@@ -247,7 +247,7 @@ int main()
 			[](Variables& m) { m.variables.push_back(5); }
 		}
 	);
-	
+
 	testMessage<ArrayAccessOutOfBounds>(
 		[](ArrayAccessOutOfBounds& m) {
 			m.pc = 10;
@@ -260,7 +260,7 @@ int main()
 			[](ArrayAccessOutOfBounds& m) { m.index = 20; }
 		}
 	);
-	
+
 	testMessage<DivisionByZero>(
 		[](DivisionByZero& m) {
 			m.pc = 10;
@@ -269,7 +269,7 @@ int main()
 			[](DivisionByZero& m) { m.pc = 5; }
 		}
 	);
-	
+
 	testMessage<EventExecutionKilled>(
 		[](EventExecutionKilled& m) {
 			m.pc = 10;
@@ -278,7 +278,7 @@ int main()
 			[](EventExecutionKilled& m) { m.pc = 5; }
 		}
 	);
-	
+
 	testMessage<NodeSpecificError>(
 		[](NodeSpecificError& m) {
 			m.pc = 10;
@@ -289,7 +289,7 @@ int main()
 			[](NodeSpecificError& m) { m.message = L"my other error"; }
 		}
 	);
-	
+
 	testMessage<ExecutionStateChanged>(
 		[](ExecutionStateChanged& m) {
 			m.pc = 10;
@@ -300,7 +300,7 @@ int main()
 			[](ExecutionStateChanged& m) { m.flags = 1; }
 		}
 	);
-	
+
 	testMessage<BreakpointSetResult>(
 		[](BreakpointSetResult& m) {
 			m.pc = 10;
@@ -311,7 +311,7 @@ int main()
 			[](BreakpointSetResult& m) { m.success = 0; }
 		}
 	);
-	
+
 	testMessage<BootloaderReset>(
 		[](BootloaderReset& m) {
 			m.dest = 1;
@@ -320,7 +320,7 @@ int main()
 			[](BootloaderReset& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<BootloaderReadPage>(
 		[](BootloaderReadPage& m) {
 			m.dest = 1;
@@ -331,7 +331,7 @@ int main()
 			[](BootloaderReadPage& m) { m.pageNumber = 1; }
 		}
 	);
-	
+
 	testMessage<BootloaderWritePage>(
 		[](BootloaderWritePage& m) {
 			m.dest = 1;
@@ -342,7 +342,7 @@ int main()
 			[](BootloaderWritePage& m) { m.pageNumber = 1; }
 		}
 	);
-	
+
 	testMessage<BootloaderPageDataWrite>(
 		[](BootloaderPageDataWrite& m) {
 			m.dest = 1;
@@ -356,7 +356,7 @@ int main()
 			[](BootloaderPageDataWrite& m) { m.data[3] = 1; }
 		}
 	);
-	
+
 	testMessage<SetBytecode>(
 		[](SetBytecode& m) {
 			m.dest = 1;
@@ -369,7 +369,7 @@ int main()
 			[](SetBytecode& m) { m.bytecode.push_back(5); }
 		}
 	);
-	
+
 	testMessage<Reset>(
 		[](Reset& m) {
 			m.dest = 1;
@@ -378,7 +378,7 @@ int main()
 			[](Reset& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<Run>(
 		[](Run& m) {
 			m.dest = 1;
@@ -387,7 +387,7 @@ int main()
 			[](Run& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<Pause>(
 		[](Pause& m) {
 			m.dest = 1;
@@ -396,7 +396,7 @@ int main()
 			[](Pause& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<Step>(
 		[](Step& m) {
 			m.dest = 1;
@@ -405,7 +405,7 @@ int main()
 			[](Step& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<Stop>(
 		[](Stop& m) {
 			m.dest = 1;
@@ -414,7 +414,7 @@ int main()
 			[](Stop& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<GetExecutionState>(
 		[](GetExecutionState& m) {
 			m.dest = 1;
@@ -423,7 +423,7 @@ int main()
 			[](GetExecutionState& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<BreakpointSet>(
 		[](BreakpointSet& m) {
 			m.dest = 1;
@@ -434,7 +434,7 @@ int main()
 			[](BreakpointSet& m) { m.pc = 20; }
 		}
 	);
-	
+
 	testMessage<BreakpointClear>(
 		[](BreakpointClear& m) {
 			m.dest = 1;
@@ -445,7 +445,7 @@ int main()
 			[](BreakpointClear& m) { m.pc = 20; }
 		}
 	);
-	
+
 	testMessage<BreakpointClearAll>(
 		[](BreakpointClearAll& m) {
 			m.dest = 1;
@@ -454,7 +454,7 @@ int main()
 			[](BreakpointClearAll& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<GetVariables>(
 		[](GetVariables& m) {
 			m.dest = 1;
@@ -467,7 +467,7 @@ int main()
 			[](GetVariables& m) { m.length = 20; }
 		}
 	);
-	
+
 	testMessage<SetVariables>(
 		[](SetVariables& m) {
 			m.dest = 1;
@@ -482,7 +482,7 @@ int main()
 			[](SetVariables& m) { m.variables.push_back(5); }
 		}
 	);
-	
+
 	testMessage<WriteBytecode>(
 		[](WriteBytecode& m) {
 			m.dest = 1;
@@ -491,7 +491,7 @@ int main()
 			[](WriteBytecode& m) { m.dest = 3; }
 		}
 	);
-	
+
 	testMessage<Reboot>(
 		[](Reboot& m) {
 			m.dest = 1;
@@ -508,6 +508,6 @@ int main()
 			[](Sleep& m) { m.dest = 3; }
 		}
 	);
-	
+
 	return 0;
 }
