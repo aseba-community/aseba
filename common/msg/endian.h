@@ -69,24 +69,29 @@ namespace Aseba
 	//! Swap bytes for 16-bit word
 	template<> inline void ByteSwapper::swapp<2>(void *data)
 	{
+		//clang-format off
 		const uint16_t a=*reinterpret_cast<uint16_t*>(data);
 		*reinterpret_cast<uint16_t*>(data)=
 			((a&0x00ff)<< 8)|
 			((a>> 8)&0x00ff);
+		//clang-format on
 	}
 	//! Swap bytes for 32-bit word
 	template<> inline void ByteSwapper::swapp<4>(void *data)
 	{
+		//clang-format off
 		const uint32_t a=*reinterpret_cast<uint32_t*>(data);
 		*reinterpret_cast<uint32_t*>(data)=
 			((a&0x000000ff)<<24)|
 			((a&0x0000ff00)<< 8)|
 			((a>> 8)&0x0000ff00)|
 			((a>>24)&0x000000ff);
+		//clang-format on
 	}
 	//! Swap bytes for 64-bit word
 	template<> inline void ByteSwapper::swapp<8>(void *data)
 	{
+		//clang-format off
 		const uint64_t a=*reinterpret_cast<uint64_t*>(data);
 		*reinterpret_cast<uint64_t*>(data)=
 			((a&0x00000000000000ffLL)<<56)|
@@ -97,6 +102,7 @@ namespace Aseba
 			((a>>24)&0x0000000000ff0000LL)|
 			((a>>40)&0x000000000000ff00LL)|
 			((a>>56)&0x00000000000000ffLL);
+		//clang-format on
 	}
 
 	#ifdef __BIG_ENDIAN__

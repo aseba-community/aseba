@@ -90,6 +90,7 @@ namespace Aseba
 		// create widget for holding tabs
 		auto tabs = new QTabWidget;
 
+		//clang-format off
 		// about tab
 		const QString aboutText =
 			"<p>" + parameters.description + "</p>" +
@@ -97,6 +98,7 @@ namespace Aseba
 			"<p>" + tr("This program is part of Aseba, a set of tools which allow beginners to program robots easily and efficiently. For more information about Aseba, visit %1.").arg("<a href=\"http://aseba.io\">aseba.io</a>") + "</p>" +
 			"<p>" + tr("(c) 2006-2017 <a href=\"http://stephane.magnenat.net\">Stéphane Magnenat</a> and <a href=\"https://github.com/aseba-community/aseba/blob/master/authors.txt\">other contributors</a>. See tabs \"Authors\" and \"Thanks To\" for more information.") + " " +
 			tr("Aseba is open-source licensed under the <a href=\"https://www.gnu.org/licenses/lgpl.html\">LGPL version 3</a>.") + "</p>"
+		//clang-format on
 		;
 		auto aboutTextLabel = new QLabel(aboutText);
 		aboutTextLabel->setWordWrap(true);
@@ -144,6 +146,7 @@ namespace Aseba
 			}
 			if (personList.second == &thankToList)
 			{
+				//clang-format off
 				using Institution = std::pair<QString, QString>;
 				using Institutions = std::vector<Institution>;
 				const Institutions institutions = {
@@ -153,6 +156,7 @@ namespace Aseba
 					{ "Game Technology Center, ETH Zurich", "http://www.gtc.inf.ethz.ch/" },
 					{ "Inria, France", "https://www.inria.fr/en/" }
 				};
+				//clang-format on
 				for (const auto& institution: institutions)
 				{
 					const QString text(QString("<b>%1</b><br/><a href=\"%2\">web</a>").arg(institution.first).arg(institution.second));
@@ -170,12 +174,15 @@ namespace Aseba
 					QString id;
 					QString name;
 				};
+
+				//clang-format off
 				using Grants = std::vector<Grant>;
 				const Grants grants = {
 					{ "Swiss National Center of Competence in Research", "", "Robotics" },
 					{ "GebertRuf Stiftung", "GRS-017/13", "Robot Design for Understanding" },
 					{ "Swiss Commission for Technology and Innovation",  "17479.2", "Combining Augmented Reality and Robotics for Innovative Accessible Educational Tools" }
 				};
+				//clang-format on
 				for (const auto& grant: grants)
 				{
 					QString text;
@@ -201,6 +208,7 @@ namespace Aseba
 		}
 
 		// libraries tab
+		//clang-format off
 		const QString welcomeText = tr("The following software are used in Aseba:");
 		const QString libEntryText = tr("<b><a href=\"%3\">%1</a></b> version %2");
 		const QString asebaBuildInfo = tr("build version %1, protocol version %2").arg(ASEBA_BUILD_VERSION).arg(ASEBA_PROTOCOL_VERSION);
@@ -221,6 +229,7 @@ namespace Aseba
 #endif // HAVE_ENKI
 			"</ul>"
 		;
+		//clang-format on
 		auto libraryTextLabel = new QLabel(libraryText);
 		libraryTextLabel->setOpenExternalLinks(true);
 		auto libraryEnclosingLayout = new QHBoxLayout;

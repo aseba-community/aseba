@@ -29,6 +29,8 @@
 class QTranslator;
 class QVBoxLayout;
 
+//clang-format off
+
 namespace Aseba
 {
 	/** \addtogroup studio */

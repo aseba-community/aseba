@@ -1,3 +1,4 @@
+//clang-format off
 #ifndef __ASEBA_AUTHORS_H
 #define __ASEBA_AUTHORS_H
 
