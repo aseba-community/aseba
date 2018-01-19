@@ -42,6 +42,7 @@ namespace Aseba
 	//! Return the number of words this element takes in memory
 	unsigned BytecodeElement::getWordSize() const
 	{
+		// clang-format off
 		switch (bytecode >> 12)
 		{
 			case ASEBA_BYTECODE_LARGE_IMMEDIATE:
@@ -49,13 +50,14 @@ namespace Aseba
 			case ASEBA_BYTECODE_STORE_INDIRECT:
 			case ASEBA_BYTECODE_CONDITIONAL_BRANCH:
 			return 2;
-			
+
 			case ASEBA_BYTECODE_EMIT:
 			return 3;
-			
+
 			default:
 			return 1;
 		}
+		// clang-format on
 	}
 	
 	//! Constructor. You must setup a description using setTargetDescription() before any call to compile().
@@ -427,6 +429,7 @@ namespace Aseba
 			
 			dump << "    ";
 			dump << pc << " (" << bytecode[pc].line << ") : ";
+			// clang-format off
 			switch (bytecode[pc] >> 12)
 			{
 				case ASEBA_BYTECODE_STOP:
@@ -532,6 +535,7 @@ namespace Aseba
 				pc++;
 				break;
 			}
+			// clang-format on
 		}
 	}
 	

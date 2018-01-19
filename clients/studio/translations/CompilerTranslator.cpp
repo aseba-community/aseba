@@ -15,7 +15,7 @@ namespace Aseba
 
 		switch (error)
 		{
-
+			// clang-format off
 			case ERROR_BROKEN_TARGET:
 				msg = tr("Broken target description: not enough room for internal variables");
 				break;
@@ -574,6 +574,7 @@ namespace Aseba
 
 			default:
 				msg = tr("Unknown error");
+			// clang-format on
 		}
 
 		return msg.toStdWString();

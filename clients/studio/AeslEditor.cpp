@@ -223,6 +223,7 @@ namespace Aseba
 			{
 				// find length of number or word
 				while (pos + len < text.length())
+				{
 					if (
 						(!text[pos + len].isDigit()) &&
 						(!text[pos + len].isLetter()) &&
@@ -232,6 +233,7 @@ namespace Aseba
 						break;
 					else
 						len++;
+				}
 			}
 			len = len > 0 ? len : 1;
 			setFormat(pos, len, Qt::red);
@@ -752,9 +754,12 @@ namespace Aseba
 
 	bool AeslEditor::handleCompleter(QKeyEvent *event)
 	{
+		// clang-format off
 		// if the popup is visible, forward special keys to the completer
-		if (completer && completer->popup()->isVisible()) {
-			switch (event->key()) {
+		if (completer && completer->popup()->isVisible())
+		{
+			switch (event->key())
+			{
 				case Qt::Key_Enter:
 				case Qt::Key_Return:
 				case Qt::Key_Escape:
@@ -766,6 +771,7 @@ namespace Aseba
 					break;
 			}
 		}
+		// clang-format on
 
 		// not the case, go on with other handlers
 		return false;
@@ -788,6 +794,7 @@ namespace Aseba
 			if (event->modifiers() & Qt::ControlModifier)
 			{
 				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+				// clang-format off
 				if ((cursor.selectedText() == "\t") ||
 					(	(cursor.selectedText() == " ") &&
 						(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
@@ -795,6 +802,7 @@ namespace Aseba
 					)
 				)
 					cursor.removeSelectedText();
+				// clang-format on
 			}
 			else
 				cursor.insertText("\t");
@@ -806,6 +814,7 @@ namespace Aseba
 		if (event->modifiers() & Qt::ControlModifier)
 		{
 			cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+			// clang-format off
 			if ((cursor.selectedText() == "\t") ||
 				(	(cursor.selectedText() == " ") &&
 					(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
@@ -813,6 +822,7 @@ namespace Aseba
 				)
 			)
 				cursor.removeSelectedText();
+			// clang-format on
 		}
 		else
 			cursor.insertText("\t");

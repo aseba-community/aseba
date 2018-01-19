@@ -2777,6 +2777,7 @@ namespace Aseba
 		const NodeTab* tab = getTabFromId(node);
 		auto tabName = nodes->tabText(index).replace(QString("&"), QString(""));
 		
+		// clang-format off
 		nodes->addTab(
 			new AbsentNodeTab(
 				node,
@@ -2786,6 +2787,7 @@ namespace Aseba
 			),
 			tabName
 		);
+		// clang-format on
 		
 		nodes->removeAndDeleteTab(index);
 		
