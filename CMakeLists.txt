@@ -49,10 +49,6 @@ endif ()
 if (WIN32)
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 endif()
-# check that the Qt5 installation is given as prefix
-if ((APPLE OR WIN32) AND NOT CMAKE_PREFIX_PATH)
-	message(FATAL_ERROR "You must set CMAKE_PREFIX_PATH to the location of your Qt5 installation")
-endif ()
 
 # Remove -Wl,--no-undefined which CMake 3.0.2 (on OpenSUSE 13.2) adds to the
 # linker options when building shared libs. That breaks building libs that use
