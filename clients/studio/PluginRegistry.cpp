@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -34,13 +34,13 @@
 #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
 
 #ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
-    #include "plugins/ThymioBlockly/ThymioBlockly.h"
+#	include "plugins/ThymioBlockly/ThymioBlockly.h"
 #endif
 namespace Aseba
-{	
+{
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	//! Create an instance of C, creating a StudioInterface to wrap node and pass it to the constructor of C
 	template<typename C>
 	NodeToolInterface* createInstance(NodeTab* node)
@@ -54,14 +54,14 @@ namespace Aseba
 		for (ProductIds::const_iterator it(pid.begin()); it != pid.end(); ++it)
 			reg(name, *it, func);
 	}
-	
+
 	//! Register a class with a name/a pid by storing a pointer to its constructor
 	void NodeToolRegistrar::reg(const QString& name, const ProductId pid, const CreatorFunc func)
 	{
 		pidCreators.insert(pid, CreatorFuncNamePair(func, name));
 		namedCreators[name] = func;
 	}
-	
+
 	//! Update tool list with onse for given pid
 	void NodeToolRegistrar::update(const ProductId pid, NodeTab* node, NodeToolInterfaces& tools) const
 	{
@@ -79,7 +79,7 @@ namespace Aseba
 			++it;
 		}
 	}
-	
+
 	//! Create tool list with one of a given name
 	void NodeToolRegistrar::update(const QString& name, NodeTab* node, NodeToolInterfaces& tools) const
 	{
@@ -93,14 +93,14 @@ namespace Aseba
 		tools.push_back(creatorFunc(node));
 		tools.back()->name = name;
 	}
-	
+
 	//! Print the list of registered classes to stream
-	void NodeToolRegistrar::dump(std::ostream &stream)
+	void NodeToolRegistrar::dump(std::ostream& stream)
 	{
 		for (PidCreatorMap::const_iterator it = pidCreators.begin(); it != pidCreators.end(); ++it)
 			stream << "- " << it->first << "\n";
 	}
-	
+
 	NodeToolRegistrer::NodeToolRegistrer()
 	{
 		ProductIds linearCameraPids;
@@ -112,6 +112,6 @@ namespace Aseba
 #endif
 		reg("StopThymioPlugin", ASEBA_PID_THYMIO2, &createInstance<StopThymioPlugin>);
 	}
-	
+
 	/*@}*/
 } // namespace Aseba

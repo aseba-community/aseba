@@ -1,3 +1,4 @@
+//clang-format off
 #ifndef __ASEBA_AUTHORS_H
 #define __ASEBA_AUTHORS_H
 
@@ -9,7 +10,7 @@ namespace Aseba
 	struct AuthorInfo
 	{
 		using Tags = std::set<std::string>;
-		
+
 		std::string name;
 		std::string email;
 		std::string web;
@@ -17,7 +18,7 @@ namespace Aseba
 		Tags tags;
 	};
 	using AuthorInfos = std::vector<AuthorInfo>;
-	
+
 	struct InstitutionInfo
 	{
 		std::string name;
@@ -76,7 +77,7 @@ namespace Aseba
 			{ u8"blockly", }
 		},
 	};
-	
+
 	static const AuthorInfos thankToList = {
 		{
 			u8"Maria María Beltrán",

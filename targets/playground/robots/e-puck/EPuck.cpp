@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -32,15 +32,15 @@ using namespace Enki;
 
 unsigned Enki::energyPool = INITIAL_POOL_ENERGY;
 
-extern "C" void PlaygroundEPuckNative_energysend(AsebaVMState *vm)
+extern "C" void PlaygroundEPuckNative_energysend(AsebaVMState* vm)
 {
 	int index = AsebaNativePopArg(vm);
-	
+
 	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
 	if (epuck)
 	{
 		const uint16_t amount = vm->variables[index];
-		
+
 		unsigned toSend = std::min((unsigned)amount, (unsigned)epuck->energy);
 		energyPool += toSend;
 		epuck->energy -= toSend;
@@ -50,15 +50,15 @@ extern "C" void PlaygroundEPuckNative_energysend(AsebaVMState *vm)
 extern "C" AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energysend;
 
 
-extern "C" void PlaygroundEPuckNative_energyreceive(AsebaVMState *vm)
+extern "C" void PlaygroundEPuckNative_energyreceive(AsebaVMState* vm)
 {
 	int index = AsebaNativePopArg(vm);
-	
+
 	AsebaFeedableEPuck* epuck(getEnkiObject<AsebaFeedableEPuck>(vm));
 	if (epuck)
 	{
 		uint16_t amount = vm->variables[index];
-		
+
 		unsigned toReceive = std::min((unsigned)amount, energyPool);
 		energyPool -= toReceive;
 		epuck->energy += toReceive;
@@ -68,10 +68,10 @@ extern "C" void PlaygroundEPuckNative_energyreceive(AsebaVMState *vm)
 extern "C" AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyreceive;
 
 
-extern "C" void PlaygroundEPuckNative_energyamount(AsebaVMState *vm)
+extern "C" void PlaygroundEPuckNative_energyamount(AsebaVMState* vm)
 {
 	int index = AsebaNativePopArg(vm);
-	
+
 	vm->variables[index] = energyPool;
 }
 
@@ -83,18 +83,18 @@ extern "C" AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energ
 namespace Enki
 {
 	using namespace Aseba;
-	
+
 	// EPuckFeeding
-	
-	EPuckFeeding::EPuckFeeding(Robot *owner) : energy(EPUCK_FEEDER_INITIAL_ENERGY)
+
+	EPuckFeeding::EPuckFeeding(Robot* owner) : energy(EPUCK_FEEDER_INITIAL_ENERGY)
 	{
 		r = EPUCK_FEEDER_RANGE;
 		this->owner = owner;
 	}
-	
-	void EPuckFeeding::objectStep(double dt, World *w, PhysicalObject *po)
+
+	void EPuckFeeding::objectStep(double dt, World* w, PhysicalObject* po)
 	{
-		FeedableEPuck *epuck = dynamic_cast<FeedableEPuck *>(po);
+		FeedableEPuck* epuck = dynamic_cast<FeedableEPuck*>(po);
 		if (epuck && energy > 0)
 		{
 			double dEnergy = dt * EPUCK_FEEDER_D_ENERGY;
@@ -104,39 +104,39 @@ namespace Enki
 				owner->setColor(EPUCK_FEEDER_COLOR_INACTIVE);
 		}
 	}
-	
-	void EPuckFeeding::finalize(double dt, World *w)
+
+	void EPuckFeeding::finalize(double dt, World* w)
 	{
-		if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy+dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
+		if ((energy < EPUCK_FEEDER_THRESHOLD_SHOW) && (energy + dt >= EPUCK_FEEDER_THRESHOLD_SHOW))
 			owner->setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 		energy += EPUCK_FEEDER_RECHARGE_RATE * dt;
 		if (energy > EPUCK_FEEDER_MAX_ENERGY)
 			energy = EPUCK_FEEDER_MAX_ENERGY;
 	}
-	
+
 	// EPuckFeeder
-	
+
 	EPuckFeeder::EPuckFeeder() : feeding(this)
 	{
 		setRectangular(3.2, 3.2, EPUCK_FEEDER_HEIGHT, -1);
 		addLocalInteraction(&feeding);
 		setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 	}
-	
+
 	// ScoreModifier
-	
-	void ScoreModifier::step(double dt, World *w)
+
+	void ScoreModifier::step(double dt, World* w)
 	{
 		double x = owner->pos.x;
 		double y = owner->pos.y;
-		if ((x > 32) && (x < 110.4-32) && (y > 67.2) && (y < 110.4-32))
+		if ((x > 32) && (x < 110.4 - 32) && (y > 67.2) && (y < 110.4 - 32))
 			polymorphic_downcast<FeedableEPuck*>(owner)->score += dt * SCORE_MODIFIER_COEFFICIENT;
 	}
-	
+
 	// FeedableEPuck
-	
+
 	FeedableEPuck::FeedableEPuck() :
-		EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), 
+		EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA),
 		energy(EPUCK_INITIAL_ENERGY),
 		score(0),
 		diedAnimation(-1),
@@ -144,11 +144,11 @@ namespace Enki
 	{
 		addGlobalInteraction(&scoreModifier);
 	}
-	
+
 	void FeedableEPuck::controlStep(double dt)
 	{
 		EPuck::controlStep(dt);
-		
+
 		energy -= dt * EPUCK_ENERGY_CONSUMPTION_RATE;
 		score += dt;
 		if (energy < 0)
@@ -160,29 +160,29 @@ namespace Enki
 		else if (diedAnimation >= 0)
 			diedAnimation--;
 	}
-	
+
 	// AsebaFeedableEPuck
-	
-	AsebaFeedableEPuck::AsebaFeedableEPuck(std::string robotName, int16_t nodeId):
+
+	AsebaFeedableEPuck::AsebaFeedableEPuck(std::string robotName, int16_t nodeId) :
 		Aseba::SingleVMNodeGlue(std::move(robotName), nodeId)
 	{
 		bytecode.resize(1024);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(32);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
-		vm.variables = reinterpret_cast<int16_t *>(&variables);
+
+		vm.variables = reinterpret_cast<int16_t*>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
-		
+
 		AsebaVMInit(&vm);
-		
+
 		variables.id = vm.nodeId;
 		variables.productId = ASEBA_PID_PLAYGROUND_EPUCK;
 	}
-	
+
 	void AsebaFeedableEPuck::controlStep(double dt)
 	{
 		// get physical variables
@@ -200,99 +200,84 @@ namespace Enki
 			variables.camG[i] = static_cast<int16_t>(camera.image[i].g() * 100.);
 			variables.camB[i] = static_cast<int16_t>(camera.image[i].b() * 100.);
 		}
-		
+
 		variables.energy = static_cast<int16_t>(energy);
-		
+
 		// process external inputs (incoming event from network or environment, etc.)
 		externalInputStep(dt);
-		
+
 		// FIXME: running the VM should be done in a soft timer to be independant of time step
-		
+
 		// run VM
 		AsebaVMRun(&vm, 1000);
-		
+
 		// reschedule a IR sensors and camera events if we are not in step by step
-		if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+		if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK)
+			|| AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 		{
 			AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 			AsebaVMRun(&vm, 1000);
-			AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-1);
+			AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START - 1);
 			AsebaVMRun(&vm, 1000);
 		}
-		
+
 		// set physical variables
 		leftSpeed = (double)(variables.speedL * 12.8) / 1000.;
 		rightSpeed = (double)(variables.speedR * 12.8) / 1000.;
-		setColor(Color(
-			Aseba::clamp<double>(variables.colorR*0.01, 0, 1),
-			Aseba::clamp<double>(variables.colorG*0.01, 0, 1),
-			Aseba::clamp<double>(variables.colorB*0.01, 0, 1)
-		));
-		
+		setColor(Color(Aseba::clamp<double>(variables.colorR * 0.01, 0, 1),
+			Aseba::clamp<double>(variables.colorG * 0.01, 0, 1),
+			Aseba::clamp<double>(variables.colorB * 0.01, 0, 1)));
+
 		// set motion
 		FeedableEPuck::controlStep(dt);
 	}
-	
-	
+
+
 	// robot description
-	
+
 	extern "C" AsebaVMDescription PlaygroundEPuckVMDescription;
-	
+
 	// really ugly and *thread unsafe* hack to have e-puck with different names
 	static char ePuckName[] = "e-puck0";
 
 	const AsebaVMDescription* AsebaFeedableEPuck::getDescription() const
 	{
-		const unsigned id(Aseba::clamp<unsigned>(vm.nodeId-1,0,9));
+		const unsigned id(Aseba::clamp<unsigned>(vm.nodeId - 1, 0, 9));
 		ePuckName[6] = '0' + id;
 		PlaygroundEPuckVMDescription.name = ePuckName;
 		return &PlaygroundEPuckVMDescription;
 	}
-	
-	
+
+
 	// local events, static so only visible in this file
-	
-	static const AsebaLocalEventDescription localEvents[] = {
-		{ "ir_sensors", "IR sensors updated" },
-		{"camera", "camera updated"},
-		{ nullptr, nullptr }
-	};
-	
-	const AsebaLocalEventDescription * AsebaFeedableEPuck::getLocalEventsDescriptions() const
-	{
-		return localEvents;
-	}
-	
-	
+
+	static const AsebaLocalEventDescription localEvents[] = { { "ir_sensors", "IR sensors updated" },
+		{ "camera", "camera updated" },
+		{ nullptr, nullptr } };
+
+	const AsebaLocalEventDescription* AsebaFeedableEPuck::getLocalEventsDescriptions() const { return localEvents; }
+
+
 	// array of descriptions of native functions, static so only visible in this file
-	
-	static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-	{
-		ASEBA_NATIVES_STD_DESCRIPTIONS,
+
+	static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] = { ASEBA_NATIVES_STD_DESCRIPTIONS,
 		&PlaygroundEPuckNativeDescription_energysend,
 		&PlaygroundEPuckNativeDescription_energyreceive,
 		&PlaygroundEPuckNativeDescription_energyamount,
-		0
-	};
+		0 };
 
-	const AsebaNativeFunctionDescription * const * AsebaFeedableEPuck::getNativeFunctionsDescriptions() const
+	const AsebaNativeFunctionDescription* const* AsebaFeedableEPuck::getNativeFunctionsDescriptions() const
 	{
 		return nativeFunctionsDescriptions;
 	}
-	
+
 	// array of native functions, static so only visible in this file
-	
-	static AsebaNativeFunctionPointer nativeFunctions[] =
-	{
-		ASEBA_NATIVES_STD_FUNCTIONS,
+
+	static AsebaNativeFunctionPointer nativeFunctions[] = { ASEBA_NATIVES_STD_FUNCTIONS,
 		PlaygroundEPuckNative_energysend,
 		PlaygroundEPuckNative_energyreceive,
-		PlaygroundEPuckNative_energyamount
-	};
-	
-	void AsebaFeedableEPuck::callNativeFunction(uint16_t id)
-	{
-		nativeFunctions[id](&vm);
-	}
-	
+		PlaygroundEPuckNative_energyamount };
+
+	void AsebaFeedableEPuck::callNativeFunction(uint16_t id) { nativeFunctions[id](&vm); }
+
 } // Enki

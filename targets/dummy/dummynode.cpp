@@ -4,22 +4,22 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef ASEBA_ASSERT
-#define ASEBA_ASSERT
+#	define ASEBA_ASSERT
 #endif
 
 #include "../../vm/vm.h"
@@ -29,7 +29,7 @@
 #include "../../common/utils/utils.h"
 #include "../../common/utils/FormatableString.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#	include "../../common/zeroconf/zeroconf-dashelhub.h"
 #endif // ZEROCONF_SUPPORT
 #include "../../transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
@@ -41,7 +41,7 @@
 
 extern AsebaVMDescription nodeDescription;
 
-class AsebaNode: public Dashel::Hub
+class AsebaNode : public Dashel::Hub
 {
 private:
 	AsebaVMState vm;
@@ -57,10 +57,10 @@ private:
 		int16_t user[1024];
 	} variables;
 	char mutableName[12];
-	
+
 	// stream for listening to incoming connections
 	Dashel::Stream* listenStream;
-	
+
 public:
 	// public because accessed from a glue function
 	uint16_t lastMessageSource;
@@ -75,34 +75,34 @@ public:
 #endif // ZEROCONF_SUPPORT
 
 public:
-	
 	AsebaNode()
 #ifdef ZEROCONF_SUPPORT
-		:zeroconf(*this)
+		:
+		zeroconf(*this)
 #endif // ZEROCONF_SUPPORT
 	{
 		// setup variables
 		vm.nodeId = 1;
-		
+
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(64);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
-		vm.variables = reinterpret_cast<int16_t *>(&variables);
+
+		vm.variables = reinterpret_cast<int16_t*>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 	}
-	
+
 	Dashel::Stream* listen(const int port, const int deltaNodeId)
 	{
 		vm.nodeId = 1 + deltaNodeId;
 		strncpy(mutableName, "dummynode-0", 12);
 		mutableName[10] = '0' + deltaNodeId;
 		nodeDescription.name = mutableName;
-		
+
 		// connect network
 		try
 		{
@@ -135,7 +135,9 @@ public:
 		if (!listenStream)
 			return;
 		// advertise target
-		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", stream != nullptr, { vm.nodeId }, { static_cast<unsigned int>(variables.productId) }};
+		Aseba::Zeroconf::TxtRecord txt{ ASEBA_PROTOCOL_VERSION, "Dummy Node", stream != nullptr, { vm.nodeId }, {
+										   static_cast<unsigned int>(variables.productId)
+									   } };
 		try
 		{
 			if (stream)
@@ -149,8 +151,8 @@ public:
 		}
 	}
 #endif // ZEROCONF_SUPPORT
-	
-	virtual void connectionCreated(Dashel::Stream *stream)
+
+	virtual void connectionCreated(Dashel::Stream* stream)
 	{
 		std::string targetName = stream->getTargetName();
 		if (targetName.substr(0, targetName.find_first_of(':')) == "tcp")
@@ -158,7 +160,7 @@ public:
 			// schedule current stream for disconnection
 			if (this->stream)
 				toDisconnect.push_back(this->stream);
-			
+
 			// set new stream as current stream
 			this->stream = stream;
 			std::cerr << this << " : New client connected." << std::endl;
@@ -168,8 +170,8 @@ public:
 #endif // ZEROCONF_SUPPORT
 		}
 	}
-	
-	virtual void connectionClosed(Dashel::Stream *stream, bool abnormal)
+
+	virtual void connectionClosed(Dashel::Stream* stream, bool abnormal)
 	{
 #ifdef ZEROCONF_SUPPORT
 		zeroconf.dashelConnectionClosed(stream);
@@ -177,7 +179,7 @@ public:
 		this->stream = nullptr;
 		// clear breakpoints
 		vm.breakpointsCount = 0;
-		
+
 		if (abnormal)
 			std::cerr << this << " : Client has disconnected unexpectedly." << std::endl;
 		else
@@ -187,32 +189,32 @@ public:
 		updateZeroconfStatus();
 #endif // ZEROCONF_SUPPORT
 	}
-	
-	virtual void incomingData(Dashel::Stream *stream)
+
+	virtual void incomingData(Dashel::Stream* stream)
 	{
 #ifdef ZEROCONF_SUPPORT
 		zeroconf.dashelIncomingData(stream);
-#endif // ZEROCONF_SUPPORT
-		// only process data for the current stream
+#endif // ZEROCONF_SUPPORT \
+	// only process data for the current stream
 		if (stream != this->stream)
 			return;
-		
+
 		uint16_t temp;
 		uint16_t len;
-		
+
 		stream->read(&temp, 2);
 		len = bswap16(temp);
 		stream->read(&temp, 2);
 		lastMessageSource = bswap16(temp);
-		lastMessageData.resize(len+2);
+		lastMessageData.resize(len + 2);
 		stream->read(&lastMessageData[0], lastMessageData.size());
-		
+
 		AsebaProcessIncomingEvents(&vm);
-		
+
 		// run VM
 		AsebaVMRun(&vm, 1000);
 	}
-	
+
 	void run()
 	{
 		// wait a given time, return if stop was called
@@ -229,15 +231,16 @@ public:
 				if (int((Aseba::UnifiedTime() - startTime).value) >= variables.timerPeriod)
 				{
 					// reschedule a periodic event if we are not in step by step
-					if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
-						AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
-					
+					if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK)
+						|| AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
+						AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START - 0);
+
 					// run VM
 					AsebaVMRun(&vm, 1000);
-					
+
 					// save current time for next iteration
 					Aseba::UnifiedTime currentTime;
-					timeout = 2*int(variables.timerPeriod) - int((currentTime - startTime).value);
+					timeout = 2 * int(variables.timerPeriod) - int((currentTime - startTime).value);
 					if (timeout < 0)
 						timeout = 0;
 					startTime = currentTime;
@@ -247,7 +250,7 @@ public:
 			{
 				timeout = -1;
 			}
-			
+
 			// disconnect old streams
 			for (size_t i = 0; i < toDisconnect.size(); ++i)
 			{
@@ -261,12 +264,12 @@ public:
 
 // Implementation of aseba glue code
 
-extern "C" void AsebaPutVmToSleep(AsebaVMState *vm) 
+extern "C" void AsebaPutVmToSleep(AsebaVMState* vm)
 {
 	std::cerr << "Received request to go into sleep" << std::endl;
 }
 
-extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t length)
+extern "C" void AsebaSendBuffer(AsebaVMState* vm, const uint8_t* data, uint16_t length)
 {
 	Dashel::Stream* stream = node.stream;
 	if (stream)
@@ -288,7 +291,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t 
 	}
 }
 
-extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
+extern "C" uint16_t AsebaGetBuffer(AsebaVMState* vm, uint8_t* data, uint16_t maxLength, uint16_t* source)
 {
 	if (node.lastMessageData.size())
 	{
@@ -300,54 +303,47 @@ extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t max
 
 extern AsebaVMDescription nodeDescription;
 
-extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState *vm)
+extern "C" const AsebaVMDescription* AsebaGetVMDescription(AsebaVMState* vm)
 {
 	return &nodeDescription;
 }
 
-static AsebaNativeFunctionPointer nativeFunctions[] =
-{
+static AsebaNativeFunctionPointer nativeFunctions[] = {
 	ASEBA_NATIVES_STD_FUNCTIONS,
 };
 
-static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] =
-{
-	ASEBA_NATIVES_STD_DESCRIPTIONS,
-	0
-};
+static const AsebaNativeFunctionDescription* nativeFunctionsDescriptions[] = { ASEBA_NATIVES_STD_DESCRIPTIONS, 0 };
 
-extern "C" const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaNativeFunctionDescription* const* AsebaGetNativeFunctionsDescriptions(AsebaVMState* vm)
 {
 	return nativeFunctionsDescriptions;
 }
 
-extern "C" void AsebaNativeFunction(AsebaVMState *vm, uint16_t id)
+extern "C" void AsebaNativeFunction(AsebaVMState* vm, uint16_t id)
 {
 	nativeFunctions[id](vm);
 }
 
 
-static const AsebaLocalEventDescription localEvents[] = {
-	{ "timer", "periodic timer at a given frequency" },
-	{ nullptr, nullptr }
-};
+static const AsebaLocalEventDescription localEvents[] = { { "timer", "periodic timer at a given frequency" },
+	{ nullptr, nullptr } };
 
-extern "C" const AsebaLocalEventDescription * AsebaGetLocalEventsDescriptions(AsebaVMState *vm)
+extern "C" const AsebaLocalEventDescription* AsebaGetLocalEventsDescriptions(AsebaVMState* vm)
 {
 	return localEvents;
 }
 
-extern "C" void AsebaWriteBytecode(AsebaVMState *vm)
+extern "C" void AsebaWriteBytecode(AsebaVMState* vm)
 {
 	std::cerr << "Received request to write bytecode into flash" << std::endl;
 }
 
-extern "C" void AsebaResetIntoBootloader(AsebaVMState *vm)
+extern "C" void AsebaResetIntoBootloader(AsebaVMState* vm)
 {
 	std::cerr << "Received request to reset into bootloader" << std::endl;
 }
 
-extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
+extern "C" void AsebaAssert(AsebaVMState* vm, AsebaAssertReason reason)
 {
 	std::cerr << "\nFatal error; exception: ";
 	switch (reason)
@@ -390,7 +386,7 @@ int main(int argc, char* argv[])
 	int argCounter = 1;
 	while (argCounter < argc)
 	{
-		const char *arg = argv[argCounter++];
+		const char* arg = argv[argCounter++];
 		if ((strcmp(arg, "-p") == 0) || (strcmp(arg, "--port") == 0))
 			do_delta = false, port = atoi(argv[argCounter++]);
 		else if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
@@ -403,7 +399,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	Dashel::Stream* listen = node.listen(do_delta ? port+deltaNodeId : port, deltaNodeId);
+	Dashel::Stream* listen = node.listen(do_delta ? port + deltaNodeId : port, deltaNodeId);
 
 	std::cout << "tcp:port=" << listen->getTargetParameter("port") << std::endl;
 

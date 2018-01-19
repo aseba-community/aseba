@@ -38,39 +38,36 @@ namespace Aseba
 	}
 
 	//! Return whether the keys of lhs and rhs are equal
-	bool Zeroconf::TargetInformationKeyCompareEqual::operator()( const TargetInformation& lhs, const TargetInformation& rhs ) const
+	bool Zeroconf::TargetInformationKeyCompareEqual::operator()(
+		const TargetInformation& lhs, const TargetInformation& rhs) const
 	{
 		return static_cast<const TargetKey&>(lhs) == static_cast<const TargetKey&>(rhs);
 	};
 
 	//! Two target keys are equal if all their members are equal
-	bool operator ==(const Zeroconf::TargetKey &lhs, const Zeroconf::TargetKey &rhs)
+	bool operator==(const Zeroconf::TargetKey& lhs, const Zeroconf::TargetKey& rhs)
 	{
-		return
-			lhs.name == rhs.name &&
-			lhs.regtype == rhs.regtype &&
-			lhs.domain == rhs.domain
-		;
+		return lhs.name == rhs.name && lhs.regtype == rhs.regtype && lhs.domain == rhs.domain;
 	}
 
 	//! This target is described by a human-readable name, regtype, and domain.
 	//! It corresponds to a remote target on which that we want to resolve
-	Zeroconf::TargetInformation::TargetInformation(std::string name, std::string regtype, std::string domain):
-		Zeroconf::TargetKey{std::move(name), std::move(regtype), std::move(domain)}
+	Zeroconf::TargetInformation::TargetInformation(std::string name, std::string regtype, std::string domain) :
+		Zeroconf::TargetKey{ std::move(name), std::move(regtype), std::move(domain) }
 	{}
 
 	//! This target is described by a human-readable name and a port.
 	//! It corresponds to a local target being advertised.
-	Zeroconf::TargetInformation::TargetInformation(std::string name, const int port):
-		Zeroconf::TargetKey{std::move(name)},
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const int port) :
+		Zeroconf::TargetKey{ std::move(name) },
 		port(port)
 	{}
 
 	//! This target describes an existing Dashel stream.
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target.
-	Zeroconf::TargetInformation::TargetInformation(std::string name, const Dashel::Stream* stream):
-		Zeroconf::TargetKey{std::move(name)},
+	Zeroconf::TargetInformation::TargetInformation(std::string name, const Dashel::Stream* stream) :
+		Zeroconf::TargetKey{ std::move(name) },
 		port(atoi(stream->getTargetParameter("port").c_str()))
 	{}
 
@@ -81,7 +78,7 @@ namespace Aseba
 	}
 
 	//! Assign this->serviceRef to rhs.serviceRef and set the later to nullptr, and move other fields.
-	Zeroconf::Target::Target(Target && rhs):
+	Zeroconf::Target::Target(Target&& rhs) :
 		TargetInformation(std::move(rhs)),
 		state(std::move(rhs.state)),
 		container(std::move(rhs.container))
@@ -95,7 +92,7 @@ namespace Aseba
 	{
 		if (serviceRef)
 			container.get().releaseServiceRef(serviceRef);
-		TargetInformation::operator = (std::move(rhs));
+		TargetInformation::operator=(std::move(rhs));
 		state = std::move(rhs.state);
 		container = std::move(rhs.container);
 		serviceRef = rhs.serviceRef;
@@ -105,14 +102,14 @@ namespace Aseba
 
 	//! This target is described by a human-readable name, regtype and domain.
 	//! It corresponds to a remote target on which that we want to resolve.
-	Zeroconf::Target::Target(std::string name, std::string regtype, std::string domain, Zeroconf & container):
+	Zeroconf::Target::Target(std::string name, std::string regtype, std::string domain, Zeroconf& container) :
 		Zeroconf::TargetInformation(std::move(name), std::move(regtype), std::move(domain)),
 		container(container)
 	{}
 
 	//! This target is described by a human-readable name and a port.
 	//! It corresponds to a local target being advertised.
-	Zeroconf::Target::Target(std::string name, const int port, Zeroconf & container):
+	Zeroconf::Target::Target(std::string name, const int port, Zeroconf& container) :
 		Zeroconf::TargetInformation(std::move(name), port),
 		container(container)
 	{}
@@ -120,34 +117,22 @@ namespace Aseba
 	//! This target describes an existing Dashel stream
 	//! It corresponds to a local target being advertised.
 	//! Raises Dashel::DashelException(Parameter missing: port) if not a tcp target
-	Zeroconf::Target::Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf & container):
+	Zeroconf::Target::Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf& container) :
 		Zeroconf::TargetInformation(std::move(name), dashelStream),
 		container(container)
 	{}
 
 	//! Destructor, release the serviceRef through the container,
 	//! which thus must be a valid object at that time.
-	Zeroconf::Target::~Target()
-	{
-		container.get().releaseServiceRef(serviceRef);
-	}
+	Zeroconf::Target::~Target() { container.get().releaseServiceRef(serviceRef); }
 
 	//! Ask the containing Zeroconf to indicate that this register is completed
-	void Zeroconf::Target::registerCompleted() const
-	{
-		container.get().registerCompleted(*this);
-	}
+	void Zeroconf::Target::registerCompleted() const { container.get().registerCompleted(*this); }
 
 	//! Ask the containing Zeroconf to indicate this resolve is completed
-	void Zeroconf::Target::updateCompleted() const
-	{
-		container.get().updateCompleted(*this);
-	}
+	void Zeroconf::Target::updateCompleted() const { container.get().updateCompleted(*this); }
 
 	//! Ask the containing Zeroconf to indicate that this target has been found
-	void Zeroconf::Target::targetFound() const
-	{
-		container.get().targetFound(*this);
-	}
+	void Zeroconf::Target::targetFound() const { container.get().targetFound(*this); }
 
 } // namespace Aseba

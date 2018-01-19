@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -26,7 +26,7 @@
 #define DMA_CAN_TX DMA_CHANNEL_1
 
 // GPIO to use to set CAN speed
-#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD,11)
+#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD, 11)
 
 // CAN interrupt priority
 #define PRIO_CAN 5
@@ -50,17 +50,17 @@
 
 
 /* The number of opcode an aseba script can have */
-#define VM_BYTECODE_SIZE 766  // PUT HERE 766 + 768 * a, where a is >= 0
+#define VM_BYTECODE_SIZE 766 // PUT HERE 766 + 768 * a, where a is >= 0
 #define VM_STACK_SIZE 32
 
 
-
-struct _vmVariables {
+struct _vmVariables
+{
 	// NodeID
 	int16_t id;
 	// source
 	int16_t source;
-		// args
+	// args
 	int16_t args[VM_VARIABLES_ARG_SIZE];
 
 	/****
@@ -88,10 +88,10 @@ enum Events
 // The glue provide a way to store and retrive it from flash.
 // The only way to write it is to do it from inside the VM (native function)
 // The native function access it as a integer array. So, use only int inside this structure
-struct private_settings {
+struct private_settings
+{
 	/* ADD here the settings to save into flash */
 	/* The minimum size is one integer, the maximum size is 95 integer (Check done at compilation) */
 	int first_setting;
 	int second_setting;
 };
-

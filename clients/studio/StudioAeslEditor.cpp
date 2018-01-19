@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -30,24 +30,20 @@ namespace Aseba
 	/** \addtogroup studio */
 	/*@{*/
 
-	StudioAeslEditor::StudioAeslEditor(const ScriptTab* tab) :
-		tab(tab),
-		dropSourceWidget(0)
-	{
-	}
-	
-	void StudioAeslEditor::dropEvent(QDropEvent *event)
+	StudioAeslEditor::StudioAeslEditor(const ScriptTab* tab) : tab(tab), dropSourceWidget(0) {}
+
+	void StudioAeslEditor::dropEvent(QDropEvent* event)
 	{
 		dropSourceWidget = dynamic_cast<QWidget*>(event->source());
 		QTextEdit::dropEvent(event);
 		dropSourceWidget = 0;
 		setFocus(Qt::MouseFocusReason);
 	}
-	
-	void StudioAeslEditor::insertFromMimeData ( const QMimeData * source )
+
+	void StudioAeslEditor::insertFromMimeData(const QMimeData* source)
 	{
 		QTextCursor cursor(this->textCursor());
-		
+
 		// check whether we are at the beginning of a line
 		bool startOfLine(cursor.atBlockStart());
 		const int posInBlock(cursor.position() - cursor.block().position());
@@ -56,7 +52,7 @@ namespace Aseba
 			const QString startText(cursor.block().text().left(posInBlock));
 			startOfLine = !startText.contains(QRegExp("\\S"));
 		}
-		
+
 		// if beginning of a line and source widget is known, add some helper text
 		if (dropSourceWidget && startOfLine)
 		{
@@ -71,7 +67,7 @@ namespace Aseba
 				prefix = "call ";
 				midfix = "(";
 				// fill call from doc
-				const TargetDescription *desc = nodeTab->vmFunctionsModel->descriptionRead;
+				const TargetDescription* desc = nodeTab->vmFunctionsModel->descriptionRead;
 				const std::wstring funcName = source->text().toStdWString();
 				for (size_t i = 0; i < desc->nativeFunctions.size(); i++)
 				{
@@ -112,7 +108,7 @@ namespace Aseba
 				prefix = "onevent ";
 				midfix = "\n";
 			}
-			
+
 			cursor.beginEditBlock();
 			cursor.insertText(prefix + source->text() + midfix);
 			const int pos = cursor.position();
@@ -124,8 +120,7 @@ namespace Aseba
 		}
 		else
 			cursor.insertText(source->text());
-		
 	}
-	
+
 	/*@}*/
 } // namespace Aseba

@@ -21,14 +21,5 @@
 #include "../../vm/natives.h"
 #include "../../common/productids.h"
 
-AsebaVMDescription nodeDescription = {
-	"",
-	{
-		{ 1, "id" },
-		{ 1, "source" },
-		{ 32, "args" },
-		{ 1, ASEBA_PID_VAR_NAME },
-		{ 1, "timer.period" },
-		{ 0, NULL }
-	}
-};
+AsebaVMDescription nodeDescription = { "",
+	{ { 1, "id" }, { 1, "source" }, { 32, "args" }, { 1, ASEBA_PID_VAR_NAME }, { 1, "timer.period" }, { 0, NULL } } };

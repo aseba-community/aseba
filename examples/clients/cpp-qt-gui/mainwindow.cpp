@@ -7,16 +7,16 @@
 
 	This example is based on a first work of Olivier Marti (2010 - 2011).
 	Stripped down & cleaned version by Florian Vaussard (2013).
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -28,8 +28,7 @@
 #include "mainwindow.h"
 #include "dashelinterface.h"
 
-MainWindow::MainWindow( QWidget *parent) :
-	QWidget(parent)
+MainWindow::MainWindow(QWidget* parent) : QWidget(parent)
 {
 	ip = new QLineEdit("127.0.0.1");
 	port = new QLineEdit("33333");
@@ -74,7 +73,10 @@ MainWindow::MainWindow( QWidget *parent) :
 	connect(quitBtn, SIGNAL(clicked()), this, SLOT(close()));
 
 	// connect signals from dashel
-	connect(&dashelInterface, SIGNAL(messageAvailable(Aseba::UserMessage *)), SLOT(messageFromDashel(Aseba::UserMessage *)), Qt::QueuedConnection);
+	connect(&dashelInterface,
+		SIGNAL(messageAvailable(Aseba::UserMessage*)),
+		SLOT(messageFromDashel(Aseba::UserMessage*)),
+		Qt::QueuedConnection);
 	connect(&dashelInterface, SIGNAL(dashelDisconnection()), SLOT(disconnectionFromDashel()), Qt::QueuedConnection);
 	connect(&dashelInterface, SIGNAL(dashelConnection()), SLOT(connectionFromDashel()), Qt::QueuedConnection);
 }
@@ -115,7 +117,7 @@ void MainWindow::sendUserMessage()
  * userMessage->data
  * 	Data associated with the event
  */
-void MainWindow::messageFromDashel(Aseba::UserMessage *message)
+void MainWindow::messageFromDashel(Aseba::UserMessage* message)
 {
 	// Process the message _here_
 	// ...
@@ -149,4 +151,3 @@ void MainWindow::disconnectionFromDashel()
 
 	QMessageBox::warning(0, tr("Oops"), tr("Disconnected from Dashel"));
 }
-

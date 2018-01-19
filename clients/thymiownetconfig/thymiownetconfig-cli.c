@@ -38,19 +38,19 @@
 
 static struct termios oldtio;
 
-int open_port(char * file)
+int open_port(char* file)
 {
 	struct termios newtio;
 	int fd;
-	
+
 	fd = open(file, O_RDWR);
 	if (fd < 0)
 		return fd;
-	
+
 	tcgetattr(fd, &oldtio);
-	
+
 	memset(&newtio, 0, sizeof(newtio));
-	
+
 	newtio.c_cflag |= CLOCAL;
 	newtio.c_cflag |= CREAD;
 	newtio.c_cflag |= CS8;
@@ -61,10 +61,10 @@ int open_port(char * file)
 	newtio.c_lflag = 0;
 	newtio.c_cc[VTIME] = 0;
 	newtio.c_cc[VMIN] = 1;
-	
+
 	tcflush(fd, TCIOFLUSH);
-	tcsetattr(fd,TCSANOW, &newtio);
-	
+	tcsetattr(fd, TCSANOW, &newtio);
+
 	return fd;
 }
 
@@ -72,13 +72,13 @@ void close_port(int fd)
 {
 	if (fd < 0)
 		return;
-	
-	tcsetattr(fd,TCSANOW, &oldtio);
-	
+
+	tcsetattr(fd, TCSANOW, &oldtio);
+
 	close(fd);
 }
 
-#define CHANNEL(x) (15+5*x)
+#define CHANNEL(x) (15 + 5 * x)
 
 struct __attribute((packed))
 {
@@ -88,9 +88,9 @@ struct __attribute((packed))
 	unsigned char txpower;
 	unsigned char version;
 	unsigned char c;
-} settings = {0xffff, 0xffff, 0, 0, 0};
+} settings = { 0xffff, 0xffff, 0, 0, 0 };
 
-static void usage(char * s)
+static void usage(char* s)
 {
 	printf("Thymio Wireless Network Configurator CLI %s\n", ASEBA_VERSION);
 	printf("Aseba protocol %d\n", ASEBA_PROTOCOL_VERSION);
@@ -101,7 +101,7 @@ static void usage(char * s)
 	printf("\t serialPort : 	The serial port file\n");
 	printf("\nOptional arguments:\n");
 	printf("\t -w :           Write into flash\n");
-	printf("\t -i :           Enter/exit paring mode\n");	//ADD MIC launch paring
+	printf("\t -i :           Enter/exit paring mode\n"); //ADD MIC launch paring
 	printf("\t -n NodeID :    Set the node ID (do not change if not mandatory)\n");
 	printf("\t -p PanID :     Set the Pan ID\n");
 	printf("\t -c 0-2 :       Set the channel number\n");
@@ -110,22 +110,22 @@ static void usage(char * s)
 	exit(1);
 }
 
-static void option_error(char * s, const char *e)
+static void option_error(char* s, const char* e)
 {
 	fprintf(stderr, "Error in command line option: %s\n\n", e);
 	usage(s);
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
 	int i;
 	int fd;
 	int count;
 	settings.c = 0;
-	if (argc < 2) 
+	if (argc < 2)
 		option_error(argv[0], "missing serial port file");
 
-	for(i = 1; i < argc; i++)
+	for (i = 1; i < argc; i++)
 	{
 		if (!strcmp(argv[i], "-w"))
 		{
@@ -142,8 +142,8 @@ int main(int argc, char ** argv)
 			i++;
 			if (argc == i)
 				option_error(argv[0], "missing NodeID");
-			settings.nodeid = strtol(argv[i],NULL,0);
-			if (settings.nodeid == 0 || settings.nodeid == 0xFFFF) 
+			settings.nodeid = strtol(argv[i], NULL, 0);
+			if (settings.nodeid == 0 || settings.nodeid == 0xFFFF)
 				option_error(argv[i], "invalid NodeID");
 			continue;
 		}
@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
 			i++;
 			if (argc == i)
 				option_error(argv[0], "missing PanID");
-			settings.panid = strtol(argv[i],NULL,0);
+			settings.panid = strtol(argv[i], NULL, 0);
 			if (settings.panid == 0 || settings.panid == 0xFFFF)
 				option_error(argv[0], "invalid PanID");
 			continue;
@@ -172,26 +172,26 @@ int main(int argc, char ** argv)
 		if (!strcmp(argv[i], "-t"))
 		{
 			i++;
-			if(argc == i)
+			if (argc == i)
 				option_error(argv[0], "missing power");
 			// Unused for now...
 			continue;
 		}
-		if (i+1 != argc)
+		if (i + 1 != argc)
 		{
 			// Not an option but still some option .. error
 			option_error(argv[0], "unknown option");
 		}
 	}
 
-	fd = open_port(argv[argc-1]);
-	
+	fd = open_port(argv[argc - 1]);
+
 	if (fd < 0)
 	{
-		fprintf(stderr, "Error opening serial port file %s\n", argv[argc-1]);
+		fprintf(stderr, "Error opening serial port file %s\n", argv[argc - 1]);
 		usage(argv[0]);
 	}
-	
+
 	count = write(fd, &settings, sizeof(settings));
 	if (count != sizeof(settings))
 	{
@@ -199,19 +199,19 @@ int main(int argc, char ** argv)
 		exit(2);
 	}
 	count = read(fd, &settings, sizeof(settings) - 1);
-	if (count != sizeof(settings)-1)
+	if (count != sizeof(settings) - 1)
 	{
-		fprintf(stderr, "Error reading settings, read %d instead of %lu bytes\n", count, sizeof(settings)-1);
+		fprintf(stderr, "Error reading settings, read %d instead of %lu bytes\n", count, sizeof(settings) - 1);
 		exit(3);
 	}
-	
+
 	printf("Got back:\n");
 	printf("\tNodeID: 0x%04x\n", settings.nodeid);
 	printf("\tPanID: 0x%04x\n", settings.panid);
-	printf("\tchannel: %d\n",(settings.channel-15)/5);
-	printf("\ttxpower: %d\n",settings.txpower);
-	printf("\tVersion: %d\n",settings.version);
+	printf("\tchannel: %d\n", (settings.channel - 15) / 5);
+	printf("\ttxpower: %d\n", settings.txpower);
+	printf("\tVersion: %d\n", settings.version);
 	close_port(fd);
-	
+
 	return 0;
-}  
+}

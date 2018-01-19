@@ -2,11 +2,7 @@
 
 namespace Aseba
 {
-	ModelAggregator::ModelAggregator(QObject* parent) :
-		QAbstractItemModel(parent)
-	{
-
-	}
+	ModelAggregator::ModelAggregator(QObject* parent) : QAbstractItemModel(parent) {}
 
 	void ModelAggregator::addModel(QAbstractItemModel* model, unsigned int column)
 	{
@@ -16,12 +12,9 @@ namespace Aseba
 		models.append(description);
 	}
 
-	int ModelAggregator::columnCount(const QModelIndex &parent) const
-	{
-		return 1;
-	}
+	int ModelAggregator::columnCount(const QModelIndex& parent) const { return 1; }
 
-	int ModelAggregator::rowCount(const QModelIndex & /*parent*/) const
+	int ModelAggregator::rowCount(const QModelIndex& /*parent*/) const
 	{
 		int count = 0;
 		for (ModelList::ConstIterator it = models.begin(); it != models.end(); it++)
@@ -29,7 +22,7 @@ namespace Aseba
 		return count;
 	}
 
-	QVariant ModelAggregator::data(const QModelIndex &index, int role) const
+	QVariant ModelAggregator::data(const QModelIndex& index, int role) const
 	{
 		if (!index.isValid())
 			return QVariant();
@@ -45,7 +38,7 @@ namespace Aseba
 			{
 				QAbstractItemModel* thisModel = (*it).model;
 				unsigned int thisColumn = (*it).column;
-				QModelIndex newIndex = thisModel->index(index.row()-previousCount, thisColumn);
+				QModelIndex newIndex = thisModel->index(index.row() - previousCount, thisColumn);
 				return thisModel->data(newIndex, role);
 			}
 		}
@@ -53,7 +46,7 @@ namespace Aseba
 		return QVariant();
 	}
 
-	bool ModelAggregator::hasIndex(int row, int column, const QModelIndex &parent) const
+	bool ModelAggregator::hasIndex(int row, int column, const QModelIndex& parent) const
 	{
 		if (parent.isValid())
 			return false;
@@ -64,19 +57,16 @@ namespace Aseba
 		return true;
 	}
 
-	QModelIndex ModelAggregator::index(int row, int column, const QModelIndex &parent) const
+	QModelIndex ModelAggregator::index(int row, int column, const QModelIndex& parent) const
 	{
 		return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
 	}
 
-	QModelIndex ModelAggregator::parent(const QModelIndex &child) const
-	{
-		return QModelIndex();
-	}
+	QModelIndex ModelAggregator::parent(const QModelIndex& child) const { return QModelIndex(); }
 
 
 	// *** TreeChainsawFilter ***
-	void TreeChainsawFilter::setSourceModel(QAbstractItemModel *sourceModel)
+	void TreeChainsawFilter::setSourceModel(QAbstractItemModel* sourceModel)
 	{
 		QAbstractItemModel* oldSource = this->sourceModel();
 		if (oldSource)
@@ -86,17 +76,11 @@ namespace Aseba
 		sort(0, Qt::AscendingOrder);
 	}
 
-	int TreeChainsawFilter::rowCount(const QModelIndex &parent) const
-	{
-		return indexList.count();
-	}
+	int TreeChainsawFilter::rowCount(const QModelIndex& parent) const { return indexList.count(); }
 
-	int TreeChainsawFilter::columnCount(const QModelIndex &parent) const
-	{
-		return 1;
-	}
+	int TreeChainsawFilter::columnCount(const QModelIndex& parent) const { return 1; }
 
-	bool TreeChainsawFilter::hasIndex(int row, int column, const QModelIndex &parent) const
+	bool TreeChainsawFilter::hasIndex(int row, int column, const QModelIndex& parent) const
 	{
 		if (parent.isValid())
 			return false;
@@ -107,23 +91,17 @@ namespace Aseba
 		return true;
 	}
 
-	QModelIndex TreeChainsawFilter::index(int row, int column, const QModelIndex &parent) const
+	QModelIndex TreeChainsawFilter::index(int row, int column, const QModelIndex& parent) const
 	{
 		return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
 	}
 
-	QModelIndex TreeChainsawFilter::parent(const QModelIndex &child) const
-	{
-		return QModelIndex();
-	}
+	QModelIndex TreeChainsawFilter::parent(const QModelIndex& child) const { return QModelIndex(); }
 
-	void TreeChainsawFilter::resetInternalData(void)
-	{
-		sort(0, Qt::AscendingOrder);
-	}
+	void TreeChainsawFilter::resetInternalData(void) { sort(0, Qt::AscendingOrder); }
 
 	// sourceIndex -> proxyIndex
-	QModelIndex TreeChainsawFilter::mapFromSource(const QModelIndex &sourceIndex) const
+	QModelIndex TreeChainsawFilter::mapFromSource(const QModelIndex& sourceIndex) const
 	{
 		if (!sourceIndex.isValid())
 			return QModelIndex();
@@ -138,7 +116,7 @@ namespace Aseba
 	}
 
 	// proxyIndex -> sourceIndex
-	QModelIndex TreeChainsawFilter::mapToSource(const QModelIndex &proxyIndex) const
+	QModelIndex TreeChainsawFilter::mapToSource(const QModelIndex& proxyIndex) const
 	{
 		if (!proxyIndex.isValid())
 			return QModelIndex();
@@ -164,7 +142,7 @@ namespace Aseba
 	}
 
 	// rebuild the internal data structure, private function
-	void TreeChainsawFilter::sortWalkTree(const QModelIndex &parent)
+	void TreeChainsawFilter::sortWalkTree(const QModelIndex& parent)
 	{
 		static int rowCounter = 0;
 

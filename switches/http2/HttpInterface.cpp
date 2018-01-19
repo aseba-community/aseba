@@ -34,7 +34,6 @@ using Aseba::Http::NodesHandler;
 using Aseba::Http::OptionsHandler;
 using Aseba::Http::ResetHandler;
 using std::cerr;
-using std::cerr;
 using std::endl;
 using std::find;
 using std::istringstream;
@@ -61,14 +60,12 @@ HttpInterface::HttpInterface(const std::string& httpPort) :
 	httpStream = connect("tcpin:port=" + httpPort);
 }
 
-HttpInterface::~HttpInterface()
-{
-
-}
+HttpInterface::~HttpInterface() {}
 
 bool HttpInterface::addTarget(const std::string& address)
 {
-	if(targetAddressStreams.find(address) == targetAddressStreams.end()) { // target is not yet in our list of targets
+	if (targetAddressStreams.find(address) == targetAddressStreams.end())
+	{ // target is not yet in our list of targets
 		targetAddressStreams[address] = nullptr; // mark this as a new target to initialize
 		targetAddressReconnectionTime[address] = UnifiedTime(0);
 		return true;
@@ -79,30 +76,40 @@ bool HttpInterface::addTarget(const std::string& address)
 
 void HttpInterface::step()
 {
-	map<string, Dashel::Stream *>::iterator end = targetAddressStreams.end();
-	for(map<string, Dashel::Stream *>::iterator iter = targetAddressStreams.begin(); iter != end; iter++) {
+	map<string, Dashel::Stream*>::iterator end = targetAddressStreams.end();
+	for (map<string, Dashel::Stream*>::iterator iter = targetAddressStreams.begin(); iter != end; iter++)
+	{
 		const std::string& address = iter->first;
 
-		if(iter->second == nullptr) {
+		if (iter->second == nullptr)
+		{
 			UnifiedTime now;
-			if((now - targetAddressReconnectionTime[address]).value > RECONNECT_TIMEOUT) {
+			if ((now - targetAddressReconnectionTime[address]).value > RECONNECT_TIMEOUT)
+			{
 				// trying to reconnect to disconnected targets
-				Dashel::Stream *stream = nullptr;
-				try {
+				Dashel::Stream* stream = nullptr;
+				try
+				{
 					stream = connect(address);
 					targets[stream] = new HttpDashelTarget(this, address, stream);
 					iter->second = stream;
-					if(verbose) {
+					if (verbose)
+					{
 						cerr << "Successfully connected target " << address << " with stream " << stream << endl;
 					}
-				} catch(Dashel::DashelException e) {
-					if(verbose) {
+				}
+				catch (Dashel::DashelException e)
+				{
+					if (verbose)
+					{
 						cerr << "Failed to connect target " << address << ": " << e.what() << endl;
 					}
 
-					if(stream != nullptr) { // uncreate target
-						std::map<Dashel::Stream *, HttpDashelTarget *>::iterator query = targets.find(stream);
-						if(query != targets.end()) {
+					if (stream != nullptr)
+					{ // uncreate target
+						std::map<Dashel::Stream*, HttpDashelTarget*>::iterator query = targets.find(stream);
+						if (query != targets.end())
+						{
 							delete query->second;
 							targets.erase(query);
 						}
@@ -111,8 +118,10 @@ void HttpInterface::step()
 					targetAddressReconnectionTime[address] = now;
 				}
 				// ping the connected networks
-				for(map<Dashel::Stream *, HttpDashelTarget *>::iterator iter = targets.begin(); iter != targets.end(); ++iter) {
-					HttpDashelTarget *target = iter->second;
+				for (map<Dashel::Stream*, HttpDashelTarget*>::iterator iter = targets.begin(); iter != targets.end();
+					 ++iter)
+				{
+					HttpDashelTarget* target = iter->second;
 					target->pingNetwork();
 				}
 			}
@@ -127,11 +136,13 @@ void HttpInterface::step()
 
 bool HttpInterface::sendEvent(const std::vector<std::string>& args)
 {
-	map<Dashel::Stream *, HttpDashelTarget *>::iterator end = targets.begin();
-	for(map<Dashel::Stream *, HttpDashelTarget *>::iterator iter = targets.begin(); iter != end; ++iter) {
-		HttpDashelTarget *target = iter->second;
+	map<Dashel::Stream*, HttpDashelTarget*>::iterator end = targets.begin();
+	for (map<Dashel::Stream*, HttpDashelTarget*>::iterator iter = targets.begin(); iter != end; ++iter)
+	{
+		HttpDashelTarget* target = iter->second;
 
-		if(!target->sendEvent(args)) {
+		if (!target->sendEvent(args))
+		{
 			return false;
 		}
 	}
@@ -144,24 +155,32 @@ void HttpInterface::notifyEventSubscribers(const std::string& event, const std::
 	// set up SSE message
 	std::stringstream reply;
 	reply << "data: " << event;
-	int dataSize = (int) data.size();
-	for(int i = 0; i < dataSize; i++) {
+	int dataSize = (int)data.size();
+	for (int i = 0; i < dataSize; i++)
+	{
 		reply << " " << data[i];
 	}
 	reply << "\r\n\r\n";
 	string replyString = reply.str();
 
-	map<Dashel::Stream *, HttpConnection>::iterator end = httpConnections.end();
-	for(map<Dashel::Stream *, HttpConnection>::iterator iter = httpConnections.begin(); iter != end; ++iter) {
-		Dashel::Stream *stream = iter->first;
+	map<Dashel::Stream*, HttpConnection>::iterator end = httpConnections.end();
+	for (map<Dashel::Stream*, HttpConnection>::iterator iter = httpConnections.begin(); iter != end; ++iter)
+	{
+		Dashel::Stream* stream = iter->first;
 		HttpConnection& connection = iter->second;
 
-		if(connection.eventSubscriptions.find("*") != connection.eventSubscriptions.end() || connection.eventSubscriptions.find(event) != connection.eventSubscriptions.end()) {
-			try {
+		if (connection.eventSubscriptions.find("*") != connection.eventSubscriptions.end()
+			|| connection.eventSubscriptions.find(event) != connection.eventSubscriptions.end())
+		{
+			try
+			{
 				stream->write(replyString.c_str(), replyString.size());
 				stream->flush();
-			} catch(Dashel::DashelException e) {
-				if(verbose) {
+			}
+			catch (Dashel::DashelException e)
+			{
+				if (verbose)
+				{
 					cerr << stream << " Failed to send HTTP event subscriber notification: " << e.what() << endl;
 				}
 				closingHttpConnections.insert(stream);
@@ -170,37 +189,45 @@ void HttpInterface::notifyEventSubscribers(const std::string& event, const std::
 	}
 }
 
-void HttpInterface::addEventSubscription(HttpRequest *request, const std::string& subscription)
+void HttpInterface::addEventSubscription(HttpRequest* request, const std::string& subscription)
 {
-	assert(dynamic_cast<DashelHttpRequest *>(request) != nullptr);
-	DashelHttpRequest *dashelHttpRequest = static_cast<DashelHttpRequest *>(request);
-	Dashel::Stream *stream = dashelHttpRequest->getStream();
+	assert(dynamic_cast<DashelHttpRequest*>(request) != nullptr);
+	DashelHttpRequest* dashelHttpRequest = static_cast<DashelHttpRequest*>(request);
+	Dashel::Stream* stream = dashelHttpRequest->getStream();
 
 	httpConnections[stream].eventSubscriptions.insert(subscription);
 
-	if(verbose) {
-		cerr << stream << " Added HTTP request " << request << " event subscription for '" << subscription << "'" << endl;
+	if (verbose)
+	{
+		cerr << stream << " Added HTTP request " << request << " event subscription for '" << subscription << "'"
+			 << endl;
 	}
 }
 
-unsigned HttpInterface::registerNode(HttpDashelTarget *target, unsigned localNodeId)
+unsigned HttpInterface::registerNode(HttpDashelTarget* target, unsigned localNodeId)
 {
 	bool found = false;
 	unsigned globalNodeId = localNodeId;
 
-	while(!found) {
-		std::map< unsigned, std::pair<HttpDashelTarget *, unsigned> >::iterator query = nodeIds.find(globalNodeId);
-		if(query != nodeIds.end()) {
+	while (!found)
+	{
+		std::map<unsigned, std::pair<HttpDashelTarget*, unsigned> >::iterator query = nodeIds.find(globalNodeId);
+		if (query != nodeIds.end())
+		{
 			globalNodeId++;
-		} else {
+		}
+		else
+		{
 			found = true;
 		}
 	}
 
 	nodeIds[globalNodeId] = make_pair(target, localNodeId);
 
-	if(verbose) {
-		cerr << "Registered node with remapped global id " << globalNodeId << " from target " << target->getAddress() << " with local id " << localNodeId << endl;
+	if (verbose)
+	{
+		cerr << "Registered node with remapped global id " << globalNodeId << " from target " << target->getAddress()
+			 << " with local id " << localNodeId << endl;
 	}
 
 	return globalNodeId;
@@ -209,39 +236,54 @@ unsigned HttpInterface::registerNode(HttpDashelTarget *target, unsigned localNod
 bool HttpInterface::runProgram(std::string& errorString)
 {
 	const vector<AeslProgram::NodeEntry>& entries = program.getEntries();
-	for(int i = 0; i < (int) entries.size(); i++) {
+	for (int i = 0; i < (int)entries.size(); i++)
+	{
 		const AeslProgram::NodeEntry& entry = entries[i];
 
-		set< pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > matchingNodes;
+		set<pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > matchingNodes;
 
-		if(!entry.nodeId.empty()) { // if there is a node id, both it and the name have to match exactly
-			pair<HttpDashelTarget *, const HttpDashelTarget::Node *> nodeReference = getNodeByIdString(entry.nodeId);
+		if (!entry.nodeId.empty())
+		{ // if there is a node id, both it and the name have to match exactly
+			pair<HttpDashelTarget*, const HttpDashelTarget::Node*> nodeReference = getNodeByIdString(entry.nodeId);
 
-			if(entry.nodeName.empty() || nodeReference.second->name == entry.nodeName) {
+			if (entry.nodeName.empty() || nodeReference.second->name == entry.nodeName)
+			{
 				matchingNodes.insert(nodeReference);
 			}
-		} else { // if there is only a name, multiples can match
+		}
+		else
+		{ // if there is only a name, multiples can match
 			matchingNodes = getNodesByName(entry.nodeName);
 		}
 
-		if(matchingNodes.empty()) {
-			if(verbose) {
-				cerr << "Warning: No target nodes match program entry with node name '" << entry.nodeName << "' and node id '" << entry.nodeId << "', skipping..." << endl;
+		if (matchingNodes.empty())
+		{
+			if (verbose)
+			{
+				cerr << "Warning: No target nodes match program entry with node name '" << entry.nodeName
+					 << "' and node id '" << entry.nodeId << "', skipping..." << endl;
 			}
 			continue;
 		}
 
-		set< pair<HttpDashelTarget *, const HttpDashelTarget::Node *> >::iterator end = matchingNodes.end();
-		for(set< pair<HttpDashelTarget *, const HttpDashelTarget::Node *> >::iterator iter = matchingNodes.begin(); iter != end; ++iter) {
-			HttpDashelTarget *target = iter->first;
-			const HttpDashelTarget::Node *node = iter->second;
+		set<pair<HttpDashelTarget*, const HttpDashelTarget::Node*> >::iterator end = matchingNodes.end();
+		for (set<pair<HttpDashelTarget*, const HttpDashelTarget::Node*> >::iterator iter = matchingNodes.begin();
+			 iter != end;
+			 ++iter)
+		{
+			HttpDashelTarget* target = iter->first;
+			const HttpDashelTarget::Node* node = iter->second;
 
-			if(!target->compileAndRunCode(node->globalId, entry.code, errorString)) {
+			if (!target->compileAndRunCode(node->globalId, entry.code, errorString))
+			{
 				return false;
 			}
 
-			if(verbose) {
-				cerr << "Compiled and sent AESL entry for node " << (entry.nodeId.empty() ? "*" : entry.nodeId) << " (" << (entry.nodeName.empty() ? "*" : entry.nodeName) << ") to node " << node->globalId << " (" << node->name << ")" << endl;
+			if (verbose)
+			{
+				cerr << "Compiled and sent AESL entry for node " << (entry.nodeId.empty() ? "*" : entry.nodeId) << " ("
+					 << (entry.nodeName.empty() ? "*" : entry.nodeName) << ") to node " << node->globalId << " ("
+					 << node->name << ")" << endl;
 			}
 		}
 	}
@@ -249,19 +291,22 @@ bool HttpInterface::runProgram(std::string& errorString)
 	return true;
 }
 
-std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpInterface::getNodesByName(const std::string& name)
+std::set<std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > HttpInterface::getNodesByName(
+	const std::string& name)
 {
-	set< pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > results;
+	set<pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > results;
 
 	// search by name
-	map<Dashel::Stream *, HttpDashelTarget *>::iterator end = targets.end();
-	for(map<Dashel::Stream *, HttpDashelTarget *>::iterator iter = targets.begin(); iter != end; ++iter) {
-		HttpDashelTarget *target = iter->second;
+	map<Dashel::Stream*, HttpDashelTarget*>::iterator end = targets.end();
+	for (map<Dashel::Stream*, HttpDashelTarget*>::iterator iter = targets.begin(); iter != end; ++iter)
+	{
+		HttpDashelTarget* target = iter->second;
 
-		set<const HttpDashelTarget::Node *> nodes = target->getNodesByName(name);
-		set<const HttpDashelTarget::Node *>::iterator nodesEnd = nodes.end();
-		for(set<const HttpDashelTarget::Node *>::iterator nodesIter = nodes.begin(); nodesIter != nodesEnd; ++nodesIter) {
-			const HttpDashelTarget::Node *node = *nodesIter;
+		set<const HttpDashelTarget::Node*> nodes = target->getNodesByName(name);
+		set<const HttpDashelTarget::Node*>::iterator nodesEnd = nodes.end();
+		for (set<const HttpDashelTarget::Node*>::iterator nodesIter = nodes.begin(); nodesIter != nodesEnd; ++nodesIter)
+		{
+			const HttpDashelTarget::Node* node = *nodesIter;
 			results.insert(make_pair(target, node));
 		}
 	}
@@ -269,39 +314,46 @@ std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpIn
 	return results;
 }
 
-std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> HttpInterface::getNodeByIdString(const std::string& nodeIdString)
+std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> HttpInterface::getNodeByIdString(
+	const std::string& nodeIdString)
 {
 	unsigned nodeId;
-	if(istringstream(nodeIdString) >> nodeId) {
+	if (istringstream(nodeIdString) >> nodeId)
+	{
 		return getNodeById(nodeId);
 	}
 
-	return make_pair((HttpDashelTarget *) nullptr, (const HttpDashelTarget::Node *) nullptr);
+	return make_pair((HttpDashelTarget*)nullptr, (const HttpDashelTarget::Node*)nullptr);
 }
 
-std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> HttpInterface::getNodeById(unsigned nodeId)
+std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> HttpInterface::getNodeById(unsigned nodeId)
 {
 	// search by global id
-	std::map< unsigned, std::pair<HttpDashelTarget *, unsigned> >::iterator query = nodeIds.find(nodeId);
-	if(query != nodeIds.end()) {
-		HttpDashelTarget *target = query->second.first;
-		const HttpDashelTarget::Node *node = target->getNodeById(nodeId);
+	std::map<unsigned, std::pair<HttpDashelTarget*, unsigned> >::iterator query = nodeIds.find(nodeId);
+	if (query != nodeIds.end())
+	{
+		HttpDashelTarget* target = query->second.first;
+		const HttpDashelTarget::Node* node = target->getNodeById(nodeId);
 
-		if(node != nullptr) {
+		if (node != nullptr)
+		{
 			return make_pair(target, node);
 		}
 	}
 
-	return make_pair((HttpDashelTarget *) nullptr, (const HttpDashelTarget::Node *) nullptr);
+	return make_pair((HttpDashelTarget*)nullptr, (const HttpDashelTarget::Node*)nullptr);
 }
 
-std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpInterface::getNodesByNameOrId(const std::string& nameOrId)
+std::set<std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > HttpInterface::getNodesByNameOrId(
+	const std::string& nameOrId)
 {
-	set< pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > result = getNodesByName(nameOrId);
+	set<pair<HttpDashelTarget*, const HttpDashelTarget::Node*> > result = getNodesByName(nameOrId);
 
-	if(result.empty()) {
-		std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> nodeReference = getNodeByIdString(nameOrId);
-		if(nodeReference.first != nullptr) {
+	if (result.empty())
+	{
+		std::pair<HttpDashelTarget*, const HttpDashelTarget::Node*> nodeReference = getNodeByIdString(nameOrId);
+		if (nodeReference.first != nullptr)
+		{
 			result.insert(nodeReference);
 		}
 	}
@@ -309,45 +361,60 @@ std::set< std::pair<HttpDashelTarget *, const HttpDashelTarget::Node *> > HttpIn
 	return result;
 }
 
-void HttpInterface::connectionCreated(Dashel::Stream *stream)
+void HttpInterface::connectionCreated(Dashel::Stream* stream)
 {
-	if(verbose) {
+	if (verbose)
+	{
 		cerr << stream << " Incoming connection from " << stream->getTargetName() << endl;
 	}
 }
 
-void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
+void HttpInterface::connectionClosed(Dashel::Stream* stream, bool abnormal)
 {
 	// handle dashel target disconnection
-	map<Dashel::Stream *, HttpDashelTarget *>::iterator targetQuery = targets.find(stream);
-	if(targetQuery != targets.end()) { // target stream
-		HttpDashelTarget *target = targetQuery->second;
+	map<Dashel::Stream*, HttpDashelTarget*>::iterator targetQuery = targets.find(stream);
+	if (targetQuery != targets.end())
+	{ // target stream
+		HttpDashelTarget* target = targetQuery->second;
 
 		const std::map<unsigned, HttpDashelTarget::Node>& nodes = target->getNodes();
 		std::map<unsigned, HttpDashelTarget::Node>::const_iterator end = nodes.end();
-		for(std::map<unsigned, HttpDashelTarget::Node>::const_iterator iter = nodes.begin(); iter != end; ++iter) {
+		for (std::map<unsigned, HttpDashelTarget::Node>::const_iterator iter = nodes.begin(); iter != end; ++iter)
+		{
 			const HttpDashelTarget::Node& node = iter->second;
 
 			// free up global node id
 			nodeIds.erase(node.globalId);
 
 			// cancel all pending variable requests for the disconnected node
-			map< unsigned, set< pair<Dashel::Stream *, DashelHttpRequest *> > >::const_iterator pendingVariablesEnd = node.pendingVariables.end();
-			for(map< unsigned, set< pair<Dashel::Stream *, DashelHttpRequest *> > >::const_iterator pendingVariablesIter = node.pendingVariables.begin(); pendingVariablesIter != pendingVariablesEnd; ++pendingVariablesIter) {
-				const set< pair<Dashel::Stream *, DashelHttpRequest *> >& pendingRequests = pendingVariablesIter->second;
+			map<unsigned, set<pair<Dashel::Stream*, DashelHttpRequest*> > >::const_iterator pendingVariablesEnd =
+				node.pendingVariables.end();
+			for (map<unsigned, set<pair<Dashel::Stream*, DashelHttpRequest*> > >::const_iterator pendingVariablesIter =
+					 node.pendingVariables.begin();
+				 pendingVariablesIter != pendingVariablesEnd;
+				 ++pendingVariablesIter)
+			{
+				const set<pair<Dashel::Stream*, DashelHttpRequest*> >& pendingRequests = pendingVariablesIter->second;
 
-				set< pair<Dashel::Stream *, DashelHttpRequest *> >::const_iterator pendingRequestsEnd = pendingRequests.end();
-				for(set< pair<Dashel::Stream *, DashelHttpRequest *> >::const_iterator pendingRequestsIter = pendingRequests.begin(); pendingRequestsIter != pendingRequestsEnd; ++pendingRequestsIter) {
-					Dashel::Stream *stream = pendingRequestsIter->first;
-					DashelHttpRequest *request = pendingRequestsIter->second;
+				set<pair<Dashel::Stream*, DashelHttpRequest*> >::const_iterator pendingRequestsEnd =
+					pendingRequests.end();
+				for (set<pair<Dashel::Stream*, DashelHttpRequest*> >::const_iterator pendingRequestsIter =
+						 pendingRequests.begin();
+					 pendingRequestsIter != pendingRequestsEnd;
+					 ++pendingRequestsIter)
+				{
+					Dashel::Stream* stream = pendingRequestsIter->first;
+					DashelHttpRequest* request = pendingRequestsIter->second;
 
 					// We store pending requests as pair<stream, request> to be able to check here if they still exist.
 					// It could be that a request was pending but then destroyed because the HTTP connection died, so we
 					// need to first make sure everything is still okay before trusting these pointers...
-					map<Dashel::Stream *, HttpConnection>::const_iterator connectionQuery = httpConnections.find(stream);
-					if(connectionQuery != httpConnections.end()) { // we can trust stream for here on...
+					map<Dashel::Stream*, HttpConnection>::const_iterator connectionQuery = httpConnections.find(stream);
+					if (connectionQuery != httpConnections.end())
+					{ // we can trust stream for here on...
 						const HttpConnection& connection = connectionQuery->second;
-						if(find(connection.queue.begin(), connection.queue.end(), request) != connection.queue.end()) { // we can trust request from here on...
+						if (find(connection.queue.begin(), connection.queue.end(), request) != connection.queue.end())
+						{ // we can trust request from here on...
 							request->respond().setStatus(HttpResponse::HTTP_STATUS_INTERNAL_SERVER_ERROR);
 						}
 					}
@@ -363,7 +430,8 @@ void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
 			notifyEventSubscribers("disconnect", data);
 		}
 
-		if(verbose) {
+		if (verbose)
+		{
 			cerr << "Target " << target->getAddress() << " disconnected, trying to reconnect..." << endl;
 		}
 
@@ -377,9 +445,11 @@ void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
 	}
 
 	// handle http connection disconnection
-	map<Dashel::Stream *, HttpConnection>::iterator httpQuery = httpConnections.find(stream);
-	if(httpQuery != httpConnections.end()) { // http connection
-		if(verbose) {
+	map<Dashel::Stream*, HttpConnection>::iterator httpQuery = httpConnections.find(stream);
+	if (httpQuery != httpConnections.end())
+	{ // http connection
+		if (verbose)
+		{
 			cerr << stream << " HTTP connection reset by peer" << endl;
 		}
 		closeHttpConnection(httpQuery->second);
@@ -388,73 +458,94 @@ void HttpInterface::connectionClosed(Dashel::Stream *stream, bool abnormal)
 	}
 }
 
-void HttpInterface::incomingData(Dashel::Stream *stream)
+void HttpInterface::incomingData(Dashel::Stream* stream)
 {
-	map<Dashel::Stream *, HttpDashelTarget *>::iterator query = targets.find(stream);
-	if(query != targets.end()) { // target stream
-		HttpDashelTarget *target = query->second;
+	map<Dashel::Stream*, HttpDashelTarget*>::iterator query = targets.find(stream);
+	if (query != targets.end())
+	{ // target stream
+		HttpDashelTarget* target = query->second;
 
-		Message *message(Message::receive(stream));
+		Message* message(Message::receive(stream));
 
 		// pass message to description manager, which builds the node descriptions in background
 		// warning: do this before dynamic casts because otherwise the parsing doesn't work (why?)
 		target->processMessage(message);
 
 		// See if we know this node already or if the source is 0 (meaning coming from IDE)
-		const HttpDashelTarget::Node *node = target->getNodeByLocalId(message->source);
-		if(node != nullptr || message->source == 0) { // else if we cannot remap the source, discard the message and do not relay it
+		const HttpDashelTarget::Node* node = target->getNodeByLocalId(message->source);
+		if (node != nullptr || message->source == 0)
+		{ // else if we cannot remap the source, discard the message and do not relay it
 			// remap source node to global node id if not sent from IDE
 			if (node != nullptr)
 				message->source = node->globalId;
 
 			// check for execution error messages
-			switch(message->type) {
+			switch (message->type)
+			{
 				case ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS:
 				case ASEBA_MESSAGE_DIVISION_BY_ZERO:
 				case ASEBA_MESSAGE_EVENT_EXECUTION_KILLED:
-				case ASEBA_MESSAGE_NODE_SPECIFIC_ERROR:
-					incomingErrorMessage(target, message);
+				case ASEBA_MESSAGE_NODE_SPECIFIC_ERROR: incomingErrorMessage(target, message);
 			}
 
 			// if variables, check for pending requests
-			const Variables *variables(dynamic_cast<Variables *>(message));
-			if(variables != nullptr) {
+			const Variables* variables(dynamic_cast<Variables*>(message));
+			if (variables != nullptr)
+			{
 				incomingVariables(target, variables);
 			}
 
 			// if event, retransmit it on an HTTP SSE channel if one exists
-			const UserMessage *userMessage(dynamic_cast<UserMessage *>(message));
-			if(userMessage != nullptr) {
+			const UserMessage* userMessage(dynamic_cast<UserMessage*>(message));
+			if (userMessage != nullptr)
+			{
 				incomingUserMessage(target, userMessage);
 			}
 
 			// act like asebaswitch: rebroadcast this message to the other streams
-			CmdMessage *cmdMessage(dynamic_cast<CmdMessage *>(message));
-			if(cmdMessage != nullptr) { // targeted message, only rebroadcast to correct target with remapped destination
-				std::map< unsigned, std::pair<HttpDashelTarget *, unsigned> >::iterator query = nodeIds.find(cmdMessage->dest);
-				if(query != nodeIds.end()) { // only relay it to known targets, else if we cannot remap the target, discard the message and do not relay it
-					HttpDashelTarget *target = query->second.first;
+			CmdMessage* cmdMessage(dynamic_cast<CmdMessage*>(message));
+			if (cmdMessage != nullptr)
+			{ // targeted message, only rebroadcast to correct target with remapped destination
+				std::map<unsigned, std::pair<HttpDashelTarget*, unsigned> >::iterator query =
+					nodeIds.find(cmdMessage->dest);
+				if (query != nodeIds.end())
+				{ // only relay it to known targets, else if we cannot remap the target, discard the message and do not relay it
+					HttpDashelTarget* target = query->second.first;
 					unsigned localNodeId = query->second.second;
 
-					try {
+					try
+					{
 						cmdMessage->dest = localNodeId;
 						cmdMessage->serialize(target->getStream());
 						target->getStream()->flush();
-					} catch(Dashel::DashelException e) {
-						cerr << "Error while rebroadcasting to stream " << target->getStream() << " of target " << target->getAddress() << endl;
+					}
+					catch (Dashel::DashelException e)
+					{
+						cerr << "Error while rebroadcasting to stream " << target->getStream() << " of target "
+							 << target->getAddress() << endl;
 					}
 				}
-			} else { // not a targeted message, just rebroadcast to all other targets
-				map<Dashel::Stream *, HttpDashelTarget *>::const_iterator end = targets.end();
-				for(map<Dashel::Stream *, HttpDashelTarget *>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter) {
-					Dashel::Stream *outStream = iter->first;
+			}
+			else
+			{ // not a targeted message, just rebroadcast to all other targets
+				map<Dashel::Stream*, HttpDashelTarget*>::const_iterator end = targets.end();
+				for (map<Dashel::Stream*, HttpDashelTarget*>::const_iterator iter = targets.begin();
+					 iter != targets.end();
+					 ++iter)
+				{
+					Dashel::Stream* outStream = iter->first;
 
-					if(outStream != stream) {
-						try {
+					if (outStream != stream)
+					{
+						try
+						{
 							message->serialize(outStream);
 							outStream->flush();
-						} catch(Dashel::DashelException e) {
-							cerr << "Error while rebroadcasting to stream " << outStream << " of target " << iter->second->getAddress() << endl;
+						}
+						catch (Dashel::DashelException e)
+						{
+							cerr << "Error while rebroadcasting to stream " << outStream << " of target "
+								 << iter->second->getAddress() << endl;
 						}
 					}
 				}
@@ -462,19 +553,24 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 		}
 
 		delete message;
-	} else { // HTTP stream
+	}
+	else
+	{ // HTTP stream
 		HttpConnection& connection = httpConnections[stream];
 		connection.stream = stream;
 
-		DashelHttpRequest *request = new DashelHttpRequest(stream);
+		DashelHttpRequest* request = new DashelHttpRequest(stream);
 
-		if(verbose) {
+		if (verbose)
+		{
 			cerr << stream << " Incoming HTTP connection, creating request " << request << endl;
 			request->setVerbose(verbose);
 		}
 
-		try {
-			if(!request->receive()) {
+		try
+		{
+			if (!request->receive())
+			{
 				request->respond().setStatus(HttpResponse::HTTP_STATUS_BAD_REQUEST);
 				request->respond().send();
 
@@ -484,7 +580,9 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 				delete request;
 				return;
 			}
-		} catch(Dashel::DashelException e) {
+		}
+		catch (Dashel::DashelException e)
+		{
 			cerr << stream << " Incoming HTTP connection unexpectedly closed: " << e.what() << endl;
 			closeHttpConnection(connection);
 			delete request;
@@ -502,27 +600,37 @@ void HttpInterface::incomingData(Dashel::Stream *stream)
 
 void HttpInterface::sendHttpResponses()
 {
-	map<Dashel::Stream *, HttpConnection>::iterator end = httpConnections.end();
-	for(map<Dashel::Stream *, HttpConnection>::iterator iter = httpConnections.begin(); iter != end; ++iter) {
+	map<Dashel::Stream*, HttpConnection>::iterator end = httpConnections.end();
+	for (map<Dashel::Stream*, HttpConnection>::iterator iter = httpConnections.begin(); iter != end; ++iter)
+	{
 		HttpConnection& connection = iter->second;
 
-		while(!connection.queue.empty() && connection.queue.front()->isResponseReady()) {
-			HttpRequest *request = connection.queue.front();
+		while (!connection.queue.empty() && connection.queue.front()->isResponseReady())
+		{
+			HttpRequest* request = connection.queue.front();
 
-			try {
+			try
+			{
 				request->respond().send();
-			} catch(Dashel::DashelException e) {
-				if(verbose) {
+			}
+			catch (Dashel::DashelException e)
+			{
+				if (verbose)
+				{
 					cerr << request << " Failed to send HTTP response: " << e.what() << endl;
 				}
 				closingHttpConnections.insert(connection.stream);
 				break;
 			}
 
-			if(request->getHeader("Connection") == "close" || (request->getProtocol() == "HTTP/1.0" && request->getHeader("Connection") != "keep-alive")) {
+			if (request->getHeader("Connection") == "close"
+				|| (request->getProtocol() == "HTTP/1.0" && request->getHeader("Connection") != "keep-alive"))
+			{
 				closingHttpConnections.insert(connection.stream);
 				break;
-			} else {
+			}
+			else
+			{
 				// just this request is finished, delete and remove from queue
 				delete request;
 				connection.queue.pop_front();
@@ -533,10 +641,12 @@ void HttpInterface::sendHttpResponses()
 
 void HttpInterface::closeClosingHttpConnections()
 {
-	std::set<Dashel::Stream *>::iterator end = closingHttpConnections.end();
-	for(std::set<Dashel::Stream *>::iterator iter = closingHttpConnections.begin(); iter != end; ++iter) {
-		std::map<Dashel::Stream *, HttpConnection>::iterator query = httpConnections.find(*iter);
-		if(query != httpConnections.end()) { // make sure the connection exists, it could have been closed already
+	std::set<Dashel::Stream*>::iterator end = closingHttpConnections.end();
+	for (std::set<Dashel::Stream*>::iterator iter = closingHttpConnections.begin(); iter != end; ++iter)
+	{
+		std::map<Dashel::Stream*, HttpConnection>::iterator query = httpConnections.find(*iter);
+		if (query != httpConnections.end())
+		{ // make sure the connection exists, it could have been closed already
 			closeHttpConnection(query->second);
 		}
 	}
@@ -547,17 +657,23 @@ void HttpInterface::closeClosingHttpConnections()
 void HttpInterface::closeHttpConnection(HttpConnection& connection)
 {
 	// delete all requests that are still in the queue
-	while(!connection.queue.empty()) {
+	while (!connection.queue.empty())
+	{
 		delete connection.queue.front();
 		connection.queue.pop_front();
 	}
 
 	// disconnect the stream if not yet done so
-	if(!connection.stream->failed()) {
-		try {
+	if (!connection.stream->failed())
+	{
+		try
+		{
 			connection.stream->fail(Dashel::DashelException::Unknown, 0, "Request handling complete");
-		} catch(Dashel::DashelException& e) {
-			if(verbose) {
+		}
+		catch (Dashel::DashelException& e)
+		{
+			if (verbose)
+			{
 				cerr << connection.stream << " Closed HTTP connection" << endl;
 			}
 		}
@@ -566,100 +682,140 @@ void HttpInterface::closeHttpConnection(HttpConnection& connection)
 	httpConnections.erase(connection.stream);
 }
 
-void HttpInterface::incomingVariables(HttpDashelTarget *target, const Variables *variables)
+void HttpInterface::incomingVariables(HttpDashelTarget* target, const Variables* variables)
 {
-	if(verbose) {
+	if (verbose)
+	{
 		cerr << "Incoming variable for target " << target->getAddress() << endl;
 	}
 
 	// first, build result string from message
 	stringstream result;
 	result << "[";
-	int numVariables = (int) variables->variables.size();
-	for(int i = 0; i < numVariables; ++i) {
+	int numVariables = (int)variables->variables.size();
+	for (int i = 0; i < numVariables; ++i)
+	{
 		result << (i ? "," : "") << variables->variables[i];
 	}
 	result << "]";
 	string resultString = result.str();
 
-	const HttpDashelTarget::Node *node = target->getNodeById(variables->source);
+	const HttpDashelTarget::Node* node = target->getNodeById(variables->source);
 
-	if(node != nullptr) {
-		map< unsigned, set< pair<Dashel::Stream *, DashelHttpRequest *> > >::const_iterator query = node->pendingVariables.find(variables->start);
+	if (node != nullptr)
+	{
+		map<unsigned, set<pair<Dashel::Stream*, DashelHttpRequest*> > >::const_iterator query =
+			node->pendingVariables.find(variables->start);
 
-		if(query != node->pendingVariables.end()) {
-			const set< pair<Dashel::Stream *, DashelHttpRequest *> >& pendingRequests = query->second;
+		if (query != node->pendingVariables.end())
+		{
+			const set<pair<Dashel::Stream*, DashelHttpRequest*> >& pendingRequests = query->second;
 
-			set< pair<Dashel::Stream *, DashelHttpRequest *> >::const_iterator end = pendingRequests.end();
-			for(set< pair<Dashel::Stream *, DashelHttpRequest *> >::const_iterator iter = pendingRequests.begin(); iter != end; ++iter) {
-				Dashel::Stream *stream = iter->first;
-				DashelHttpRequest *request = iter->second;
+			set<pair<Dashel::Stream*, DashelHttpRequest*> >::const_iterator end = pendingRequests.end();
+			for (set<pair<Dashel::Stream*, DashelHttpRequest*> >::const_iterator iter = pendingRequests.begin();
+				 iter != end;
+				 ++iter)
+			{
+				Dashel::Stream* stream = iter->first;
+				DashelHttpRequest* request = iter->second;
 
 				// We store pending requests as pair<stream, request> to be able to check here if they still exist.
 				// It could be that a request was pending but then destroyed because the HTTP connection died, so we
 				// need to first make sure everything is still okay before trusting these pointers...
-				map<Dashel::Stream *, HttpConnection>::const_iterator connectionQuery = httpConnections.find(stream);
-				if(connectionQuery != httpConnections.end()) { // we can trust stream for here on...
+				map<Dashel::Stream*, HttpConnection>::const_iterator connectionQuery = httpConnections.find(stream);
+				if (connectionQuery != httpConnections.end())
+				{ // we can trust stream for here on...
 					const HttpConnection& connection = connectionQuery->second;
-					if(find(connection.queue.begin(), connection.queue.end(), request) != connection.queue.end()) { // we can trust request from here on...
+					if (find(connection.queue.begin(), connection.queue.end(), request) != connection.queue.end())
+					{ // we can trust request from here on...
 						request->respond().setContent(resultString);
-					} else {
-						if(verbose) {
-							cerr << "Target " << target->getAddress() << " received variables for node " << node->globalId << " (" << node->name << "), but the originating HTTP request was discarded in the meanwhile" << endl;
+					}
+					else
+					{
+						if (verbose)
+						{
+							cerr << "Target " << target->getAddress() << " received variables for node "
+								 << node->globalId << " (" << node->name
+								 << "), but the originating HTTP request was discarded in the meanwhile" << endl;
 						}
 					}
-				} else {
-					if(verbose) {
-						cerr << "Target " << target->getAddress() << " received variables for node " << node->globalId << " (" << node->name << "), but the originating HTTP connection was closed in the meanwhile" << endl;
+				}
+				else
+				{
+					if (verbose)
+					{
+						cerr << "Target " << target->getAddress() << " received variables for node " << node->globalId
+							 << " (" << node->name
+							 << "), but the originating HTTP connection was closed in the meanwhile" << endl;
 					}
 				}
 			}
 
 			target->removePendingVariable(node->globalId, variables->start);
-		} else if(verbose) {
-			cerr << "Target " << target->getAddress() << " received variables for node " << node->globalId << " (" << node->name << "), but there was no pending variable request for them" << endl;
 		}
-	} else if(verbose) {
-		cerr << "Target " << target->getAddress() << " received variables for node " << variables->source << " but no node with this id is known" << endl;
+		else if (verbose)
+		{
+			cerr << "Target " << target->getAddress() << " received variables for node " << node->globalId << " ("
+				 << node->name << "), but there was no pending variable request for them" << endl;
+		}
+	}
+	else if (verbose)
+	{
+		cerr << "Target " << target->getAddress() << " received variables for node " << variables->source
+			 << " but no node with this id is known" << endl;
 	}
 
 	sendHttpResponses();
 }
 
-void HttpInterface::incomingUserMessage(HttpDashelTarget *target, const UserMessage *userMessage)
+void HttpInterface::incomingUserMessage(HttpDashelTarget* target, const UserMessage* userMessage)
 {
-	if(verbose) {
+	if (verbose)
+	{
 		cerr << "Incoming user message for target " << target->getAddress() << endl;
 	}
 
 	const CommonDefinitions& commonDefinitions = program.getCommonDefinitions();
 
-	if(userMessage->type >= 0 && userMessage->type < commonDefinitions.events.size()) {
+	if (userMessage->type >= 0 && userMessage->type < commonDefinitions.events.size())
+	{
 		string eventName = WStringToUTF8(commonDefinitions.events[userMessage->type].name);
 		notifyEventSubscribers(eventName, userMessage->data);
-	} else if(verbose) {
-		cerr << "Target " << target->getAddress() << " received user message with type " << userMessage->type << ", but no such event is known" << endl;
+	}
+	else if (verbose)
+	{
+		cerr << "Target " << target->getAddress() << " received user message with type " << userMessage->type
+			 << ", but no such event is known" << endl;
 	}
 }
 
-void HttpInterface::incomingErrorMessage(HttpDashelTarget *target, const Message *message)
+void HttpInterface::incomingErrorMessage(HttpDashelTarget* target, const Message* message)
 {
-	if(verbose) {
+	if (verbose)
+	{
 		cerr << "Incoming error message for target " << target->getAddress() << endl;
 	}
 
-	const char *errorString = nullptr;
-	if(message->type == ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS) {
+	const char* errorString = nullptr;
+	if (message->type == ASEBA_MESSAGE_ARRAY_ACCESS_OUT_OF_BOUNDS)
+	{
 		errorString = "array_access_out_of_bounds";
-	} else if(message->type == ASEBA_MESSAGE_DIVISION_BY_ZERO) {
+	}
+	else if (message->type == ASEBA_MESSAGE_DIVISION_BY_ZERO)
+	{
 		errorString = "division_by_zero";
-	} else if(message->type == ASEBA_MESSAGE_EVENT_EXECUTION_KILLED) {
+	}
+	else if (message->type == ASEBA_MESSAGE_EVENT_EXECUTION_KILLED)
+	{
 		errorString = "event_execution_killed";
-	} else if(message->type == ASEBA_MESSAGE_NODE_SPECIFIC_ERROR) {
+	}
+	else if (message->type == ASEBA_MESSAGE_NODE_SPECIFIC_ERROR)
+	{
 		errorString = "node_specific_error";
 	}
 
 	notifyEventSubscribers(errorString);
 }
 
-const std::string HttpInterface::defaultProgram = "<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";
+const std::string HttpInterface::defaultProgram =
+	"<!DOCTYPE aesl-source><network><keywords flag=\"true\"/><node nodeId=\"1\" name=\"thymio-II\"></node></network>\n";

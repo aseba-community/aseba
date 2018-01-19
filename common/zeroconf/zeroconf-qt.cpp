@@ -70,28 +70,25 @@ namespace Aseba
 
 	//! Emit signal when register completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::TargetInformation & target)
+	void QtZeroconf::registerCompleted(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		emit zeroconfRegisterCompleted(target);
 	}
 
 	//! Emit signal when update completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::TargetInformation & target)
+	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		emit zeroconfUpdateCompleted(target);
 	}
 
 	//! Emit signal when resolve completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::targetFound(const Aseba::Zeroconf::TargetInformation & target)
-	{
-		emit zeroconfTargetFound(target);
-	}
-	
+	void QtZeroconf::targetFound(const Aseba::Zeroconf::TargetInformation& target) { emit zeroconfTargetFound(target); }
+
 	//! Emit signal when target is removed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
-	void QtZeroconf::targetRemoved(const Aseba::Zeroconf::TargetInformation & target)
+	void QtZeroconf::targetRemoved(const Aseba::Zeroconf::TargetInformation& target)
 	{
 		emit zeroconfTargetRemoved(target);
 	}
@@ -109,19 +106,17 @@ namespace Aseba
 	{
 		DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 		if (err != kDNSServiceErr_NoError)
-			throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
+			throw Zeroconf::Error(
+				FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
 	}
 
 	//! Create a Qt socket notifier in read mode for the file descriptor of the provided service reference
-	QtZeroconf::ServiceRefSocketNotifier::ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent):
+	QtZeroconf::ServiceRefSocketNotifier::ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject* parent) :
 		QSocketNotifier(DNSServiceRefSockFD(serviceRef), QSocketNotifier::Read, parent),
 		serviceRef(serviceRef)
-	{ }
+	{}
 
 	//! Deallocate the service reference
-	QtZeroconf::ServiceRefSocketNotifier::~ServiceRefSocketNotifier()
-	{
-		DNSServiceRefDeallocate(serviceRef);
-	}
+	QtZeroconf::ServiceRefSocketNotifier::~ServiceRefSocketNotifier() { DNSServiceRefDeallocate(serviceRef); }
 
 } // namespace Aseba

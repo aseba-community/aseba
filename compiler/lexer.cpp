@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -29,8 +29,8 @@
 
 namespace Aseba
 {
-	#ifdef ANDROID
-	long int wcstol_fix( const wchar_t * str, wchar_t ** endptr, int base )
+#ifdef ANDROID
+	long int wcstol_fix(const wchar_t* str, wchar_t** endptr, int base)
 	{
 		long int v(0);
 		while (*str)
@@ -42,32 +42,31 @@ namespace Aseba
 			}
 			else
 			{
-				const long int maskedVal(str[0] & (~(1<<5)));
+				const long int maskedVal(str[0] & (~(1 << 5)));
 				v += (maskedVal - 'A') + 10;
 			}
 			++str;
 		}
 		return v;
 	}
-	#define wcstol wcstol_fix
-	#endif // ANDROID
-	
+#	define wcstol wcstol_fix
+#endif // ANDROID
+
 	//! Construct a new token of given type and value
-	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) :
-		type(type),
-		sValue(value),
-		pos(pos)
+	Compiler::Token::Token(Type type, SourcePos pos, const std::wstring& value) : type(type), sValue(value), pos(pos)
 	{
 		if (type == TOKEN_INT_LITERAL)
 		{
 			long int decode;
 			bool wasUnsigned = false;
 			// all values are assumed to be signed 16-bits
-			if ((value.length() > 1) && (value[1] == 'x')) {
+			if ((value.length() > 1) && (value[1] == 'x'))
+			{
 				decode = wcstol(value.c_str() + 2, nullptr, 16);
 				wasUnsigned = true;
 			}
-			else if ((value.length() > 1) && (value[1] == 'b')) {
+			else if ((value.length() > 1) && (value[1] == 'b'))
+			{
 				decode = wcstol(value.c_str() + 2, nullptr, 2);
 				wasUnsigned = true;
 			}
@@ -84,7 +83,7 @@ namespace Aseba
 		pos.column--; // column has already been incremented when token is created, so we remove one
 		pos.character--; // character has already been incremented when token is created, so we remove one
 	}
-	
+
 	//! Return the name of the type of this token
 	const std::wstring Compiler::Token::typeName() const
 	{
@@ -156,7 +155,7 @@ namespace Aseba
 			default: return translate(ERROR_TOKEN_UNKNOWN);
 		}
 	}
-	
+
 	//! Return a string representation of the token
 	std::wstring Compiler::Token::toWString() const
 	{
@@ -169,8 +168,8 @@ namespace Aseba
 			oss << L" : " << sValue;
 		return oss.str();
 	}
-	
-	
+
+
 	//! Parse source and build tokens vector
 	//! \param source source code
 	void Compiler::tokenize(std::wistream& source)
@@ -178,25 +177,28 @@ namespace Aseba
 		tokens.clear();
 		SourcePos pos(0, 0, 0);
 		const unsigned tabSize = 4;
-		
+
 		// tokenize text source
 		while (source.good())
 		{
 			wchar_t c = source.get();
-			
+
 			if (source.eof())
 				break;
-			
+
 			pos.column++;
 			pos.character++;
-			
+
 			switch (c)
 			{
 				// simple cases of one character
 				case ' ': break;
 				//case '\t': pos.column += tabSize - 1; break;
 				case '\t': break;
-				case '\n': pos.row++; pos.column = -1; break; // -1 so next call to pos.column++ result set 0
+				case '\n':
+					pos.row++;
+					pos.column = -1;
+					break; // -1 so next call to pos.column++ result set 0
 				case '\r': pos.column = -1; break; // -1 so next call to pos.column++ result set 0
 				case '(': tokens.emplace_back(Token::TOKEN_PAR_OPEN, pos); break;
 				case ')': tokens.emplace_back(Token::TOKEN_PAR_CLOSE, pos); break;
@@ -204,7 +206,7 @@ namespace Aseba
 				case ']': tokens.emplace_back(Token::TOKEN_BRACKET_CLOSE, pos); break;
 				case ':': tokens.emplace_back(Token::TOKEN_COLON, pos); break;
 				case ',': tokens.emplace_back(Token::TOKEN_COMMA, pos); break;
-				
+
 				// special case for comment
 				case '#':
 				{
@@ -263,7 +265,7 @@ namespace Aseba
 					}
 				}
 				break;
-				
+
 				// cases that require one character look-ahead
 				case '+':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_ADD_EQUAL))
@@ -317,22 +319,20 @@ namespace Aseba
 					tokens.emplace_back(Token::TOKEN_OP_BIT_AND, pos);
 					break;
 
-				case '~':
-					tokens.emplace_back(Token::TOKEN_OP_BIT_NOT, pos);
-					break;
+				case '~': tokens.emplace_back(Token::TOKEN_OP_BIT_NOT, pos); break;
 
 				case '!':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_NOT_EQUAL))
 						break;
 					throw TranslatableError(pos, ERROR_SYNTAX);
 					break;
-				
+
 				case '=':
 					if (testNextCharacter(source, pos, '=', Token::TOKEN_OP_EQUAL))
 						break;
 					tokens.emplace_back(Token::TOKEN_ASSIGN, pos);
 					break;
-				
+
 				// cases that require two characters look-ahead
 				case '<':
 					if (source.peek() == '<')
@@ -349,7 +349,7 @@ namespace Aseba
 						break;
 					tokens.emplace_back(Token::TOKEN_OP_SMALLER, pos);
 					break;
-				
+
 				case '>':
 					if (source.peek() == '>')
 					{
@@ -365,14 +365,14 @@ namespace Aseba
 						break;
 					tokens.emplace_back(Token::TOKEN_OP_BIGGER, pos);
 					break;
-				
+
 				// cases that require to look for a while
 				default:
 				{
 					// check first character
 					if (!std::iswalnum(c) && (c != '_'))
 						throw TranslatableError(pos, ERROR_INVALID_IDENTIFIER).arg((unsigned)c, 0, 16);
-					
+
 					// get a string
 					std::wstring s;
 					s += c;
@@ -385,7 +385,7 @@ namespace Aseba
 						posIncrement++;
 						nextC = source.peek();
 					}
-					
+
 					// we now have a string, let's check what it is
 					if (std::iswdigit(s[0]))
 					{
@@ -407,7 +407,6 @@ namespace Aseba
 							}
 							else
 								throw TranslatableError(pos, ERROR_NUMBER_INVALID_BASE);
-							
 						}
 						else
 						{
@@ -473,25 +472,25 @@ namespace Aseba
 						else
 							tokens.emplace_back(Token::TOKEN_STRING_LITERAL, pos, s);
 					}
-					
+
 					pos.column += posIncrement;
 					pos.character += posIncrement;
 				}
 				break;
 			} // switch (c)
 		} // while (source.good())
-		
+
 		tokens.emplace_back(Token::TOKEN_END_OF_STREAM, pos);
 	}
 
-	wchar_t Compiler::getNextCharacter(std::wistream &source, SourcePos &pos)
+	wchar_t Compiler::getNextCharacter(std::wistream& source, SourcePos& pos)
 	{
 		pos.column++;
 		pos.character++;
 		return source.get();
 	}
 
-	bool Compiler::testNextCharacter(std::wistream &source, SourcePos &pos, wchar_t test, Token::Type tokenIfTrue)
+	bool Compiler::testNextCharacter(std::wistream& source, SourcePos& pos, wchar_t test, Token::Type tokenIfTrue)
 	{
 		if ((int)source.peek() == int(test))
 		{
@@ -501,14 +500,14 @@ namespace Aseba
 		}
 		return false;
 	}
-	
+
 	//! Debug print of tokens
-	void Compiler::dumpTokens(std::wostream &dest) const
+	void Compiler::dumpTokens(std::wostream& dest) const
 	{
-		for (const auto & token : tokens)
+		for (const auto& token : tokens)
 			dest << token.toWString() << std::endl;
 	}
-	
+
 	//! Return whether a string is a language keyword
 	bool Compiler::isKeyword(const std::wstring& s)
 	{

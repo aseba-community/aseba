@@ -31,9 +31,7 @@ namespace Aseba
 	using namespace Dashel;
 
 	//! Constructor, taking a reference to a Dashel::Hub
-	DashelhubZeroconf::DashelhubZeroconf(Hub& hub):
-		hub(hub)
-	{}
+	DashelhubZeroconf::DashelhubZeroconf(Hub& hub) : hub(hub) {}
 
 	//! Clear all targets and clean-up remaining streams
 	DashelhubZeroconf::~DashelhubZeroconf()
@@ -70,7 +68,7 @@ namespace Aseba
 			return;
 
 		int socket = DNSServiceRefSockFD(serviceRef);
-		assert (socket != -1);
+		assert(socket != -1);
 
 		auto streamIt(zeroconfStreams.begin());
 		while (streamIt != zeroconfStreams.end())
@@ -86,22 +84,20 @@ namespace Aseba
 	}
 
 	//! Check if data were coming on one of our streams, and if so process
-	void DashelhubZeroconf::dashelIncomingData(Dashel::Stream * stream)
+	void DashelhubZeroconf::dashelIncomingData(Dashel::Stream* stream)
 	{
 		if (zeroconfStreams.find(stream) != zeroconfStreams.end())
 		{
 			auto serviceRef = zeroconfStreams.at(stream);
 			DNSServiceErrorType err = DNSServiceProcessResult(serviceRef);
 			if (err != kDNSServiceErr_NoError)
-				throw Zeroconf::Error(FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
+				throw Zeroconf::Error(
+					FormatableString("DNSServiceProcessResult (service ref %1): error %0").arg(err).arg(serviceRef));
 		}
 	}
 
 	//! Check if one of our streams was disconnected, and if so take note
-	void DashelhubZeroconf::dashelConnectionClosed(Stream * stream)
-	{
-		zeroconfStreams.erase(stream);
-	}
+	void DashelhubZeroconf::dashelConnectionClosed(Stream* stream) { zeroconfStreams.erase(stream); }
 
 	//! Call Dashel::step and then delete all streams whose release where pending
 	bool DashelhubZeroconf::dashelStep(int timeout)
@@ -112,7 +108,7 @@ namespace Aseba
 	}
 
 	//! Return whether stream is handled by Zeroconf
-	bool DashelhubZeroconf::isStreamHandled(Dashel::Stream * stream) const
+	bool DashelhubZeroconf::isStreamHandled(Dashel::Stream* stream) const
 	{
 		if (zeroconfStreams.count(stream) != 0)
 			return true;
@@ -122,9 +118,9 @@ namespace Aseba
 	}
 
 	//! Close all streams and deallocate their service reference
-	void DashelhubZeroconf::cleanUpStreams(std::map<Dashel::Stream *, DNSServiceRef>& streams)
+	void DashelhubZeroconf::cleanUpStreams(std::map<Dashel::Stream*, DNSServiceRef>& streams)
 	{
-		for (auto& streamKV: streams)
+		for (auto& streamKV : streams)
 		{
 			hub.closeStream(streamKV.first);
 			DNSServiceRefDeallocate(streamKV.second);

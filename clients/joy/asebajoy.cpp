@@ -41,30 +41,26 @@ class Joystick
 {
 protected:
 	int number;
-	SDL_Joystick *joy;
+	SDL_Joystick* joy;
 	int oa[5];
 	int ob[9];
 	int ohat;
-	
+
 public:
-	Joystick(int number, SDL_Joystick *joy):
-		number(number), joy(joy)
+	Joystick(int number, SDL_Joystick* joy) : number(number), joy(joy)
 	{
-		fill(oa, oa+5, 0);
-		fill(ob, ob+9, 0);
+		fill(oa, oa + 5, 0);
+		fill(ob, ob + 9, 0);
 		ohat = 0;
 	}
-	
-	~Joystick()
-	{
-		SDL_JoystickClose(joy);
-	}
-	
+
+	~Joystick() { SDL_JoystickClose(joy); }
+
 	void process(Stream* stream)
 	{
 		VariablesDataVector data(2);
 		data[0] = number;
-		
+
 		// axes
 		for (int i = 0; i < std::min(5, SDL_JoystickNumAxes(joy)); ++i)
 		{
@@ -77,7 +73,7 @@ public:
 				oa[i] = a;
 			}
 		}
-		
+
 		// hat
 		if (SDL_JoystickNumHats(joy) > 0)
 		{
@@ -90,7 +86,7 @@ public:
 				ohat = hat;
 			}
 		}
-		
+
 		// buttons
 		for (int i = 0; i < std::min(9, SDL_JoystickNumButtons(joy)); ++i)
 		{
@@ -111,17 +107,17 @@ class JoystickReader : public Hub
 protected:
 	Stream* stream;
 	vector<Joystick*> joysticks;
-	
+
 public:
 	JoystickReader(const char* target)
 	{
 		// SDL inint stuff
-		if((SDL_Init(SDL_INIT_JOYSTICK)==-1))
+		if ((SDL_Init(SDL_INIT_JOYSTICK) == -1))
 		{
 			cerr << "Error : Could not initialize SDL: " << SDL_GetError() << endl;
 			exit(EXIT_COULD_NOT_INIT_SDL);
 		}
-		
+
 		// list all joysticks
 		const int count = SDL_NumJoysticks();
 		for (int i = 0; i < count; ++i)
@@ -137,24 +133,24 @@ public:
 				cerr << "Warning: not enough axis on joystick " << i << endl;
 				continue;
 			}
-			
+
 			joysticks.push_back(new Joystick(i, joy));
 		}
-		
+
 		// we need at least one
 		if (joysticks.empty())
 		{
 			cerr << "Error: not suitable joystick found" << endl;
 			exit(EXIT_NOT_SUITABLE_JOY_FOUND);
 		}
-		
+
 		cerr << "Found " << joysticks.size() << " joysticks" << endl;
-		
+
 		// connect to Dashel
 		stream = Hub::connect(target);
 		cout << "Connected to " << stream->getTargetName() << endl;
 	}
-	
+
 	~JoystickReader()
 	{
 		for (size_t i = 0; i < joysticks.size(); ++i)
@@ -169,14 +165,11 @@ public:
 		for (size_t i = 0; i < joysticks.size(); ++i)
 			joysticks[i]->process(stream);
 	}
-	
+
 protected:
-	void incomingData(Stream *stream)
-	{
-		delete Message::receive(stream);
-	}
-	
-	void connectionClosed(Stream *stream, bool abnormal)
+	void incomingData(Stream* stream) { delete Message::receive(stream); }
+
+	void connectionClosed(Stream* stream, bool abnormal)
 	{
 		dumpTime(cerr);
 		cerr << "Connection closed to " << stream->getTargetName();
@@ -187,13 +180,13 @@ protected:
 	}
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	const char *target = ASEBA_DEFAULT_TARGET;
-	
+	const char* target = ASEBA_DEFAULT_TARGET;
+
 	if (argc >= 2)
 		target = argv[1];
-	
+
 	try
 	{
 		JoystickReader reader(target);
@@ -201,7 +194,7 @@ int main(int argc, char *argv[])
 			reader.processJoysticks();
 		return 0;
 	}
-	catch(Dashel::DashelException e)
+	catch (Dashel::DashelException e)
 	{
 		std::cerr << e.what() << std::endl;
 		return EXIT_DASHEL_EXCEPTION_OCCURED;

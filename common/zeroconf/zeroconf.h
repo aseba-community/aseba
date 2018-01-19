@@ -39,7 +39,7 @@ namespace Dashel
 }
 
 struct _DNSServiceRef_t;
-typedef struct _DNSServiceRef_t *DNSServiceRef;
+typedef struct _DNSServiceRef_t* DNSServiceRef;
 
 namespace Aseba
 {
@@ -65,9 +65,9 @@ namespace Aseba
 	{
 	public:
 		//! An error in registering or browsing Zeroconf
-		struct Error: public std::runtime_error
+		struct Error : public std::runtime_error
 		{
-			Error(const std::string & what): std::runtime_error(what) {}
+			Error(const std::string& what) : std::runtime_error(what) {}
 		};
 
 		//! A TargetKey allows to uniquely identify a target on the network within Zeroconf.
@@ -75,16 +75,16 @@ namespace Aseba
 		struct TargetKey
 		{
 			std::string name; //!< the full name of this target
-			std::string regtype{"_aseba._tcp"}; //!< the mDNS registration type
-			std::string domain{"local."}; //!< the domain of the host
+			std::string regtype{ "_aseba._tcp" }; //!< the mDNS registration type
+			std::string domain{ "local." }; //!< the domain of the host
 		};
 
 		//! A TargetInformation allows client classes to choose and access Aseba targets.
-		struct TargetInformation: TargetKey
+		struct TargetInformation : TargetKey
 		{
 			// metadata about this target after resolution
 			std::string host; //!< the Dashel target connection ports
-			int port{0}; //!< the Dashel target connection port
+			int port{ 0 }; //!< the Dashel target connection port
 
 			std::map<std::string, std::string> properties; //!< user-modifiable metadata about this target
 
@@ -96,31 +96,32 @@ namespace Aseba
 		};
 
 		//! A Target allows client classes to choose and access Aseba targets.
-		class Target: public TargetInformation
+		class Target : public TargetInformation
 		{
 		public:
-			Target(std::string name, std::string regtype, std::string domain, Zeroconf & container);
-			Target(std::string name, const int port, Zeroconf & container);
-			Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf & container);
+			Target(std::string name, std::string regtype, std::string domain, Zeroconf& container);
+			Target(std::string name, const int port, Zeroconf& container);
+			Target(std::string name, const Dashel::Stream* dashelStream, Zeroconf& container);
 
 			~Target();
 
 			// disable copy constructor and copy assigment operator
-			Target(const Target &) = delete;
+			Target(const Target&) = delete;
 			Target& operator=(const Target&) = delete;
 			// implement move versions instead
-			Target(Target && rhs);
+			Target(Target&& rhs);
 			Target& operator=(Target&& rhs);
 
 		protected:
 			// we do not want user code to use callbacks or play with the serviceRef
-			friend class Zeroconf; friend struct ZeroconfCallbacks;
+			friend class Zeroconf;
+			friend struct ZeroconfCallbacks;
 
 			void registerCompleted() const;
 			void updateCompleted() const;
 			void targetFound() const;
 
-			DNSServiceRef serviceRef{nullptr}; //!< Attached serviceRef
+			DNSServiceRef serviceRef{ nullptr }; //!< Attached serviceRef
 
 			//! Possible states of a target with respect to the daemon
 			enum class State
@@ -153,10 +154,11 @@ namespace Aseba
 		//! Compute whether two TargetInformation objects are equal, using data from their parent TargetKey
 		struct TargetInformationKeyCompareEqual
 		{
-			bool operator()( const TargetInformation& lhs, const TargetInformation& rhs ) const;
+			bool operator()(const TargetInformation& lhs, const TargetInformation& rhs) const;
 		};
 		//! Detected targets is a set of TargetInformation indexed by their TargetKey
-		using DetectedTargets = std::unordered_set<TargetInformation, TargetInformationKeyHash, TargetInformationKeyCompareEqual>;
+		using DetectedTargets =
+			std::unordered_set<TargetInformation, TargetInformationKeyHash, TargetInformationKeyCompareEqual>;
 
 		/**
 			Zeroconf records three DNS records for each service: a PTR for the
@@ -174,9 +176,10 @@ namespace Aseba
 			using Fields = std::map<std::string, std::string>;
 
 		public:
-			TxtRecord(const unsigned int protovers, const std::string& type, bool busy = false, const std::vector<unsigned int>& ids = {}, const std::vector<unsigned int>& pids = {});
-			TxtRecord(const std::string & txtRecord);
-			TxtRecord(const unsigned char * txtRecord, uint16_t txtLen);
+			TxtRecord(const unsigned int protovers, const std::string& type, bool busy = false,
+				const std::vector<unsigned int>& ids = {}, const std::vector<unsigned int>& pids = {});
+			TxtRecord(const std::string& txtRecord);
+			TxtRecord(const unsigned char* txtRecord, uint16_t txtLen);
 
 			// Different kinds of keys can be encoded into TXT records
 			void assign(const std::string& key, const std::string& value);
@@ -184,7 +187,7 @@ namespace Aseba
 			void assign(const std::string& key, const std::vector<unsigned int>& values);
 			void assign(const std::string& key, const bool value);
 
-			const std::string at (const std::string& k) const { return fields.at(k); }
+			const std::string at(const std::string& k) const { return fields.at(k); }
 			Fields::const_iterator begin() const { return fields.begin(); }
 			Fields::const_iterator end() const { return fields.end(); }
 
@@ -208,10 +211,10 @@ namespace Aseba
 		virtual ~Zeroconf() = default;
 
 		// Aseba::Zeroconf can advertise local targets
-		void advertise(const std::string & name, const int port, const TxtRecord & txtrec);
-		void advertise(const std::string & name, const Dashel::Stream * stream, const TxtRecord & txtrec);
-		void forget(const std::string & name, const int port);
-		void forget(const std::string & name, const Dashel::Stream * stream);
+		void advertise(const std::string& name, const int port, const TxtRecord& txtrec);
+		void advertise(const std::string& name, const Dashel::Stream* stream, const TxtRecord& txtrec);
+		void forget(const std::string& name, const int port);
+		void forget(const std::string& name, const Dashel::Stream* stream);
 
 		// Aseba::Zeroconf can request the listing of non-local targets by browsing the network
 		void browse();
@@ -220,19 +223,22 @@ namespace Aseba
 		// helper functions
 		friend struct ZeroconfCallbacks;
 		void forget(Targets::iterator targetIt);
-		void registerTarget(Target & target, const TxtRecord & txtrec);
-		void updateTarget(Target & target, const TxtRecord & txtrec);
-		void resolveTarget(const std::string & name, const std::string & regtype, const std::string & domain);
+		void registerTarget(Target& target, const TxtRecord& txtrec);
+		void updateTarget(Target& target, const TxtRecord& txtrec);
+		void resolveTarget(const std::string& name, const std::string& regtype, const std::string& domain);
 		Targets::iterator getTarget(DNSServiceRef serviceRef);
-		Targets::iterator getTarget(const std::string & name, const int port);
-		Targets::iterator getTarget(const std::string & name, const Dashel::Stream * stream);
+		Targets::iterator getTarget(const std::string& name, const int port);
+		Targets::iterator getTarget(const std::string& name, const Dashel::Stream* stream);
 
 	protected:
 		// information callback for sub-class
-		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a register is completed
-		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a txt update is completed
-		virtual void targetFound(const Aseba::Zeroconf::TargetInformation &) {} //!< Called for each resolved target
-		virtual void targetRemoved(const Aseba::Zeroconf::TargetInformation &) {} //!< Called when a previously found target is removed
+		virtual void registerCompleted(const Aseba::Zeroconf::TargetInformation&) {
+		} //!< Called when a register is completed
+		virtual void updateCompleted(const Aseba::Zeroconf::TargetInformation&) {
+		} //!< Called when a txt update is completed
+		virtual void targetFound(const Aseba::Zeroconf::TargetInformation&) {} //!< Called for each resolved target
+		virtual void targetRemoved(const Aseba::Zeroconf::TargetInformation&) {
+		} //!< Called when a previously found target is removed
 
 		// serviceRef registering/de-registering, to be implemented by subclasses
 		//! Watch the file description associated with the service reference and call DNSServiceProcessResult when data are available.
@@ -252,10 +258,10 @@ namespace Aseba
 		TargetRefSet targetsToRemoveUponRegistration;
 
 		//! The serviceRef for browse requests isn't attached to a target
-		DNSServiceRef browseServiceRef{nullptr};
+		DNSServiceRef browseServiceRef{ nullptr };
 	};
 
-	bool operator ==(const Zeroconf::TargetKey &lhs, const Zeroconf::TargetKey &rhs);
+	bool operator==(const Zeroconf::TargetKey& lhs, const Zeroconf::TargetKey& rhs);
 
 	/*@}*/
 } // namespace Aseba

@@ -37,33 +37,33 @@ class DashelInterface : public QThread, public Dashel::Hub
 {
 	Q_OBJECT
 
-	public:
-		DashelInterface();
-		~DashelInterface();
-		void connectAseba(const QString& dashelTarget);
-		void connectAseba(const QString& ip, const QString& port);
-		void disconnectAseba();
+public:
+	DashelInterface();
+	~DashelInterface();
+	void connectAseba(const QString& dashelTarget);
+	void connectAseba(const QString& ip, const QString& port);
+	void disconnectAseba();
 
-		void sendEvent(unsigned id, const QVector<int> &values = QVector<int>(0));
+	void sendEvent(unsigned id, const QVector<int>& values = QVector<int>(0));
 
-	signals:
-		void messageAvailable(Aseba::UserMessage *message);
-		void dashelDisconnection();
-		void dashelConnection();
+signals:
+	void messageAvailable(Aseba::UserMessage* message);
+	void dashelDisconnection();
+	void dashelConnection();
 
-	protected:
-		// from QThread
-		virtual void run();
+protected:
+	// from QThread
+	virtual void run();
 
-		// from Dashel::Hub
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+	// from Dashel::Hub
+	virtual void incomingData(Dashel::Stream* stream);
+	virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
 
-		// members
-		Dashel::Stream* stream;
-		QString dashelParams;
-		bool isRunning;
-		bool isConnected;
+	// members
+	Dashel::Stream* stream;
+	QString dashelParams;
+	bool isRunning;
+	bool isConnected;
 };
 
 #endif // DASHELINTERFACE_H

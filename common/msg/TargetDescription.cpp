@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -30,16 +30,16 @@ namespace Aseba
 		crc = crcXModem(crc, bytecodeSize);
 		crc = crcXModem(crc, variablesSize);
 		crc = crcXModem(crc, stackSize);
-		for (const auto & namedVariable : namedVariables)
+		for (const auto& namedVariable : namedVariables)
 		{
 			crc = crcXModem(crc, namedVariable.size);
 			crc = crcXModem(crc, namedVariable.name);
 		}
-		for (const auto & localEvent : localEvents)
+		for (const auto& localEvent : localEvents)
 		{
 			crc = crcXModem(crc, localEvent.name);
 		}
-		for (const auto & nativeFunction : nativeFunctions)
+		for (const auto& nativeFunction : nativeFunctions)
 		{
 			crc = crcXModem(crc, nativeFunction.name);
 			for (size_t j = 0; j < nativeFunction.parameters.size(); ++j)
@@ -50,21 +50,20 @@ namespace Aseba
 		}
 		return crc;
 	}
-	
+
 	//! Get a VariablesMap out of namedVariables, overwrite freeVariableIndex
 	VariablesMap TargetDescription::getVariablesMap(unsigned& freeVariableIndex) const
 	{
 		freeVariableIndex = 0;
 		VariablesMap variablesMap;
-		for (const auto & namedVariable : namedVariables)
+		for (const auto& namedVariable : namedVariables)
 		{
-			variablesMap[namedVariable.name] =
-			std::make_pair(freeVariableIndex, namedVariable.size);
+			variablesMap[namedVariable.name] = std::make_pair(freeVariableIndex, namedVariable.size);
 			freeVariableIndex += namedVariable.size;
 		}
 		return variablesMap;
 	}
-	
+
 	//! Get a FunctionsMap out of nativeFunctions
 	FunctionsMap TargetDescription::getFunctionsMap() const
 	{

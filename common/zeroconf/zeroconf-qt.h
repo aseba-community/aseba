@@ -34,13 +34,16 @@ namespace Aseba
 		Q_OBJECT
 
 	signals:
-		void zeroconfRegisterCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a register is completed
-		void zeroconfUpdateCompleted(const Aseba::Zeroconf::TargetInformation &); //!< emitted when an update is completed
-		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a target is resolved
-		void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation &); //!< emitted when a previously found target is removed
+		void zeroconfRegisterCompleted(
+			const Aseba::Zeroconf::TargetInformation&); //!< emitted when a register is completed
+		void zeroconfUpdateCompleted(
+			const Aseba::Zeroconf::TargetInformation&); //!< emitted when an update is completed
+		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation&); //!< emitted when a target is resolved
+		void zeroconfTargetRemoved(
+			const Aseba::Zeroconf::TargetInformation&); //!< emitted when a previously found target is removed
 
 	public:
-		QtZeroconf(QObject *parent = nullptr): QObject(parent) {}
+		QtZeroconf(QObject* parent = nullptr) : QObject(parent) {}
 		~QtZeroconf() override;
 
 	protected slots:
@@ -48,10 +51,10 @@ namespace Aseba
 
 	protected:
 		// From Zeroconf
-		void registerCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
-		void updateCompleted(const Aseba::Zeroconf::TargetInformation & target) override;
-		void targetFound(const Aseba::Zeroconf::TargetInformation & target) override;
-		void targetRemoved(const Aseba::Zeroconf::TargetInformation &) override;
+		void registerCompleted(const Aseba::Zeroconf::TargetInformation& target) override;
+		void updateCompleted(const Aseba::Zeroconf::TargetInformation& target) override;
+		void targetFound(const Aseba::Zeroconf::TargetInformation& target) override;
+		void targetRemoved(const Aseba::Zeroconf::TargetInformation&) override;
 
 		void processServiceRef(DNSServiceRef serviceRef) override;
 		void releaseServiceRef(DNSServiceRef serviceRef) override;
@@ -66,9 +69,9 @@ namespace Aseba
 	};
 
 	//! Extends a Qt socket notifier with the associated service reference
-	struct QtZeroconf::ServiceRefSocketNotifier: QSocketNotifier
+	struct QtZeroconf::ServiceRefSocketNotifier : QSocketNotifier
 	{
-		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject *parent);
+		ServiceRefSocketNotifier(DNSServiceRef serviceRef, QObject* parent);
 		~ServiceRefSocketNotifier() override;
 		DNSServiceRef serviceRef; //!< the associated service reference
 	};

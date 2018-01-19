@@ -27,40 +27,41 @@ using Aseba::Http::AeslProgram;
 using std::cerr;
 using std::endl;
 
-AeslProgram::AeslProgram(const std::string& filename) :
-	loaded(false)
+AeslProgram::AeslProgram(const std::string& filename) : loaded(false)
 {
 	// local file or URL
-	xmlDoc *doc(xmlReadFile(filename.c_str(), nullptr, 0));
-	if(!doc) {
+	xmlDoc* doc(xmlReadFile(filename.c_str(), nullptr, 0));
+	if (!doc)
+	{
 		cerr << "Cannot read AESL script XML from file " << filename << endl;
-	} else {
+	}
+	else
+	{
 		load(doc);
 	}
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 }
 
-AeslProgram::AeslProgram(const char *buffer, const int size) :
-	loaded(false)
+AeslProgram::AeslProgram(const char* buffer, const int size) : loaded(false)
 {
 	// local file or URL
-	xmlDoc *doc(xmlReadMemory(buffer, size, "vmcode.aesl", nullptr, 0));
-	if(!doc) {
+	xmlDoc* doc(xmlReadMemory(buffer, size, "vmcode.aesl", nullptr, 0));
+	if (!doc)
+	{
 		cerr << "Cannot read AESL script XML from memory " << buffer << endl;
-	} else {
+	}
+	else
+	{
 		load(doc);
 	}
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 }
 
-AeslProgram::~AeslProgram()
-{
+AeslProgram::~AeslProgram() {}
 
-}
-
-void AeslProgram::load(xmlDoc *doc)
+void AeslProgram::load(xmlDoc* doc)
 {
 	loaded = true;
 
@@ -73,18 +74,25 @@ void AeslProgram::load(xmlDoc *doc)
 	xmlXPathObjectPtr obj;
 
 	// 1. Path network/event
-	if((obj = xmlXPathEvalExpression(BAD_CAST"/network/event", context))) {
+	if ((obj = xmlXPathEvalExpression(BAD_CAST "/network/event", context)))
+	{
 		xmlNodeSetPtr nodeset = obj->nodesetval;
-		for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i) {
-			xmlChar *name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
-			xmlChar *size(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("size")));
-			if(name && size) {
-				int eventSize = atoi((const char *) size);
-				if(eventSize > ASEBA_MAX_EVENT_ARG_SIZE) {
-					cerr << "Event " << name << " has a length " << eventSize << " larger than maximum" << ASEBA_MAX_EVENT_ARG_SIZE << endl;
+		for (int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+		{
+			xmlChar* name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+			xmlChar* size(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("size")));
+			if (name && size)
+			{
+				int eventSize = atoi((const char*)size);
+				if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
+				{
+					cerr << "Event " << name << " has a length " << eventSize << " larger than maximum"
+						 << ASEBA_MAX_EVENT_ARG_SIZE << endl;
 					loaded = false;
 					break;
-				} else commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *) name), eventSize));
+				}
+				else
+					commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char*)name), eventSize));
 			}
 			xmlFree(name);
 			xmlFree(size);
@@ -92,51 +100,62 @@ void AeslProgram::load(xmlDoc *doc)
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}
 	// 2. Path network/constant
-	if((obj = xmlXPathEvalExpression(BAD_CAST"/network/constant", context))) {
+	if ((obj = xmlXPathEvalExpression(BAD_CAST "/network/constant", context)))
+	{
 		xmlNodeSetPtr nodeset = obj->nodesetval;
-		for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i) {
-			xmlChar *name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
-			xmlChar *value(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
-			if(name && value) commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *) name), atoi((const char *) value)));
-			xmlFree(name);  // nop if name is nullptr
+		for (int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+		{
+			xmlChar* name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+			xmlChar* value(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("value")));
+			if (name && value)
+				commonDefinitions.constants.push_back(
+					NamedValue(UTF8ToWString((const char*)name), atoi((const char*)value)));
+			xmlFree(name); // nop if name is nullptr
 			xmlFree(value); // nop if value is nullptr
 		}
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}
 	// 3. Path network/keywords
-	if((obj = xmlXPathEvalExpression(BAD_CAST"/network/keywords", context))) {
+	if ((obj = xmlXPathEvalExpression(BAD_CAST "/network/keywords", context)))
+	{
 		xmlNodeSetPtr nodeset = obj->nodesetval;
-		for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i) {
-			xmlChar *flag(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("flag")));
+		for (int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+		{
+			xmlChar* flag(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("flag")));
 			// do nothing because compiler doesn't pay attention to keywords
 			xmlFree(flag);
 		}
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}
 	// 4. Path network/node
-	if((obj = xmlXPathEvalExpression(BAD_CAST"/network/node", context))) {
+	if ((obj = xmlXPathEvalExpression(BAD_CAST "/network/node", context)))
+	{
 		xmlNodeSetPtr nodeset = obj->nodesetval;
-		for(int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i) {
-			xmlChar *name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
-			xmlChar *storedId(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("nodeId")));
-			xmlChar *text(xmlNodeGetContent(nodeset->nodeTab[i]));
+		for (int i = 0; i < (nodeset ? nodeset->nodeNr : 0); ++i)
+		{
+			xmlChar* name(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("name")));
+			xmlChar* storedId(xmlGetProp(nodeset->nodeTab[i], BAD_CAST("nodeId")));
+			xmlChar* text(xmlNodeGetContent(nodeset->nodeTab[i]));
 
-			if(text != nullptr) {
+			if (text != nullptr)
+			{
 				NodeEntry entry;
-				entry.nodeName = (name == nullptr ? "": (const char *) name);
-				entry.nodeId = (storedId == nullptr ? "": (const char *) storedId);
-				entry.code = (const char *) text;
+				entry.nodeName = (name == nullptr ? "" : (const char*)name);
+				entry.nodeId = (storedId == nullptr ? "" : (const char*)storedId);
+				entry.code = (const char*)text;
 
 				entries.push_back(entry);
-			} else {
+			}
+			else
+			{
 				cerr << "Encountered node with no code" << endl;
 				loaded = false;
 			}
 
 			// free attribute and content
-			xmlFree(name);     // nop if name is nullptr
+			xmlFree(name); // nop if name is nullptr
 			xmlFree(storedId); // nop if name is nullptr
-			xmlFree(text);     // nop if text is nullptr
+			xmlFree(text); // nop if text is nullptr
 		}
 		xmlXPathFreeObject(obj); // also frees nodeset
 	}
@@ -145,7 +164,8 @@ void AeslProgram::load(xmlDoc *doc)
 	xmlXPathFreeContext(context);
 
 	// check if there was an error
-	if(!loaded) {
+	if (!loaded)
+	{
 		entries.clear();
 		commonDefinitions.events.clear();
 		commonDefinitions.constants.clear();

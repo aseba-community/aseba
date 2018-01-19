@@ -21,11 +21,11 @@
 
 #include <p33fxxxx.h>
 
-_FWDT(FWDTEN_OFF);              // Watchdog Timer disabled
+_FWDT(FWDTEN_OFF); // Watchdog Timer disabled
 _FOSCSEL(FNOSC_FRCPLL); // override oscillator configuration bits
-_FOSC(POSCMD_NONE & OSCIOFNC_ON & FCKSM_CSECMD);
+_FOSC(POSCMD_NONE& OSCIOFNC_ON& FCKSM_CSECMD);
 // ICD communicates on PGC1/EMUC1 and disable JTAG
-_FICD(ICS_PGD1 & JTAGEN_OFF);
+_FICD(ICS_PGD1& JTAGEN_OFF);
 
 #include <gpio/gpio.h>
 #include <clock/clock.h>
@@ -38,27 +38,21 @@ _FICD(ICS_PGD1 & JTAGEN_OFF);
 #include <skel.h>
 
 
-
-void update_aseba_variables_read(void) {
-
-}
+void update_aseba_variables_read(void) {}
 
 
-void update_aseba_variables_write(void) {
-	
-}
+void update_aseba_variables_write(void) {}
 
 
-	
-
-int main(void) {
+int main(void)
+{
 	clock_init_internal_rc_40();
-	
+
 	init_aseba_and_can();
-	if( ! load_settings_from_flash()) {
-                // Todo
-    }
-	
+	if (!load_settings_from_flash())
+	{
+		// Todo
+	}
+
 	run_aseba_main_loop();
 }
-

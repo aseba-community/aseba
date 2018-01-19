@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -71,9 +71,9 @@ namespace Aseba { namespace ThymioBlockly
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Blockly Interface"));
 		setMinimumSize(QSize(400,400));
-		
+
 		mainLayout = new QVBoxLayout(this);
-		
+
 		toolLayout = new  QHBoxLayout();
 		//toolLayout->setHorizontalSpacing(0);
 		//toolLayout->setVerticalSpacing(0);
@@ -87,36 +87,36 @@ namespace Aseba { namespace ThymioBlockly
 		newButton->setFlat(true);
 		newButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(newButton);
-		
+
 		openButton = new QPushButton();
 		openButton->setIcon(QIcon(":/images/icons/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
 		openButton->setFlat(true);
 		openButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(openButton);
-		
+
 		saveButton = new QPushButton();
 		saveButton->setIcon(QIcon(":/images/icons/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 		saveButton->setFlat(true);
 		saveButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveButton);
-		
+
 		saveAsButton = new QPushButton();
 		saveAsButton->setIcon(QIcon(":/images/icons/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 		saveAsButton->setFlat(true);
 		saveAsButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveAsButton);
-		
+
 		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer1);
-		
+
 		firstSeparator = new QFrame();
 		firstSeparator->setFrameShape(QFrame::VLine);
 		firstSeparator->setFrameShadow(QFrame::Sunken);
 		toolLayout->addWidget(firstSeparator);
-		
+
 		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer2);
 
@@ -129,7 +129,7 @@ namespace Aseba { namespace ThymioBlockly
 		runButton->setFlat(true);
 		runButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(runButton);
-		
+
 		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacerRunStop);
 
@@ -139,18 +139,18 @@ namespace Aseba { namespace ThymioBlockly
 		stopButton->setFlat(true);
 		stopButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(stopButton);
-		
+
 		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer4);
-		
+
 		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer5);
-		
+
 		secondSeparator = new QFrame();
 		secondSeparator->setFrameShape(QFrame::VLine);
 		secondSeparator->setFrameShadow(QFrame::Sunken);
 		toolLayout->addWidget(secondSeparator);
-		
+
 		spacer6 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer6);
 
@@ -160,7 +160,7 @@ namespace Aseba { namespace ThymioBlockly
 		helpButton->setFlat(true);
 		helpButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(helpButton);
-		
+
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
@@ -172,12 +172,12 @@ namespace Aseba { namespace ThymioBlockly
 		connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(save()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
-		
+
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 		connect(snapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshot()));
-		
+
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
 
@@ -213,12 +213,12 @@ namespace Aseba { namespace ThymioBlockly
 		setWindowModality(Qt::ApplicationModal);
 		setWindowIcon(QIcon(":/images/icons/thymioblockly.svgz"));
 	}
-	
+
 	ThymioBlockly::~ThymioBlockly()
 	{
 		saveGeometryIfVisible();
 	}
-	
+
 	void ThymioBlockly::openHelp() const
 	{
 		const AboutBox::Parameters aboutParameters = {
@@ -231,14 +231,14 @@ namespace Aseba { namespace ThymioBlockly
 		};
 		// we use nullptr here as parent might disappear under our eyes if the Thymio node gets disconnected
 		AboutBox aboutBox(nullptr, aboutParameters);
-		
+
 		aboutBox.exec();
 	}
-	
+
 	void ThymioBlockly::saveSnapshot() const
 	{
 		QSettings settings;
-		
+
 		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString());
 		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
 		{
@@ -248,17 +248,17 @@ namespace Aseba { namespace ThymioBlockly
 		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
 			tr("Export program as image"), initialFileName, "Images (*.png *.jpg *.bmp *.ppm *.tiff)", &selectedFilter));
-		
+
 		if (fileName.isEmpty())
 			return;
-		
+
 		// save file name to settings
 		settings.setValue("ThymioBlockly/snapshotFileName", fileName);
 
 		// image
 		if (fileName.lastIndexOf(".") < 0)
 			fileName += ".png";
-		
+
 		QImage image(webview->rect().size(), QImage::Format_ARGB32_Premultiplied);
 		{ // paint into image
 			QPainter painter(&image);
@@ -266,7 +266,7 @@ namespace Aseba { namespace ThymioBlockly
 		}
 		image.save(fileName);
 	}
-		
+
 	QWidget* ThymioBlockly::createMenuEntry()
 	{
 		QPushButton *vplButton = new QPushButton(QIcon(":/images/icons/thymioblockly.svgz"), tr("Launch Blockly"));
@@ -274,19 +274,19 @@ namespace Aseba { namespace ThymioBlockly
 		connect(vplButton, SIGNAL(clicked()), SLOT(newFile()));
 		return vplButton;
 	}
-	
+
 	void ThymioBlockly::closeAsSoonAsPossible()
 	{
 		close();
 	}
-	
+
 	//! prevent recursion of changes triggered by VPL itself
 	void ThymioBlockly::clearSceneWithoutRecompilation()
 	{
 		skipNextUpdate = true;
 		asebaJavascriptInterface.requestReset();
 	}
-	
+
 	void ThymioBlockly::showAtSavedPosition()
 	{
 		QSettings settings;
@@ -307,14 +307,14 @@ namespace Aseba { namespace ThymioBlockly
 	{
 		de->openFile();
 	}
-	
+
 	bool ThymioBlockly::save()
 	{
 		asebaJavascriptInterface.requestSave();
 		de->saveFile(false);
 		return true;
 	}
-	
+
 	bool ThymioBlockly::saveAs()
 	{
 		asebaJavascriptInterface.requestSave();
@@ -327,7 +327,7 @@ namespace Aseba { namespace ThymioBlockly
 		if(!isVisible()) {
 			return true;
 		}
-		
+
 		if(preDiscardWarningDialog(true))
 		{
 			de->clearOpenedFileName(true);
@@ -340,7 +340,7 @@ namespace Aseba { namespace ThymioBlockly
 			return false;
 		}
 	}
-	
+
 	void ThymioBlockly::run()
 	{
 		if(runButton->isEnabled())
@@ -357,7 +357,7 @@ namespace Aseba { namespace ThymioBlockly
 		const unsigned rightSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.right.target");
 		de->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
-	
+
 	void ThymioBlockly::initAsebaJavascriptInterface()
 	{
 		QWebPage *page = webview->page();
@@ -394,7 +394,7 @@ namespace Aseba { namespace ThymioBlockly
 		else
 			saveGeometryIfVisible();
 	}
-	
+
 	void ThymioBlockly::saveGeometryIfVisible()
 	{
 		if (isVisible())
@@ -403,7 +403,7 @@ namespace Aseba { namespace ThymioBlockly
 			settings.setValue("ThymioBlockly/geometry", saveGeometry());
 		}
 	}
-	
+
 	bool ThymioBlockly::preDiscardWarningDialog(bool keepCode)
 	{
 		QMessageBox msgBox;
@@ -411,7 +411,7 @@ namespace Aseba { namespace ThymioBlockly
 		msgBox.setText(tr("The Blockly document has been modified.<p>Do you want to save the changes?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
-		
+
 		int ret = msgBox.exec();
 		switch (ret)
 		{
@@ -433,7 +433,7 @@ namespace Aseba { namespace ThymioBlockly
 
 		return false;
 	}
-	
+
 	QDomDocument ThymioBlockly::saveToDom() const
 	{
 		asebaJavascriptInterface.requestSave();
@@ -459,7 +459,7 @@ namespace Aseba { namespace ThymioBlockly
 			}
 		}
 	}
-	
+
 	void ThymioBlockly::aboutToLoad()
 	{
 		saveGeometryIfVisible();
@@ -472,12 +472,12 @@ namespace Aseba { namespace ThymioBlockly
 
 		// remove <!DOCTYPE tool-plugin-data>, blockly can't handle it...
 		currentSavedXml.remove("<!DOCTYPE tool-plugin-data>");
-		
+
 		asebaJavascriptInterface.requestLoad(currentSavedXml);
-		
+
 		showAtSavedPosition();
 	}
-	
+
 	void ThymioBlockly::codeChangedInEditor()
 	{
 		if(!isVisible())
@@ -485,17 +485,17 @@ namespace Aseba { namespace ThymioBlockly
 			clearSceneWithoutRecompilation();
 		}
 	}
-	
+
 	bool ThymioBlockly::isModified() const
 	{
 		return false;
 	}
-	
+
 	qreal ThymioBlockly::getViewScale() const
 	{
 		return 1.0;
 	}
-	
+
 	void ThymioBlockly::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
@@ -517,9 +517,9 @@ namespace Aseba { namespace ThymioBlockly
 				//20 // safety factor, as it seems that metrics do miss some space*/
 			)
 		) / (toolbarWidgetCount));
-		
+
 		desiredIconSize = qMin(desiredIconSize, event->size().height()/14);
-		
+
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
 		const QSize importantIconSize(tbIconSize * 1.41);
@@ -534,5 +534,5 @@ namespace Aseba { namespace ThymioBlockly
 		spacerRunStop->changeSize(desiredIconSize/4, desiredIconSize);
 		toolLayout->invalidate();
 	}
-	
+
 } } // namespace ThymioVPL / namespace Aseba

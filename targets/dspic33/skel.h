@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -38,8 +38,6 @@
 #include <skel-user.h>
 
 
-
-
 extern struct _vmVariables vmVariables;
 
 extern unsigned int events_flags;
@@ -47,15 +45,12 @@ extern unsigned int events_flags;
 extern AsebaVMState vmState;
 
 
-/*** In your code, put "SET_EVENT(EVENT_NUMBER)" when you want to trigger an 
+/*** In your code, put "SET_EVENT(EVENT_NUMBER)" when you want to trigger an
 	 event. This macro is interrupt-safe, you can call it anywhere you want.
 ***/
 #define SET_EVENT(event) atomic_or(&events_flags, 1 << event)
 #define CLEAR_EVENT(event) atomic_and(&events_flags, ~(1 << event))
 #define IS_EVENT(event) (events_flags & (1 << event))
-
-
-
 
 
 // Call this when everything is initialised and you are ready to give full control to the VM

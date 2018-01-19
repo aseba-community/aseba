@@ -4,15 +4,13 @@
 
 using namespace std;
 
-int main(int argc, char*argv[])
+int main(int argc, char* argv[])
 {
 	const array<string, 3> invalidUTF8s = {
-		string{ static_cast<char>(192) },
-		string{ static_cast<char>(224) },
-		string{ static_cast<char>(224), 'a' }
+		string{ static_cast<char>(192) }, string{ static_cast<char>(224) }, string{ static_cast<char>(224), 'a' }
 	};
 	const string longString("long string to avoid small string optimisation");
-	for (auto invalidUTF8: invalidUTF8s)
+	for (auto invalidUTF8 : invalidUTF8s)
 	{
 		try
 		{
@@ -26,5 +24,3 @@ int main(int argc, char*argv[])
 	}
 	return 0;
 }
-
-

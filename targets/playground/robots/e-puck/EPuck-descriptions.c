@@ -22,12 +22,10 @@
 #include "../../../../common/productids.h"
 
 
-AsebaVMDescription PlaygroundEPuckVMDescription = {
-	"e-puck  ",
-	{
-		{ 1, "id" },	// Do not touch it
+AsebaVMDescription PlaygroundEPuckVMDescription = { "e-puck  ",
+	{ { 1, "id" }, // Do not touch it
 		{ 1, "source" }, // nor this one
-		{ 32, "args" },	// neither this one
+		{ 32, "args" }, // neither this one
 		{ 1, ASEBA_PID_VAR_NAME },
 		{ 1, "speed.left" },
 		{ 1, "speed.right" },
@@ -39,37 +37,16 @@ AsebaVMDescription PlaygroundEPuckVMDescription = {
 		{ 60, "cam.green" },
 		{ 60, "cam.blue" },
 		{ 1, "energy" },
-		{ 0, NULL }
-	}
-};
+		{ 0, NULL } } };
 
-AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energysend =
-{
-	"energy.send",
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energysend = { "energy.send",
 	"send energy to pool",
-	{
-		{ 1, "amount" },
-		{ 0, 0 }
-	}
-};
+	{ { 1, "amount" }, { 0, 0 } } };
 
-AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyreceive =
-{
-	"energy.receive",
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyreceive = { "energy.receive",
 	"receive energy from pool",
-	{
-		{ 1, "amount" },
-		{ 0, 0 }
-	}
-};
+	{ { 1, "amount" }, { 0, 0 } } };
 
-AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyamount =
-{
-	"energy.amount",
+AsebaNativeFunctionDescription PlaygroundEPuckNativeDescription_energyamount = { "energy.amount",
 	"get the amount of energy available in pool",
-	{
-		{ 1, "amount" },
-		{ 0, 0 }
-	}
-};
-
+	{ { 1, "amount" }, { 0, 0 } } };

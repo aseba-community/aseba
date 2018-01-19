@@ -28,6 +28,7 @@ authors_dest_file = os.path.join(top_level_path, "common/authors.h")
 
 authors_file_head = \
 """\
+//clang-format off
 #ifndef __ASEBA_AUTHORS_H
 #define __ASEBA_AUTHORS_H
 
@@ -39,7 +40,7 @@ namespace Aseba
 	struct AuthorInfo
 	{
 		using Tags = std::set<std::string>;
-		
+
 		std::string name;
 		std::string email;
 		std::string web;
@@ -47,7 +48,7 @@ namespace Aseba
 		Tags tags;
 	};
 	using AuthorInfos = std::vector<AuthorInfo>;
-	
+
 	struct InstitutionInfo
 	{
 		std::string name;
@@ -61,7 +62,7 @@ namespace Aseba
 authors_file_contrib_step = \
 """\
 	};
-	
+
 	static const AuthorInfos thankToList = {
 """
 

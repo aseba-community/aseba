@@ -24,7 +24,7 @@
 #include "zeroconf-thread.h"
 #include "dns_sd.h"
 #ifdef WIN32
-#include <winsock2.h>
+#	include <winsock2.h>
 #endif
 
 using namespace std;
@@ -42,9 +42,9 @@ namespace Aseba
 		// clear all targets
 		targets.clear();
 		// deallocate remaining service references
-		for (auto serviceRef: serviceRefs)
+		for (auto serviceRef : serviceRefs)
 			DNSServiceRefDeallocate(serviceRef);
-		for (auto serviceRef: pendingReleaseServiceRefs)
+		for (auto serviceRef : pendingReleaseServiceRefs)
 			DNSServiceRefDeallocate(serviceRef);
 	}
 
@@ -83,27 +83,30 @@ namespace Aseba
 	//! file descriptor and wait on them for activity using select.
 	void ThreadZeroconf::handleDnsServiceEvents()
 	{
-		struct timeval tv{1,0}; //!< maximum time to learn about a new service (1 sec)
+		struct timeval tv
+		{
+			1, 0
+		}; //!< maximum time to learn about a new service (1 sec)
 
 		while (true)
 		{
-			{// lock
+			{ // lock
 				std::unique_lock<std::recursive_mutex> locker(watcherLock);
 				// we use a condition variable to avoid infinite loops here
 				threadWait.wait(locker, [&] { return !serviceRefs.empty() || !running; });
-			}// unlock
+			} // unlock
 			if (!running)
 				break;
 			fd_set fds;
 			int max_fds(0);
 			FD_ZERO(&fds);
-			std::map<DNSServiceRef,int> serviceFd;
+			std::map<DNSServiceRef, int> serviceFd;
 
 			int fd_count(0);
 
-			{// lock
+			{ // lock
 				std::lock_guard<std::recursive_mutex> locker(watcherLock);
-				for (auto serviceRef: serviceRefs)
+				for (auto serviceRef : serviceRefs)
 				{
 					int fd = DNSServiceRefSockFD(serviceRef);
 					if (fd != -1)
@@ -114,16 +117,17 @@ namespace Aseba
 						fd_count++;
 					}
 				}
-			}// unlock
-			int result = select(max_fds+1, &fds, (fd_set*)nullptr, (fd_set*)nullptr, &tv);
-			try {
+			} // unlock
+			int result = select(max_fds + 1, &fds, (fd_set*)nullptr, (fd_set*)nullptr, &tv);
+			try
+			{
 				if (result >= 0)
 				{
 					// lock
 					std::lock_guard<std::recursive_mutex> locker(watcherLock);
 
 					// release old service refs
-					for (auto serviceRef: pendingReleaseServiceRefs)
+					for (auto serviceRef : pendingReleaseServiceRefs)
 						DNSServiceRefDeallocate(serviceRef);
 					pendingReleaseServiceRefs.clear();
 
@@ -131,7 +135,7 @@ namespace Aseba
 					if (result > 0)
 					{
 						// no timeout
-						for (auto serviceRef: serviceRefs)
+						for (auto serviceRef : serviceRefs)
 						{
 							auto fdIt(serviceFd.find(serviceRef));
 							if (fdIt != serviceFd.end())
@@ -147,9 +151,11 @@ namespace Aseba
 					// unlock
 				}
 				else
-					throw Zeroconf::Error(FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
+					throw Zeroconf::Error(
+						FormatableString("handleDnsServiceEvents: select returned %0 errno %1").arg(result).arg(errno));
 			}
-			catch (...) {
+			catch (...)
+			{
 				watcherException = std::current_exception();
 				break;
 			}

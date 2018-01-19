@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -75,13 +75,13 @@ namespace Aseba { namespace ThymioVPL
 		runAnimTimer(0)
 	{
 		runAnimFrames.resize(17);
-		
+
 		// Create the gui ...
 		setWindowTitle(tr("Thymio Visual Programming Language"));
 		setMinimumSize(QSize(400,400));
-		
+
 		mainLayout = new QVBoxLayout(this);
-		
+
 		toolLayout = new  QGridLayout();
 		toolLayout->setHorizontalSpacing(0);
 		toolLayout->setVerticalSpacing(0);
@@ -95,39 +95,39 @@ namespace Aseba { namespace ThymioVPL
 		newButton->setFlat(true);
 		newButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(newButton,0,0);
-		
+
 		openButton = new QPushButton();
 		openButton->setIcon(QIcon(":/images/icons/fileopen.svgz"));
 		openButton->setToolTip(tr("Open"));
 		openButton->setFlat(true);
 		openButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(openButton,0,1);
-		
+
 		saveButton = new QPushButton();
 		saveButton->setIcon(QIcon(":/images/icons/save.svgz"));
 		saveButton->setToolTip(tr("Save"));
 		saveButton->setFlat(true);
 		saveButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveButton,1,0);
-		
+
 		saveAsButton = new QPushButton();
 		saveAsButton->setIcon(QIcon(":/images/icons/saveas.svgz"));
 		saveAsButton->setToolTip(tr("Save as"));
 		saveAsButton->setFlat(true);
 		saveAsButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(saveAsButton,1,1);
-		
+
 		spacer1 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer1,0,2,2,1);
-		
+
 		firstSeparator = new QFrame();
 		firstSeparator->setFrameShape(QFrame::VLine);
 		firstSeparator->setFrameShadow(QFrame::Sunken);
 		toolLayout->addWidget(firstSeparator,0,3,2,1);
-		
+
 		spacer2 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer2,0,4,2,1);
-		
+
 		undoButton = new QPushButton();
 		undoButton->setIcon(QIcon(":/images/icons/edit-undo.svgz"));
 		undoButton->setToolTip(tr("Undo"));
@@ -136,7 +136,7 @@ namespace Aseba { namespace ThymioVPL
 		undoButton->setEnabled(false);
 		undoButton->setShortcut(QKeySequence::Undo);
 		toolLayout->addWidget(undoButton,0,5,2,1);
-		
+
 		redoButton = new QPushButton();
 		redoButton->setIcon(QIcon(":/images/icons/edit-redo.svgz"));
 		redoButton->setToolTip(tr("Redo"));
@@ -145,7 +145,7 @@ namespace Aseba { namespace ThymioVPL
 		redoButton->setEnabled(false);
 		redoButton->setShortcut(QKeySequence::Redo);
 		toolLayout->addWidget(redoButton,0,6,2,1);
-		
+
 		spacer3 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer3,0,7,2,1);
 
@@ -155,7 +155,7 @@ namespace Aseba { namespace ThymioVPL
 		runButton->setFlat(true);
 		runButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(runButton,0,8,2,1);
-		
+
 		spacerRunStop = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacerRunStop,0,9,2,1);
 
@@ -165,25 +165,25 @@ namespace Aseba { namespace ThymioVPL
 		stopButton->setFlat(true);
 		stopButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(stopButton,0,10,2,1);
-		
+
 		spacer4 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer4,0,11,2,1);
-		
+
 		advancedButton = new QPushButton();
 		advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
 		advancedButton->setToolTip(tr("Advanced mode"));
 		advancedButton->setFlat(true);
 		advancedButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(advancedButton,0,12,2,1);
-		
+
 		spacer5 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer5,0,13,2,1);
-		
+
 		secondSeparator = new QFrame();
 		secondSeparator->setFrameShape(QFrame::VLine);
 		secondSeparator->setFrameShadow(QFrame::Sunken);
 		toolLayout->addWidget(secondSeparator,0,14,2,1);
-		
+
 		spacer6 = new QSpacerItem(1,1,QSizePolicy::Expanding);
 		toolLayout->addItem(spacer6,0,15,2,1);
 
@@ -193,7 +193,7 @@ namespace Aseba { namespace ThymioVPL
 		helpButton->setFlat(true);
 		helpButton->setStyleSheet("QPushButton:pressed { border: 1px solid white }");
 		toolLayout->addWidget(helpButton,0,16);
-		
+
 		snapshotButton = new QPushButton();
 		snapshotButton->setIcon(QIcon(":/images/icons/screenshot.svgz"));
 		snapshotButton->setToolTip(tr("Screenshot"));
@@ -207,16 +207,16 @@ namespace Aseba { namespace ThymioVPL
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
 		connect(undoButton, SIGNAL(clicked()), this, SLOT(undo()));
 		connect(redoButton, SIGNAL(clicked()), this, SLOT(redo()));
-		
+
 		connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 		connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 		connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 		connect(helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 		connect(snapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshot()));
-		
+
 		horizontalLayout = new QHBoxLayout();
 		mainLayout->addLayout(horizontalLayout);
-		
+
 		// events
 		eventsLayout = new QVBoxLayout();
 
@@ -226,7 +226,7 @@ namespace Aseba { namespace ThymioVPL
 		eventButtons.push_back(new BlockButton("acc", this));
 		eventButtons.push_back(new BlockButton("clap", this));
 		eventButtons.push_back(new BlockButton("timeout", this));
-		
+
 		eventsLabel = new QLabel(tr("Events"));
 		eventsLabel->setStyleSheet("QLabel { font-size: 10pt; font-weight: bold; }");
 		#ifdef Q_WS_MACX
@@ -244,11 +244,11 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
 			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
-		
+
 		eventButtons[eventButtons.size()-1]->hide(); // timeout
-		
+
 		horizontalLayout->addLayout(eventsLayout);
-		
+
 		sceneLayout = new QVBoxLayout();
 
 		// compilation
@@ -256,18 +256,18 @@ namespace Aseba { namespace ThymioVPL
 		compilationResult = new QLabel(tr("Compilation success."));
 		compilationResult->setStyleSheet("QLabel { font-size: 10pt; }");
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
-		
+
 		compilationResultImage->setPixmap(pixmapFromSVG(":/images/vpl/success.svgz", fontSize*1.2));
 		compilationResult->setWordWrap(true);
 		compilationResult->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-		
+
 		showCompilationError = new QPushButton(tr("show line"));
 		showCompilationError->setStyleSheet("QPushButton { font-size: 10pt; }");
 		showCompilationError->hide();
 		connect(showCompilationError, SIGNAL(clicked()), SLOT(showErrorLine()));
 
 		compilationResultLayout = new QHBoxLayout;
-		compilationResultLayout->addWidget(compilationResultImage);  
+		compilationResultLayout->addWidget(compilationResultImage);
 		compilationResultLayout->addWidget(compilationResult,10000);
 		compilationResultLayout->addWidget(showCompilationError);
 		sceneLayout->addLayout(compilationResultLayout);
@@ -280,25 +280,25 @@ namespace Aseba { namespace ThymioVPL
 		sceneLayout->addWidget(view);
 		Q_ASSERT(scene->setsCount() > 0);
 		view->centerOn(*scene->setsBegin());
-		
+
 		connect(scene, SIGNAL(contentRecompiled()), SLOT(processCompilationResult()));
 		connect(scene, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		connect(scene, SIGNAL(highlightChanged()), SLOT(processHighlightChange()));
 		connect(scene, SIGNAL(modifiedStatusChanged(bool)), SIGNAL(modifiedStatusChanged(bool)));
-		
+
 		connect(de->getTarget(), SIGNAL(userEvent(unsigned, const VariablesDataVector)), SLOT(userEvent(unsigned, const VariablesDataVector)));
-		
+
 		/*zoomSlider = new QSlider(Qt::Horizontal);
 		zoomSlider->setRange(1,10);
 		zoomSlider->setValue(1);
 		zoomSlider->setInvertedAppearance(true);
 		zoomSlider->setInvertedControls(true);
 		sceneLayout->addWidget(zoomSlider);
-		
+
 		connect(zoomSlider, SIGNAL(valueChanged(int)), scene, SLOT(updateZoomLevel()));*/
 
 		horizontalLayout->addLayout(sceneLayout);
-     
+
 		// actions
 		actionsLayout = new QVBoxLayout();
 
@@ -308,7 +308,7 @@ namespace Aseba { namespace ThymioVPL
 		actionButtons.push_back(new BlockButton("sound", this));
 		actionButtons.push_back(new BlockButton("timer", this));
 		actionButtons.push_back(new BlockButton("setstate", this));
-		
+
 		actionsLabel = new QLabel(tr("Actions"));
 		actionsLabel->setStyleSheet("QLabel { font-size: 10pt; font-weight: bold; }");
 		#ifdef Q_WS_MACX
@@ -325,25 +325,25 @@ namespace Aseba { namespace ThymioVPL
 			connect(button, SIGNAL(contentChanged()), scene, SLOT(recompile()));
 			connect(button, SIGNAL(undoCheckpoint()), SLOT(pushUndo()));
 		}
-		
+
 		actionButtons[actionButtons.size()-2]->hide(); // timer
 		actionButtons[actionButtons.size()-1]->hide(); // set state
 
 		horizontalLayout->addLayout(actionsLayout);
-		
+
 		// window properties
 		setWindowModality(Qt::ApplicationModal);
 		setWindowIcon(QIcon(":/images/icons/thymiovpl.svgz"));
-		
+
 		// save initial state
 		pushUndo();
 	}
-	
+
 	ThymioVisualProgramming::~ThymioVisualProgramming()
 	{
 		saveGeometryIfVisible();
 	}
-	
+
 	void ThymioVisualProgramming::openHelp()
 	{
 		USAGE_LOG(logOpenHelp());
@@ -357,14 +357,14 @@ namespace Aseba { namespace ThymioVPL
 		};
 		// we use nullptr here as parent might disappear under our eyes if the Thymio node gets disconnected
 		AboutBox aboutBox(nullptr, aboutParameters);
-		
+
 		aboutBox.exec();
 	}
-	
+
 	void ThymioVisualProgramming::saveSnapshot() const
 	{
 		QSettings settings;
-		
+
 		USAGE_LOG(logSaveSnapshot());
 		QString initialFileName(settings.value("ThymioVPL/snapshotFileName", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString());
 		if (initialFileName.isEmpty() && !de->openedFileName().isEmpty())
@@ -375,26 +375,26 @@ namespace Aseba { namespace ThymioVPL
 		QString selectedFilter;
 		QString fileName(QFileDialog::getSaveFileName(0,
 			tr("Export program as image"), initialFileName, "Images (*.png *.jpg *.bmp *.ppm *.tiff);;Scalable Vector Graphics (*.svg)", &selectedFilter));
-		
+
 		if (fileName.isEmpty())
 			return;
-		
+
 		// save file name to settings
 		settings.setValue("ThymioVPL/snapshotFileName", fileName);
-		
+
 		if (selectedFilter.at(0) == 'S')
 		{
 			// SVG
 			if (fileName.lastIndexOf(".") < 0)
 				fileName += ".svg";
-			
+
 			QSvgGenerator generator;
 			generator.setFileName(fileName);
 			generator.setSize(scene->sceneRect().size().toSize());
 			generator.setViewBox(scene->sceneRect());
 			generator.setTitle(QString("VPL program %0").arg(de->openedFileName()));
 			generator.setDescription("This image was generated with Thymio VPL from Aseba, get it at http://thymio.org");
-			
+
 			QPainter painter(&generator);
 			scene->render(&painter);
 		}
@@ -403,7 +403,7 @@ namespace Aseba { namespace ThymioVPL
 			// image
 			if (fileName.lastIndexOf(".") < 0)
 				fileName += ".png";
-			
+
 			QImage image(scene->sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
 			{ // paint into image
 				QPainter painter(&image);
@@ -412,32 +412,32 @@ namespace Aseba { namespace ThymioVPL
 			image.save(fileName);
 		}
 	}
-	
+
 	void ThymioVisualProgramming::setColors(QComboBox *comboBox)
 	{
 		assert(comboBox);
 		for (unsigned i=0; i<Style::blockColorsCount(); ++i)
 			comboBox->addItem(drawColorScheme(Style::blockColor("event", i), Style::blockColor("state", i), Style::blockColor("action", i)), "");
 	}
-	
+
 	QPixmap ThymioVisualProgramming::drawColorScheme(const QColor& eventColor, const QColor& stateColor, const QColor& actionColor)
 	{
 		QPixmap pixmap(192,58);
 		pixmap.fill(Qt::transparent);
 		QPainter painter(&pixmap);
-		
+
 		painter.setBrush(eventColor);
 		painter.drawRoundedRect(0,0,54,54,4,4);
-		
+
 		painter.setBrush(stateColor);
 		painter.drawRoundedRect(66,0,54,54,4,4);
-		
+
 		painter.setBrush(actionColor);
 		painter.drawRoundedRect(130,0,54,54,4,4);
-		
+
 		return pixmap;
 	}
-	
+
 	QWidget* ThymioVisualProgramming::createMenuEntry()
 	{
 		QPushButton *vplButton = new QPushButton(QIcon(":/images/icons/thymiovpl.svgz"), tr("Launch VPL"));
@@ -445,12 +445,12 @@ namespace Aseba { namespace ThymioVPL
 		connect(vplButton, SIGNAL(clicked()), SLOT(showVPLModal()));
 		return vplButton;
 	}
-	
+
 	void ThymioVisualProgramming::closeAsSoonAsPossible()
 	{
 		close();
 	}
-	
+
 	//! prevent recursion of changes triggered by VPL itself
 	void ThymioVisualProgramming::clearSceneWithoutRecompilation()
 	{
@@ -460,7 +460,7 @@ namespace Aseba { namespace ThymioVPL
 		clearUndo();
 		loading = false;
 	}
-	
+
 	void ThymioVisualProgramming::showAtSavedPosition()
 	{
 		QSettings settings;
@@ -480,14 +480,14 @@ namespace Aseba { namespace ThymioVPL
 			processCompilationResult();
 		}
 	}
-	
+
 	void ThymioVisualProgramming::setupGlobalEvents()
 	{
 		CommonDefinitions commonDefinitions;
 		commonDefinitions.events.push_back(NamedValue(L"pair_run", 1));
 		de->setCommonDefinitions(commonDefinitions);
 	}
-	
+
 	void ThymioVisualProgramming::newFile()
 	{
 		if (de->newFile())
@@ -505,13 +505,13 @@ namespace Aseba { namespace ThymioVPL
 		USAGE_LOG(logOpenFile());
 		de->openFile();
 	}
-	
+
 	bool ThymioVisualProgramming::save()
 	{
 		USAGE_LOG(logSave());
 		return de->saveFile(false);
 	}
-	
+
 	bool ThymioVisualProgramming::saveAs()
 	{
 		USAGE_LOG(logSaveAs());
@@ -523,8 +523,8 @@ namespace Aseba { namespace ThymioVPL
 		USAGE_LOG(logCloseFile());
 		if (!isVisible())
 			return true;
-		
-		if (scene->isEmpty() || preDiscardWarningDialog(true)) 
+
+		if (scene->isEmpty() || preDiscardWarningDialog(true))
 		{
 			de->clearOpenedFileName(scene->isModified());
 			clearHighlighting(true);
@@ -537,21 +537,21 @@ namespace Aseba { namespace ThymioVPL
 			return false;
 		}
 	}
-	
+
 	void ThymioVisualProgramming::showErrorLine()
 	{
 		if (!scene->compilationResult().isSuccessful())
 			view->ensureVisible(scene->getSetRow(scene->compilationResult().errorLine));
 	}
-	
+
 	void ThymioVisualProgramming::setColorScheme(int index)
 	{
 		Style::blockSetCurrentColorIndex(index);
-		
+
 		scene->update();
 		updateBlockButtonImages();
 	}
-	
+
 	void ThymioVisualProgramming::updateBlockButtonImages()
 	{
 		for(QList<BlockButton*>::iterator itr(eventButtons.begin());
@@ -562,7 +562,7 @@ namespace Aseba { namespace ThymioVPL
 			itr != actionButtons.end(); ++itr)
 			(*itr)->updateBlockImage(scene->getAdvanced());
 	}
-	
+
 	void ThymioVisualProgramming::run()
 	{
 		USAGE_LOG(logRun());
@@ -582,12 +582,12 @@ namespace Aseba { namespace ThymioVPL
 		const unsigned rightSpeedVarPos = de->getVariablesModel()->getVariablePos("motor.right.target");
 		de->setVariableValues(rightSpeedVarPos, VariablesDataVector(1, 0));
 	}
-	
+
 	void ThymioVisualProgramming::toggleAdvancedMode()
 	{
 		toggleAdvancedMode(!scene->getAdvanced());
 	}
-	
+
 	void ThymioVisualProgramming::toggleAdvancedMode(bool advanced, bool force, bool ignoreSceneCheck)
 	{
 		if (!ignoreSceneCheck && (scene->getAdvanced() == advanced))
@@ -610,7 +610,7 @@ namespace Aseba { namespace ThymioVPL
 				QMessageBox::Yes|QMessageBox::No, QMessageBox::No) == QMessageBox::No)
 					doClear = false;
 			}
-			
+
 			if (doClear)
 			{
 				advancedButton->setIcon(QIcon(":/images/icons/vpl-advanced_off.svgz"));
@@ -622,7 +622,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		updateBlockButtonImages();
 	}
-	
+
 	void ThymioVisualProgramming::closeEvent ( QCloseEvent * event )
 	{
 		if (!closeFile())
@@ -630,7 +630,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			saveGeometryIfVisible();
 	}
-	
+
 	void ThymioVisualProgramming::saveGeometryIfVisible()
 	{
 		if (isVisible())
@@ -639,18 +639,18 @@ namespace Aseba { namespace ThymioVPL
 			settings.setValue("ThymioVisualProgramming/geometry", saveGeometry());
 		}
 	}
-	
+
 	bool ThymioVisualProgramming::preDiscardWarningDialog(bool keepCode)
 	{
 		if (!scene->isModified())
 			return true;
-		
+
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Warning"));
 		msgBox.setText(tr("The VPL document has been modified.<p>Do you want to save the changes?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
-		
+
 		int ret = msgBox.exec();
 		switch (ret)
 		{
@@ -674,7 +674,7 @@ namespace Aseba { namespace ThymioVPL
 
 		return false;
 	}
-	
+
 	void ThymioVisualProgramming::clearHighlighting(bool keepCode)
 	{
 		if (keepCode && scene->compilationResult().isSuccessful())
@@ -683,15 +683,15 @@ namespace Aseba { namespace ThymioVPL
 			de->displayCode(QList<QString>(), -1);
 	}
 
-	QDomDocument ThymioVisualProgramming::saveToDom() const 
+	QDomDocument ThymioVisualProgramming::saveToDom() const
 	{
 		// if VPL is in its virign state, do not return a valid document
 		// to prevent erasing of text-base code
 		if (scene->isEmpty())
 			return QDomDocument();
-		
+
 		QDomDocument document("tool-plugin-data");
-		
+
 		QDomElement vplroot = document.createElement("vplroot");
 		vplroot.setAttribute("xml-format-version", 1);
 		document.appendChild(vplroot);
@@ -702,7 +702,7 @@ namespace Aseba { namespace ThymioVPL
 
 		return document;
 	}
-	
+
 	void ThymioVisualProgramming::aboutToLoad()
 	{
 		clearHighlighting(false);
@@ -710,11 +710,11 @@ namespace Aseba { namespace ThymioVPL
 		hide();
 	}
 
-	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile) 
+	void ThymioVisualProgramming::loadFromDom(const QDomDocument& document, bool fromFile)
 	{
 		const QDomElement vplroot(document.documentElement());
 		const QString version(vplroot.attribute("xml-format-version"));
-		
+
 		if (version.isNull())
 		{
 			loadFromDom(transformDomToVersion1(document), fromFile);
@@ -724,9 +724,9 @@ namespace Aseba { namespace ThymioVPL
 		{
 			QMessageBox::warning(0, tr("Incompatible Version"), tr("This file is incompatible with this version of ThymioVPL. It might not work correctly."));
 		}
-		
+
 		loading = true;
-		
+
 		// load program
 		const QDomElement programElement(vplroot.firstChildElement("program"));
 		if (!programElement.isNull())
@@ -734,51 +734,51 @@ namespace Aseba { namespace ThymioVPL
 			scene->deserialize(programElement);
 			toggleAdvancedMode(scene->getAdvanced(), true, true);
 		}
-		
+
 		scene->setModified(!fromFile);
 		scene->recompileWithoutSetModified();
-		
+
 		if (!scene->isEmpty())
 		{
 			setupGlobalEvents();
 			showAtSavedPosition();
 		}
-		
+
 		clearUndo();
-		
+
 		loading = false;
-		
+
 		// once loaded, process the result of compilation if there is anything to compile
 		if (!scene->isEmpty())
 			processCompilationResult();
 	}
-	
+
 	QDomDocument ThymioVisualProgramming::transformDomToVersion1(const QDomDocument& document0)
 	{
 		const QDomElement vplroot0(document0.documentElement());
 		const QDomElement settings0(vplroot0.firstChildElement("settings"));
-		
+
 		QDomDocument document1;
-		
+
 		QDomElement vplroot1(document1.createElement("vplroot"));
 		document1.appendChild(vplroot1);
 		vplroot1.setAttribute("xml-format-version", "1");
-		
+
 		QDomElement settings1(document1.createElement("settings"));
 		vplroot1.appendChild(settings1);
 		settings1.setAttribute("color-scheme", settings0.attribute("color-scheme"));
-		
+
 		QDomElement program1(document1.createElement("program"));
 		vplroot1.appendChild(program1);
 		program1.setAttribute("advanced_mode", settings0.attribute("advanced-mode") == "true");
-		
+
 		// track duplicate events
 		QMap<QString, QDomElement> setsByEvent;
-		
+
 		for (QDomElement buttonset0(vplroot0.firstChildElement("buttonset")); !buttonset0.isNull(); buttonset0 = buttonset0.nextSiblingElement("buttonset"))
 		{
 			QDomElement set1(document1.createElement("set"));
-			
+
 			QString eventName(buttonset0.attribute("event-name"));
 			if (!eventName.isNull())
 			{
@@ -787,7 +787,7 @@ namespace Aseba { namespace ThymioVPL
 					// tap event was renamed to acc
 					eventName = "acc";
 				}
-				
+
 				QDomElement event1(document1.createElement("block"));
 				set1.appendChild(event1);
 				event1.setAttribute("type", "event");
@@ -808,7 +808,7 @@ namespace Aseba { namespace ThymioVPL
 					event1.setAttribute(QString("value%0").arg(i), value);
 				}
 			}
-			
+
 			int state(buttonset0.attribute("state").toInt());
 			if (state >= 0)
 			{
@@ -822,7 +822,7 @@ namespace Aseba { namespace ThymioVPL
 					state1.setAttribute(QString("value%0").arg(i), value);
 				}
 			}
-			
+
 			{
 				// check for duplicate events
 				QString setKey;
@@ -849,7 +849,7 @@ namespace Aseba { namespace ThymioVPL
 					// statefilter action was renamed to setstate
 					actionName = "setstate";
 				}
-				
+
 				QDomElement action1(document1.createElement("block"));
 				set1.appendChild(action1);
 				action1.setAttribute("type", "action");
@@ -863,10 +863,10 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 		}
-		
+
 		return document1;
 	}
-	
+
 	void ThymioVisualProgramming::codeChangedInEditor()
 	{
 		if (!isVisible() && !loading)
@@ -874,17 +874,17 @@ namespace Aseba { namespace ThymioVPL
 			clearSceneWithoutRecompilation();
 		}
 	}
-	
+
 	bool ThymioVisualProgramming::isModified() const
 	{
 		return scene->isModified();
 	}
-	
+
 	qreal ThymioVisualProgramming::getViewScale() const
 	{
 		return view->getScale();
 	}
-	
+
 	void ThymioVisualProgramming::pushUndo()
 	{
 		/* Useful code for printing backtrace
@@ -905,17 +905,17 @@ namespace Aseba { namespace ThymioVPL
 		printf("\n");
 		#endif // Q_OS_LINUX
 		*/
-		
+
 		undoStack.push(scene->toString());
 		undoPos = undoStack.size()-2;
 		undoButton->setEnabled(undoPos >= 0);
-		
+
 		if (undoStack.size() > 50)
 			undoStack.pop_front();
-		
+
 		redoButton->setEnabled(false);
 	}
-	
+
 	void ThymioVisualProgramming::clearUndo()
 	{
 		undoButton->setEnabled(false);
@@ -924,35 +924,35 @@ namespace Aseba { namespace ThymioVPL
 		undoPos = -1;
 		pushUndo();
 	}
-	
+
 	void ThymioVisualProgramming::undo()
 	{
 		if (undoPos < 0)
 			return;
-		
+
 		scene->fromString(undoStack[undoPos]);
 		toggleAdvancedMode(scene->getAdvanced(), true, true);
 		scene->setModified(true);
 		scene->recompileWithoutSetModified();
 
 		--undoPos;
-		
+
 		undoButton->setEnabled(undoPos >= 0);
 		redoButton->setEnabled(true);
 	}
-	
+
 	void ThymioVisualProgramming::redo()
 	{
 		if (undoPos >= undoStack.size()-2)
 			return;
-		
+
 		++undoPos;
-		
+
 		scene->fromString(undoStack[undoPos+1]);
 		toggleAdvancedMode(scene->getAdvanced(), true, true);
 		scene->setModified(true);
 		scene->recompileWithoutSetModified();
-		
+
 		undoButton->setEnabled(true);
 		redoButton->setEnabled(undoPos < undoStack.size()-2);
 	}
@@ -961,7 +961,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		if (loading)
 			return;
-		
+
 		const Compiler::CompilationResult compilation(scene->compilationResult());
 		compilationResult->setText(compilation.getMessage(scene->getAdvanced()));
 		const int fontSize(QFontMetrics(compilationResult->font()).lineSpacing());
@@ -1009,25 +1009,25 @@ namespace Aseba { namespace ThymioVPL
 			emit compilationOutcome(false);
 		}
 	}
-	
+
 	void ThymioVisualProgramming::processHighlightChange()
 	{
 		if (scene->compilationResult().isSuccessful())
 			de->displayCode(scene->getCode(), scene->getSelectedSetCodeId());
 	}
-	
+
 	void ThymioVisualProgramming::userEvent(unsigned id, const VariablesDataVector& data)
 	{
 		// if hidden, do not react
 		if (isHidden())
 			return;
-		
+
 		// here we can add react to incoming events
 		if (id == 2)
 			USAGE_LOG(logTabletData(data));
 		else if (id > 2)
 			USAGE_LOG(logUserEvent(id,data));
-		
+
 		// a set was executed on target, highlight in program if the code in the robot is the same as in this editor
 		if (id == 0 && runButton->isEnabled() && !runAnimTimer && !data.empty())
 		{
@@ -1036,19 +1036,19 @@ namespace Aseba { namespace ThymioVPL
 				(*(scene->setsBegin() + index))->blink();
 		}
 	}
-	
+
 	void ThymioVisualProgramming::addEvent()
 	{
 		BlockButton* button(polymorphic_downcast<BlockButton*>(sender()));
 		view->ensureVisible(scene->addEvent(button->getName()));
 	}
-	
+
 	void ThymioVisualProgramming::addAction()
 	{
 		BlockButton* button(polymorphic_downcast<BlockButton*>(sender()));
 		view->ensureVisible(scene->addAction(button->getName()));
 	}
-	
+
 	static QImage blend(const QImage& firstImage, const QImage& secondImage, qreal ratio)
 	{
 		// only attempt to blend images of similar sizes and formats
@@ -1058,7 +1058,7 @@ namespace Aseba { namespace ThymioVPL
 			return QImage();
 		if ((firstImage.format() != QImage::Format_ARGB32) && (firstImage.format() != QImage::Format_ARGB32_Premultiplied))
 			return QImage();
-		
+
 		// handcoded blend, because Qt painter-based function have problems on many platforms
 		QImage destImage(firstImage.size(), firstImage.format());
 		const quint32 a(ratio*255.);
@@ -1068,25 +1068,25 @@ namespace Aseba { namespace ThymioVPL
 			const quint32 *pF(reinterpret_cast<const quint32*>(firstImage.scanLine(y)));
 			const quint32 *pS(reinterpret_cast<const quint32*>(secondImage.scanLine(y)));
 			quint32 *pD(reinterpret_cast<quint32*>(destImage.scanLine(y)));
-			
+
 			for (int x=0; x<firstImage.width(); ++x)
 			{
 				const quint32 vF(*pF++);
 				const quint32 vS(*pS++);
-				
-				*pD++ = 
+
+				*pD++ =
 					(((((vF >> 24) & 0xff) * a + ((vS >> 24) & 0xff) * oma) & 0xff00) << 16) |
 					(((((vF >> 16) & 0xff) * a + ((vS >> 16) & 0xff) * oma) & 0xff00) <<  8) |
 					(((((vF >>  8) & 0xff) * a + ((vS >>  8) & 0xff) * oma) & 0xff00)      ) |
 					(((((vF >>  0) & 0xff) * a + ((vS >>  0) & 0xff) * oma) & 0xff00) >>  8);
 			}
 		}
-		
+
 		return destImage;
 	}
-	
+
 	#ifndef Q_OS_WIN
-	
+
 	void ThymioVisualProgramming::regenerateRunButtonAnimation(const QSize& iconSize)
 	{
 		// load the play animation
@@ -1098,7 +1098,7 @@ namespace Aseba { namespace ThymioVPL
 		QImageReader playRedReader(":/images/icons/play-green.svgz");
 		playRedReader.setScaledSize(iconSize);
 		const QImage playRedImage(playRedReader.read());
-		
+
 		const int count(runAnimFrames.size());
 		for (int i = 0; i<count; ++i)
 		{
@@ -1106,16 +1106,16 @@ namespace Aseba { namespace ThymioVPL
 			runAnimFrames[i] = QPixmap::fromImage(blend(playImage, playRedImage, alpha));
 		}
 	}
-	
+
 	#endif // Q_OS_WIN
-	
+
 	//! Start the run button animation timer, safe even if the timer is already running
 	void ThymioVisualProgramming::startRunButtonAnimationTimer()
 	{
 		if (!runAnimTimer)
 			runAnimTimer = startTimer(50);
 	}
-	
+
 	//! Stop the run button animation timer, safe even if the timer is not running
 	void ThymioVisualProgramming::stopRunButtonAnimationTimer()
 	{
@@ -1130,33 +1130,33 @@ namespace Aseba { namespace ThymioVPL
 			#endif // Q_OS_WIN
 		}
 	}
-	
+
 	float ThymioVisualProgramming::computeScale(QResizeEvent *event, int desiredToolbarIconSize)
 	{
-		// FIXME: scale computation should be updated 
+		// FIXME: scale computation should be updated
 		// desired sizes for height
 		const int idealContentHeight(6*256);
 		const int uncompressibleHeight(
 			max(actionsLabel->height(), eventsLabel->height()) +
-			desiredToolbarIconSize * 2 + 
-			4 * style()->pixelMetric(QStyle::PM_ButtonMargin) + 
+			desiredToolbarIconSize * 2 +
+			4 * style()->pixelMetric(QStyle::PM_ButtonMargin) +
 			4 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth) +
 			style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) +
 			6 * 10 +
-			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) + 
+			2 * style()->pixelMetric(QStyle::PM_LayoutTopMargin) +
 			2 * style()->pixelMetric(QStyle::PM_LayoutBottomMargin)
 		);
 		const int availableHeight(event->size().height() - uncompressibleHeight);
 		const qreal scaleHeight(qreal(availableHeight)/qreal(idealContentHeight));
-		
+
 		// desired sizes for width
 		const int idealContentWidth(1088+256*2);
 		const int uncompressibleWidth(
 			2 * style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) +
-			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) + 
+			style()->pixelMetric(QStyle::PM_LayoutLeftMargin) +
 			style()->pixelMetric(QStyle::PM_LayoutRightMargin) +
 			#ifdef ANDROID
-			40 + 
+			40 +
 			#else // ANDROID
 			style()->pixelMetric(QStyle::PM_ScrollBarSliderMin) +
 			#endif // ANDROID
@@ -1164,12 +1164,12 @@ namespace Aseba { namespace ThymioVPL
 		);
 		const int availableWidth(event->size().width() - uncompressibleWidth);
 		const qreal scaleWidth(qreal(availableWidth)/qreal(idealContentWidth));
-		
+
 		// compute and set scale
 		const qreal scale(qMin(scaleHeight, scaleWidth));
 		return scale;
 	}
-	
+
 	void ThymioVisualProgramming::resizeEvent( QResizeEvent *event)
 	{
 		// compute size of elements for toolbar
@@ -1191,13 +1191,13 @@ namespace Aseba { namespace ThymioVPL
 				//20 // safety factor, as it seems that metrics do miss some space*/
 			)
 		) / (toolbarWidgetCount));
-		
+
 		// two pass of layout computation, should be a good-enough approximation
 		qreal testScale(computeScale(event, desiredIconSize));
 		desiredIconSize = qMin(desiredIconSize, int(256.*testScale));
 		desiredIconSize = qMin(desiredIconSize, event->size().height()/14);
 		const qreal scale(computeScale(event, desiredIconSize));
-		
+
 		// set toolbar
 		const QSize tbIconSize(QSize(desiredIconSize, desiredIconSize));
 		const QSize importantIconSize(tbIconSize * 1.41);
@@ -1223,7 +1223,7 @@ namespace Aseba { namespace ThymioVPL
 		spacer5->changeSize(desiredIconSize/4, desiredIconSize);
 		spacer6->changeSize(desiredIconSize/4, desiredIconSize);
 		toolLayout->invalidate();
-		
+
 		// set view and cards on sides
 		#ifdef Q_WS_MACX // we have to work around bugs in size reporting in OS X
 		const QSize iconSize(243*scale, 243*scale);
@@ -1237,11 +1237,11 @@ namespace Aseba { namespace ThymioVPL
 			itr != actionButtons.end(); ++itr)
 			(*itr)->setIconSize(iconSize);
 	}
-	
+
 	void ThymioVisualProgramming::timerEvent ( QTimerEvent * event )
 	{
 		#ifdef Q_OS_WIN
-		// for unknown reason, animation does not work some times on Windows, so setting image directly from QIcon	
+		// for unknown reason, animation does not work some times on Windows, so setting image directly from QIcon
 		if (runAnimFrame >= 0)
 			runButton->setIcon(QIcon(":/images/icons/play.svgz"));
 		else

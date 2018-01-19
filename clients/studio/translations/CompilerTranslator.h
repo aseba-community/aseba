@@ -7,16 +7,15 @@
 
 namespace Aseba
 {
-	class CompilerTranslator: public QObject
+	class CompilerTranslator : public QObject
 	{
 		Q_OBJECT
 
-		public:
-			CompilerTranslator();
+	public:
+		CompilerTranslator();
 
-			static const std::wstring translate(ErrorCode error);
+		static const std::wstring translate(ErrorCode error);
 	};
 };
 
 #endif // _TRANSLATOR_H
-

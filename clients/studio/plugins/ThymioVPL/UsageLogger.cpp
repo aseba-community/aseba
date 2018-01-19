@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -37,19 +37,19 @@ using namespace std;
 
 namespace Aseba{ namespace ThymioVPL
 {
-	
+
 bool UsageLogger::loggingEnabled = false;
 UsageLogger::UsageLogger()
 {
 	if(loggingEnabled){
 		askForGroupName();
-	
+
 		QString homePath = QDir::homePath();
 		QString filePath = homePath + "/" + groupName + "_" + getTimeStampString() + ".log";
-		
+
 		fileOut = new ofstream(filePath.toUtf8().constData(), ios::app | ios::binary);
 		scene = 0;
-		
+
 		connect(&signalMapper, SIGNAL(mapped(unsigned int, QObject *, QObject *)),this, SLOT(logGUIEvents(unsigned int, QObject*, QObject *)));
 	}
 	action = new Action();
@@ -77,7 +77,7 @@ void UsageLogger::askForGroupName(){
 				  groupName, &ok);
 	if (ok && !text.isEmpty()){
 		groupName = text;
-		settings.setValue("logging/groupname", groupName); 
+		settings.setValue("logging/groupname", groupName);
 	}
 }
 
@@ -108,14 +108,14 @@ void UsageLogger::logGUIEvents(unsigned int senderId, QObject *originalSender, Q
 	if(originalSender == 0){
 		return;
 	}
-	
+
 	Block *b = dynamic_cast<Block*>(logicalParent);
 	if(b != 0){
 		int row = getRow(b);
-		
+
 		QSlider * slider = dynamic_cast<QSlider*>(originalSender);
 		GeometryShapeButton * button = dynamic_cast<GeometryShapeButton*>(originalSender);
-		
+
 		if(slider != 0){
 			int sliderValue = slider->value();
 			logBlockAction(SLIDER,b->getName(),b->getType(), row, senderId, &sliderValue, nullptr, nullptr, nullptr);
@@ -131,13 +131,13 @@ void UsageLogger::logGUIEvents(unsigned int senderId, QObject *originalSender, Q
 void UsageLogger::logBlockAction(BlockActionType type, QString blockName, QString blockType, int row, int elementId, int * sliderValue, unsigned int * soundValue, unsigned int * timerValue, int * buttonValue){
 	Action * wrapper = getActionWithCurrentState();
 	BlockAction *a = new BlockAction();
-	
+
 	a->set_type(type);
 	a->set_blockname(blockName.toUtf8().constData());
 	a->set_blocktype(blockType.toUtf8().constData());
 	a->set_row(row);
 	a->set_elementid(elementId);
-	
+
 	if(sliderValue){
 		a->set_slidervalue(*sliderValue);
 	}
@@ -150,7 +150,7 @@ void UsageLogger::logBlockAction(BlockActionType type, QString blockName, QStrin
 	if(buttonValue){
 		a->set_buttonvalue(*buttonValue);
 	}
-	
+
 	wrapper->set_type(Action_ActionType_BLOCK_ACTION);
 	wrapper->set_allocated_blockaction(a);
 	storeAction(wrapper);
@@ -175,7 +175,7 @@ void UsageLogger::logSetAction(RowAction_ActionType type, int row){
 	RowAction * rowAction = new RowAction();
 	rowAction->set_row(row);
 	rowAction->set_type(type);
-	
+
 	wrapper->set_type(Action_ActionType_ROW);
 	wrapper->set_allocated_rowaction(rowAction);
 	storeAction(wrapper);
@@ -185,7 +185,7 @@ void UsageLogger::logSetAdvanced(bool advanced){
 	Action * wrapper = getActionWithCurrentState();
 	AdvancedModeAction *a = new AdvancedModeAction();
 	a->set_isadvanced(advanced);
-	
+
 	wrapper->set_type(Action_ActionType_ADVANCED_MODE);
 	wrapper->set_allocated_advancedmodeaction(a);
 	storeAction(wrapper);
@@ -193,13 +193,13 @@ void UsageLogger::logSetAdvanced(bool advanced){
 void UsageLogger::logAddEventBlock(int row, Block *block){
 	logAddBlock(EVENT,row,block);
 }
-void UsageLogger::logAddActionBlock(int row, Block *block, int position){	
+void UsageLogger::logAddActionBlock(int row, Block *block, int position){
 	logAddBlock(ACTION,row,block);
 }
 
 void UsageLogger::logAddBlock(BlockType type,int row, Block *block){
 	Action * wrapper = getActionWithCurrentState();
-	
+
 	AddBlockAction *a = new AddBlockAction();
 	a->set_type(type);
 	a->set_blockname(block->getName().toUtf8().constData());
@@ -213,7 +213,7 @@ void UsageLogger::logAddBlock(BlockType type,int row, Block *block){
 void UsageLogger::logEventBlockMode(QString name, QString type, int mode){
 	Action * wrapper = getActionWithCurrentState();
 	AccBlockModeAction *a = new AccBlockModeAction();
-	
+
 	a->set_blockname(name.toUtf8().constData());
 	a->set_blocktype(type.toUtf8().constData());
 	a->set_mode(mode);
@@ -224,12 +224,12 @@ void UsageLogger::logEventBlockMode(QString name, QString type, int mode){
 
 void UsageLogger::logMenuAction(MenuEntry entry){
 	Action * wrapper = getActionWithCurrentState();
-	
+
 	MenuAction *a = new MenuAction();
 	a->set_entry(entry);
 	wrapper->set_type(Action_ActionType_MENU);
 	wrapper->set_allocated_menuaction(a);
-	
+
 	storeAction(wrapper);
 }
 
@@ -258,13 +258,13 @@ void UsageLogger::logEventActionSetDrop(int row, QGraphicsSceneDragDropEvent *ev
 
 void UsageLogger::logMouseAction(MouseActionType type, double xPos, double yPos, MouseButton button, const int * row, const char * blockName, const char * blockType){
 	Action * wrapper = getActionWithCurrentState();
-	
+
 	MouseAction *a = new MouseAction();
 	a->set_type(type);
 	a->set_button(button);
 	a->set_xpos(xPos);
 	a->set_ypos(yPos);
-	
+
 	if(row != 0){
 		a->set_row(*row);
 	}
@@ -274,10 +274,10 @@ void UsageLogger::logMouseAction(MouseActionType type, double xPos, double yPos,
 	if(blockType != 0){
 		a->set_blocktype(blockType);
 	}
-	
+
 	wrapper->set_type(Action_ActionType_MOUSE_ACTION);
 	wrapper->set_allocated_mouseaction(a);
-	
+
 	storeAction(wrapper);
 }
 
@@ -303,10 +303,10 @@ void UsageLogger::logCloseFile(){
 	logMenuAction(CLOSE_FILE);
 }
 void UsageLogger::logStop(){
-	logMenuAction(STOP);	
+	logMenuAction(STOP);
 }
 void UsageLogger::logRun(){
-	logMenuAction(RUN);	
+	logMenuAction(RUN);
 }
 void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 	Action * wrapper = getActionWithCurrentState();
@@ -315,7 +315,7 @@ void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 	for(unsigned i=0; i < data.size(); i++){
 		a->add_variable(data[i]);
 	}
-	
+
 	wrapper->set_type(Action_ActionType_DEVICE_ACTION);
 	wrapper->set_allocated_deviceaction(a);
 	storeAction(wrapper);
@@ -323,8 +323,8 @@ void UsageLogger::logUserEvent(unsigned id, const VariablesDataVector& data){
 
 void UsageLogger::logTabletData(const VariablesDataVector& data){
 	assert(data.size() == 15);
-	
-	
+
+
 	const float cam_x = float(data[0]) * 0.001;
 	const float cam_y = float(data[1]) * 0.001;
 	const float cam_z = float(data[2]) * 0.001;
@@ -344,11 +344,11 @@ void UsageLogger::logTabletData(const VariablesDataVector& data){
 	const bool board_is_tracked = data[14] & (1<<1);
 	const bool thymio_is_tracked = data[14] & (1<<2);
 	qDebug() << "app state" << recording_duration << timeline_left << timeline_right << selected_set_id << selected_set_time << app_recording << board_is_tracked << thymio_is_tracked;
-	
-	
+
+
 	Action * wrapper = getActionWithCurrentState();
 	TabletAction *a = new TabletAction();
-	
+
 	a->set_camerax(cam_x);
 	a->set_cameray(cam_y);
 	a->set_cameraz(cam_z);
@@ -366,7 +366,7 @@ void UsageLogger::logTabletData(const VariablesDataVector& data){
 	a->set_apprecording(app_recording);
 	a->set_boardistracked(board_is_tracked);
 	a->set_thymioistracked(thymio_is_tracked);
-	
+
 	wrapper->set_type(Action_ActionType_TABLET);
 	wrapper->set_allocated_tabletaction(a);
 	storeAction(wrapper);
@@ -387,12 +387,12 @@ Action * UsageLogger::getActionWithCurrentState()
 	if(scene != 0){
 		action->set_programstateasxml(scene->toString().toUtf8().constData());
 	}
-	
+
 	TimeStamp *t = new TimeStamp();
 	t->set_timestamp(time(nullptr));
 	t->set_milliseconds(getMilliseconds());
 	action->set_allocated_time(t);
-	
+
 	return action;
 }
 

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -28,46 +28,63 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
-	AeslHighlighter::AeslHighlighter(AeslEditor *editor, QTextDocument *parent) :
+
+	AeslHighlighter::AeslHighlighter(AeslEditor* editor, QTextDocument* parent) :
 		QSyntaxHighlighter(parent),
 		editor(editor)
 	{
 		HighlightingRule rule;
-		
+
 		// keywords
 		QTextCharFormat keywordFormat;
 		keywordFormat.setForeground(Qt::darkRed);
 		QStringList keywordPatterns;
-		keywordPatterns << "\\bemit\\b" << "\\bwhile\\b" << "\\bdo\\b"
-						<< "\\bfor\\b" << "\\bin\\b" << "\\bstep\\b"
-						<< "\\bif\\b" << "\\bthen\\b" << "\\belse\\b" << "\\belseif\\b"
-						<< "\\bend\\b" << "\\bvar\\b" << "\\bconst\\b" << "\\bcall\\b"
-						<< "\\bonevent\\b" << "\\bontimer\\b" << "\\bwhen\\b"
-						<< "\\band\\b" << "\\bor\\b" << "\\bnot\\b" << "\\babs\\b"
-						<< "\\bsub\\b" << "\\bcallsub\\b" << "\\breturn\\b";
+		keywordPatterns << "\\bemit\\b"
+						<< "\\bwhile\\b"
+						<< "\\bdo\\b"
+						<< "\\bfor\\b"
+						<< "\\bin\\b"
+						<< "\\bstep\\b"
+						<< "\\bif\\b"
+						<< "\\bthen\\b"
+						<< "\\belse\\b"
+						<< "\\belseif\\b"
+						<< "\\bend\\b"
+						<< "\\bvar\\b"
+						<< "\\bconst\\b"
+						<< "\\bcall\\b"
+						<< "\\bonevent\\b"
+						<< "\\bontimer\\b"
+						<< "\\bwhen\\b"
+						<< "\\band\\b"
+						<< "\\bor\\b"
+						<< "\\bnot\\b"
+						<< "\\babs\\b"
+						<< "\\bsub\\b"
+						<< "\\bcallsub\\b"
+						<< "\\breturn\\b";
 		foreach (QString pattern, keywordPatterns)
 		{
 			rule.pattern = QRegExp(pattern);
 			rule.format = keywordFormat;
 			highlightingRules.append(rule);
 		}
-		
+
 		// literals
 		QTextCharFormat literalsFormat;
 		literalsFormat.setForeground(Qt::darkBlue);
 		rule.pattern = QRegExp("\\b(-{0,1}\\d+|0x([0-9]|[a-f]|[A-F])+|0b[0-1]+)\\b");
 		rule.format = literalsFormat;
 		highlightingRules.append(rule);
-		
+
 		// comments #
 		QTextCharFormat commentFormat;
 		commentFormat.setForeground(Qt::darkGreen);
-		rule.pattern = QRegExp("(?!\\*)#(?!\\*).*");   // '#' without '*' right after or before
+		rule.pattern = QRegExp("(?!\\*)#(?!\\*).*"); // '#' without '*' right after or before
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
 
-		rule.pattern = QRegExp("^#(?!\\*).*");           // '#' without '*' right after + beginning of line
+		rule.pattern = QRegExp("^#(?!\\*).*"); // '#' without '*' right after + beginning of line
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
 
@@ -75,9 +92,9 @@ namespace Aseba
 		rule.pattern = QRegExp("#\\*.*\\*#");
 		rule.format = commentFormat;
 		highlightingRules.append(rule);
-		
+
 		// multilines block of comments #* ... [\n]* ... *#
-		commentBlockRules.begin = QRegExp("#\\*(?!.*\\*#)");    // '#*' with no corresponding '*#'
+		commentBlockRules.begin = QRegExp("#\\*(?!.*\\*#)"); // '#*' with no corresponding '*#'
 		commentBlockRules.end = QRegExp(".*\\*#");
 		commentBlockRules.format = commentFormat;
 
@@ -89,17 +106,17 @@ namespace Aseba
 		rule.format = todoFormat;
 		highlightingRules.append(rule);
 	}
-	
-	void AeslHighlighter::highlightBlock(const QString &text)
+
+	void AeslHighlighter::highlightBlock(const QString& text)
 	{
-		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(currentBlockUserData());
-		
+		AeslEditorUserData* uData = polymorphic_downcast_or_null<AeslEditorUserData*>(currentBlockUserData());
+
 		// current line background blue
 		bool isActive = uData && uData->properties.contains("active");
 		bool isExecutionError = uData && uData->properties.contains("executionError");
 		bool isBreakpointPending = uData && uData->properties.contains("breakpointPending");
 		bool isBreakpoint = uData && uData->properties.contains("breakpoint");
-		
+
 		QColor breakpointPendingColor(255, 240, 178);
 		QColor breakpointColor(255, 211, 178);
 		QColor activeColor(220, 220, 255);
@@ -130,12 +147,12 @@ namespace Aseba
 			if (isExecutionError)
 				selection.format.setBackground(errorColor);
 		}
-		
+
 		// we are done
 		extraSelections.append(selection);
 		editor->setExtraSelections(extraSelections);
 		*/
-		
+
 		// This is backup code in case the ExtraSelection creates trashes
 		QColor specialBackground("white");
 		if (isBreakpointPending)
@@ -155,7 +172,7 @@ namespace Aseba
 			format.setBackground(specialBackground);
 			setFormat(0, text.length(), format);
 		}
-		
+
 		// syntax highlight
 		foreach (HighlightingRule rule, highlightingRules)
 		{
@@ -165,16 +182,16 @@ namespace Aseba
 			{
 				int length = expression.matchedLength();
 				QTextCharFormat format = rule.format;
-				
+
 				// This is backup code in case the ExtraSelection creates trashes
 				if (specialBackground != "white")
 					format.setBackground(specialBackground);
-				
+
 				setFormat(index, length, format);
 				index = text.indexOf(expression, index + length);
 			}
 		}
-		
+
 		// Prepare the format for multilines comment block
 		int index;
 		QTextCharFormat format = commentBlockRules.format;
@@ -184,7 +201,7 @@ namespace Aseba
 			format.setBackground(breakpointPendingColor);
 
 		// Search for a multilines comment block
-		setCurrentBlockState(NO_COMMENT);                // No comment
+		setCurrentBlockState(NO_COMMENT); // No comment
 		if (previousBlockState() != COMMENT)
 		{
 			// Search for a beginning
@@ -223,12 +240,8 @@ namespace Aseba
 			{
 				// find length of number or word
 				while (pos + len < text.length())
-					if (
-						(!text[pos + len].isDigit()) &&
-						(!text[pos + len].isLetter()) &&
-						(text[pos + len] != '_') &&
-						(text[pos + len] != '.')
-					)
+					if ((!text[pos + len].isDigit()) && (!text[pos + len].isLetter()) && (text[pos + len] != '_')
+						&& (text[pos + len] != '.'))
 						break;
 					else
 						len++;
@@ -241,7 +254,7 @@ namespace Aseba
 	AeslEditorSidebar::AeslEditorSidebar(AeslEditor* editor) :
 		QWidget(editor),
 		editor(editor),
-		currentSizeHint(0,0),
+		currentSizeHint(0, 0),
 		verticalScroll(0)
 	{
 		setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -252,15 +265,12 @@ namespace Aseba
 	void AeslEditorSidebar::scroll(int dy)
 	{
 		verticalScroll = dy;
-		update();		// repaint
+		update(); // repaint
 	}
 
-	QSize AeslEditorSidebar::sizeHint() const
-	{
-		return QSize(idealWidth(), 0);
-	}
+	QSize AeslEditorSidebar::sizeHint() const { return QSize(idealWidth(), 0); }
 
-	void AeslEditorSidebar::paintEvent(QPaintEvent *event)
+	void AeslEditorSidebar::paintEvent(QPaintEvent* event)
 	{
 		QSize newSizeHint = sizeHint();
 
@@ -277,7 +287,7 @@ namespace Aseba
 
 		// iterate over all text blocks
 		QTextBlock block = editor->document()->firstBlock();
-		int offset = editor->contentsRect().top();		// top margin
+		int offset = editor->contentsRect().top(); // top margin
 
 		while (block.isValid())
 		{
@@ -296,17 +306,11 @@ namespace Aseba
 		return -1;
 	}
 
-	AeslLineNumberSidebar::AeslLineNumberSidebar(AeslEditor *editor) :
-		AeslEditorSidebar(editor)
-	{
-	}
+	AeslLineNumberSidebar::AeslLineNumberSidebar(AeslEditor* editor) : AeslEditorSidebar(editor) {}
 
-	void AeslLineNumberSidebar::showLineNumbers(bool state)
-	{
-		setVisible(state);
-	}
+	void AeslLineNumberSidebar::showLineNumbers(bool state) { setVisible(state); }
 
-	void AeslLineNumberSidebar::paintEvent(QPaintEvent *event)
+	void AeslLineNumberSidebar::paintEvent(QPaintEvent* event)
 	{
 		AeslEditorSidebar::paintEvent(event);
 
@@ -320,7 +324,7 @@ namespace Aseba
 		QRect editorRect = editor->contentsRect();
 
 		// enable clipping to match the vertical painting area of the editor
-		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip );
+		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip);
 		painter.setClipping(true);
 
 		// define the painting area for linenumbers (top / bottom are identic to the editor))
@@ -334,10 +338,10 @@ namespace Aseba
 		painter.setPen(Qt::darkGray);
 		// set font from editor
 		painter.setFont(editor->font());
-		
+
 		// iterate over all text blocks
 		// FIXME: do clever painting
-		while(block.isValid())
+		while (block.isValid())
 		{
 			if (block.isVisible())
 			{
@@ -357,7 +361,8 @@ namespace Aseba
 		// http://doc.qt.nokia.com/latest/widgets-codeeditor.html
 		int digits = 1;
 		int linenumber = editor->document()->blockCount();
-		while (linenumber >= 10) {
+		while (linenumber >= 10)
+		{
 			linenumber /= 10;
 			digits++;
 		}
@@ -367,20 +372,15 @@ namespace Aseba
 		return space;
 	}
 
-	AeslBreakpointSidebar::AeslBreakpointSidebar(AeslEditor *editor) :
-		AeslEditorSidebar(editor),
-		borderSize(1)
-	{
-		
-	}
+	AeslBreakpointSidebar::AeslBreakpointSidebar(AeslEditor* editor) : AeslEditorSidebar(editor), borderSize(1) {}
 
-	void AeslBreakpointSidebar::paintEvent(QPaintEvent *event)
+	void AeslBreakpointSidebar::paintEvent(QPaintEvent* event)
 	{
 		AeslEditorSidebar::paintEvent(event);
-		
+
 		// define the breakpoint geometry, according to the font metrics from the editor
 		const int lineSpacing = editor->fontMetrics().lineSpacing();
-		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
+		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2 * borderSize, lineSpacing - 2 * borderSize);
 
 		// begin painting
 		QPainter painter(this);
@@ -392,7 +392,7 @@ namespace Aseba
 		QRect editorRect = editor->contentsRect();
 
 		// enable clipping to match the vertical painting area of the editor
-		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip );
+		painter.setClipRect(QRect(0, editorRect.top(), width(), editorRect.bottom()), Qt::ReplaceClip);
 		painter.setClipping(true);
 
 		// define the painting area for breakpoints (top / bottom are identic to the editor)
@@ -407,7 +407,7 @@ namespace Aseba
 		painter.setBrush(Qt::red);
 		// iterate over all text blocks
 		// FIXME: do clever painting
-		while(block.isValid())
+		while (block.isValid())
 		{
 			if (block.isVisible())
 			{
@@ -419,14 +419,13 @@ namespace Aseba
 					// FIXME: Hughly breakpoing design...
 					painter.drawRect(breakpoint.translated(0, y));
 				}
-
 			}
 
 			block = block.next();
 		}
 	}
 
-	void AeslBreakpointSidebar::mousePressEvent(QMouseEvent *event)
+	void AeslBreakpointSidebar::mousePressEvent(QMouseEvent* event)
 	{
 		// click in the breakpoint column
 		int line = posToLineNumber(event->pos().y());
@@ -437,8 +436,8 @@ namespace Aseba
 	{
 		// get metrics from editor
 		const int lineSpacing = editor->fontMetrics().lineSpacing();
-		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2*borderSize, lineSpacing - 2*borderSize);
-		return breakpoint.width() + 2*borderSize;
+		const QRect breakpoint(borderSize, borderSize, lineSpacing - 2 * borderSize, lineSpacing - 2 * borderSize);
+		return breakpoint.width() + 2 * borderSize;
 	}
 
 	AeslEditor::AeslEditor() :
@@ -458,7 +457,7 @@ namespace Aseba
 		setFont(font);
 		setAcceptDrops(true);
 		setAcceptRichText(false);
-		setTabStopWidth( QFontMetrics(font).width(' ') * 4);
+		setTabStopWidth(QFontMetrics(font).width(' ') * 4);
 
 #ifdef Q_WS_WIN
 		// Fix selection color on Windows when the find dialog is active
@@ -479,31 +478,31 @@ namespace Aseba
 		completer->setCompletionMode(QCompleter::PopupCompletion);
 		QObject::connect(completer, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
 	}
-	
-	void AeslEditor::contextMenuEvent ( QContextMenuEvent * e )
+
+	void AeslEditor::contextMenuEvent(QContextMenuEvent* e)
 	{
 		// create menu
-		QMenu *menu = createStandardContextMenu();
+		QMenu* menu = createStandardContextMenu();
 		if (!isReadOnly())
 		{
-			QAction *breakpointAction;
+			QAction* breakpointAction;
 			menu->addSeparator();
-			
+
 			// check for breakpoint
 			QTextBlock block = cursorForPosition(e->pos()).block();
 			//AeslEditorUserData *uData = polymorphic_downcast<AeslEditorUserData *>(block.userData());
 			bool breakpointPresent = isBreakpoint(block);
-			
+
 			// add action
 			if (breakpointPresent)
 				breakpointAction = menu->addAction(tr("Clear breakpoint"));
 			else
 				breakpointAction = menu->addAction(tr("Set breakpoint"));
-			QAction *breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
-			
+			QAction* breakpointClearAllAction = menu->addAction(tr("Clear all breakpoints"));
+
 			// execute menu
 			QAction* selectedAction = menu->exec(e->globalPos());
-			
+
 			// do actions
 			if (selectedAction == breakpointAction)
 			{
@@ -529,15 +528,12 @@ namespace Aseba
 		delete menu;
 	}
 
-	bool AeslEditor::isBreakpoint()
-	{
-		return isBreakpoint(textCursor().block());
-	}
+	bool AeslEditor::isBreakpoint() { return isBreakpoint(textCursor().block()); }
 
 	bool AeslEditor::isBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
-		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending") )) ;
+		AeslEditorUserData* uData = polymorphic_downcast_or_null<AeslEditorUserData*>(block.userData());
+		return (uData && (uData->properties.contains("breakpoint") || uData->properties.contains("breakpointPending")));
 	}
 
 	bool AeslEditor::isBreakpoint(int line)
@@ -546,10 +542,7 @@ namespace Aseba
 		return isBreakpoint(block);
 	}
 
-	void AeslEditor::toggleBreakpoint()
-	{
-		toggleBreakpoint(textCursor().block());
-	}
+	void AeslEditor::toggleBreakpoint() { toggleBreakpoint(textCursor().block()); }
 
 	void AeslEditor::toggleBreakpoint(QTextBlock block)
 	{
@@ -559,14 +552,11 @@ namespace Aseba
 			setBreakpoint(block);
 	}
 
-	void AeslEditor::setBreakpoint()
-	{
-		setBreakpoint(textCursor().block());
-	}
+	void AeslEditor::setBreakpoint() { setBreakpoint(textCursor().block()); }
 
 	void AeslEditor::setBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
+		AeslEditorUserData* uData = polymorphic_downcast_or_null<AeslEditorUserData*>(block.userData());
 		if (!uData)
 		{
 			// create user data
@@ -578,14 +568,11 @@ namespace Aseba
 		emit breakpointSet(block.blockNumber());
 	}
 
-	void AeslEditor::clearBreakpoint()
-	{
-		clearBreakpoint(textCursor().block());
-	}
+	void AeslEditor::clearBreakpoint() { clearBreakpoint(textCursor().block()); }
 
 	void AeslEditor::clearBreakpoint(QTextBlock block)
 	{
-		AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(block.userData());
+		AeslEditorUserData* uData = polymorphic_downcast_or_null<AeslEditorUserData*>(block.userData());
 		uData->properties.remove("breakpointPending");
 		uData->properties.remove("breakpoint");
 		if (uData->properties.isEmpty())
@@ -600,7 +587,7 @@ namespace Aseba
 	{
 		for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
 		{
-			AeslEditorUserData *uData = polymorphic_downcast_or_null<AeslEditorUserData *>(it.userData());
+			AeslEditorUserData* uData = polymorphic_downcast_or_null<AeslEditorUserData*>(it.userData());
 			if (uData)
 			{
 				uData->properties.remove("breakpoint");
@@ -671,7 +658,7 @@ namespace Aseba
 		// end of editing block
 		cursor.endEditBlock();
 	}
-	
+
 	//! Replace current code using a sequence of elements (each can be multiple sloc) and highlight one of these elements
 	void AeslEditor::replaceAndHighlightCode(const QList<QString>& code, int elementToHighlight)
 	{
@@ -681,24 +668,24 @@ namespace Aseba
 		cursor.select(QTextCursor::Document);
 		cursor.removeSelectedText();
 		int posStart = 0;
-		int posEnd =0;
-		
-		for (int i=0; i<code.size(); i++)
+		int posEnd = 0;
+
+		for (int i = 0; i < code.size(); i++)
 		{
 			if (i == elementToHighlight)
 			{
-				format.setBackground(QBrush(QColor(255,255,200)));
+				format.setBackground(QBrush(QColor(255, 255, 200)));
 				posStart = cursor.position();
 				cursor.insertText(code[i], format);
 				posEnd = cursor.position();
-			} 
+			}
 			else
 			{
 				format.setBackground(QBrush(Qt::white));
 				cursor.insertText(code[i], format);
 			}
 		}
-		
+
 		cursor.endEditBlock();
 		cursor.setPosition(posEnd);
 		setTextCursor(cursor);
@@ -706,8 +693,8 @@ namespace Aseba
 		setTextCursor(cursor);
 		ensureCursorVisible();
 	}
-	
-	void AeslEditor::wheelEvent(QWheelEvent * event)
+
+	void AeslEditor::wheelEvent(QWheelEvent* event)
 	{
 		// handle zooming of text
 		if (event->modifiers() & Qt::ControlModifier)
@@ -726,7 +713,7 @@ namespace Aseba
 		QTextEdit::wheelEvent(event);
 	}
 
-	void AeslEditor::keyPressEvent(QKeyEvent * event)
+	void AeslEditor::keyPressEvent(QKeyEvent* event)
 	{
 		// if read-only, only call parent
 		if (isReadOnly())
@@ -750,20 +737,19 @@ namespace Aseba
 		doCompletion(&eventCopy);
 	}
 
-	bool AeslEditor::handleCompleter(QKeyEvent *event)
+	bool AeslEditor::handleCompleter(QKeyEvent* event)
 	{
 		// if the popup is visible, forward special keys to the completer
-		if (completer && completer->popup()->isVisible()) {
-			switch (event->key()) {
+		if (completer && completer->popup()->isVisible())
+		{
+			switch (event->key())
+			{
 				case Qt::Key_Enter:
 				case Qt::Key_Return:
 				case Qt::Key_Escape:
 				case Qt::Key_Tab:
-				case Qt::Key_Backtab:
-					event->ignore();
-					return true;	// let the completer do default behavior
-				default:
-					break;
+				case Qt::Key_Backtab: event->ignore(); return true; // let the completer do default behavior
+				default: break;
 			}
 		}
 
@@ -771,7 +757,7 @@ namespace Aseba
 		return false;
 	}
 
-	bool AeslEditor::handleTab(QKeyEvent *event)
+	bool AeslEditor::handleTab(QKeyEvent* event)
 	{
 		// handle tab and control tab
 		if (!(event->key() == Qt::Key_Tab) || !(textCursor().hasSelection()))
@@ -788,12 +774,10 @@ namespace Aseba
 			if (event->modifiers() & Qt::ControlModifier)
 			{
 				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-				if ((cursor.selectedText() == "\t") ||
-					(	(cursor.selectedText() == " ") &&
-						(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
-						(cursor.selectedText() == "    ")
-					)
-				)
+				if ((cursor.selectedText() == "\t")
+					|| ((cursor.selectedText() == " ")
+						   && (cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3))
+						   && (cursor.selectedText() == "    ")))
 					cursor.removeSelectedText();
 			}
 			else
@@ -806,12 +790,10 @@ namespace Aseba
 		if (event->modifiers() & Qt::ControlModifier)
 		{
 			cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-			if ((cursor.selectedText() == "\t") ||
-				(	(cursor.selectedText() == " ") &&
-					(cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3)) &&
-					(cursor.selectedText() == "    ")
-				)
-			)
+			if ((cursor.selectedText() == "\t")
+				|| ((cursor.selectedText() == " ")
+					   && (cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 3))
+					   && (cursor.selectedText() == "    ")))
 				cursor.removeSelectedText();
 		}
 		else
@@ -823,15 +805,15 @@ namespace Aseba
 		return true;
 	}
 
-	bool AeslEditor::handleNewLine(QKeyEvent *event)
+	bool AeslEditor::handleNewLine(QKeyEvent* event)
 	{
 		// handle indentation and new line
-		if (!(event->key() == Qt::Key_Return ) && !(event->key() == Qt::Key_Enter))
+		if (!(event->key() == Qt::Key_Return) && !(event->key() == Qt::Key_Enter))
 			// I won't handle this event
 			return false;
 
 		QString headingSpace("\n");
-		const QString &line = textCursor().block().text();
+		const QString& line = textCursor().block().text();
 		for (size_t i = 0; i < (size_t)line.length(); i++)
 		{
 			const QChar c(line[(unsigned)i]);
@@ -839,7 +821,6 @@ namespace Aseba
 				headingSpace += c;
 			else
 				break;
-
 		}
 		insertPlainText(headingSpace);
 
@@ -847,7 +828,7 @@ namespace Aseba
 		return true;
 	}
 
-	void AeslEditor::detectLocalContextChange(QKeyEvent *event)
+	void AeslEditor::detectLocalContextChange(QKeyEvent* event)
 	{
 		// this function spy the events to detect the local context
 		LocalContext currentContext = UnknownContext;
@@ -875,25 +856,27 @@ namespace Aseba
 		}
 	}
 
-	void AeslEditor::doCompletion(QKeyEvent *event)
+	void AeslEditor::doCompletion(QKeyEvent* event)
 	{
-		static QString eow("~!@#$%^&*()+{}|:\"<>?,/;'[]\\-=");		// end of word
+		static QString eow("~!@#$%^&*()+{}|:\"<>?,/;'[]\\-="); // end of word
 		QString completionPrefix = textUnderCursor();
-//		qDebug() << "Completion prefix: " << completionPrefix;
+		//		qDebug() << "Completion prefix: " << completionPrefix;
 
 		// don't show the popup if the word is too short, or if we detect an "end of word" character
-		if (event->text().isEmpty()|| completionPrefix.length() < 1 || eow.contains(event->text().right(1))) {
+		if (event->text().isEmpty() || completionPrefix.length() < 1 || eow.contains(event->text().right(1)))
+		{
 			completer->popup()->hide();
 			return;
 		}
 
 		// update the completion prefix
-		if (completionPrefix != completer->completionPrefix()) {
+		if (completionPrefix != completer->completionPrefix())
+		{
 			completer->setCompletionPrefix(completionPrefix);
 			completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
 		}
 
-//		qDebug() << completer->completionCount();
+		//		qDebug() << completer->completionCount();
 		// if we match the only completion available, close the popup.
 		if (completer->completionCount() == 1)
 			if (completer->currentCompletion() == completionPrefix)
@@ -904,7 +887,8 @@ namespace Aseba
 
 		// show the popup
 		QRect cr = cursorRect();
-		cr.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
+		cr.setWidth(
+			completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
 		completer->complete(cr);
 	}
 
@@ -930,7 +914,7 @@ namespace Aseba
 		int endPosition = tc.position();
 		// found the begining, including possible "." in the word
 		tc.movePosition(QTextCursor::StartOfWord);
-		while( (document()->characterAt(tc.position() - 1)) == QChar('.') )
+		while ((document()->characterAt(tc.position() - 1)) == QChar('.'))
 		{
 			tc.movePosition(QTextCursor::Left);
 			tc.movePosition(QTextCursor::WordLeft);
@@ -948,7 +932,8 @@ namespace Aseba
 			tc.movePosition(QTextCursor::Left);
 		// go at the begining of the current word (including possible '.' in the word)
 		tc.movePosition(QTextCursor::WordLeft);
-		while((document()->characterAt(tc.position() - 1)) == QChar('.') ) {
+		while ((document()->characterAt(tc.position() - 1)) == QChar('.'))
+		{
 			tc.movePosition(QTextCursor::Left);
 			tc.movePosition(QTextCursor::WordLeft);
 		}
@@ -967,12 +952,12 @@ namespace Aseba
 		return tc.selectedText();
 	}
 
-	void AeslEditor::setCompleterModel(QAbstractItemModel *model)
+	void AeslEditor::setCompleterModel(QAbstractItemModel* model)
 	{
 		completer->setModel(model);
 		completer->setCompletionRole(Qt::DisplayRole);
 	}
 
-	
+
 	/*@}*/
 } // namespace Aseba

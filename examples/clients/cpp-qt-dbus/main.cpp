@@ -33,7 +33,7 @@ using namespace std;
 using namespace Aseba;
 
 // global pointer to an object of class DBusInterface, which serves as the interface to our Aseba network
-DBusInterface *ThymioIIInterface;
+DBusInterface* ThymioIIInterface;
 
 // Example of a custom callback function, to connect to ThymioIIInterface
 // Note: connected callbacks need not be global (see std::function documentation in C++11 for more information)
@@ -42,22 +42,22 @@ void my_callback(const Values& event_values)
 	cout << "\nThymio encountered an obstacle " << DBusInterface::toString(event_values) << endl;
 
 	// the bearing of the obstacle determines the sound played
-	qint16 max_index=0;
-	qint16 max=-1;
-	for(int i=0; i<event_values.size(); i++)
+	qint16 max_index = 0;
+	qint16 max = -1;
+	for (int i = 0; i < event_values.size(); i++)
 	{
-		if(event_values[i] > max)
+		if (event_values[i] > max)
 		{
 			max = event_values[i];
 			max_index = i;
 		}
 	}
-	Values sound_index({max_index});
+	Values sound_index({ max_index });
 	ThymioIIInterface->sendEventName("PlaySound", sound_index);
 }
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	// Qt init
 	QCoreApplication a(argc, argv);
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
 
 	// set Aseba variables
 	cout << "\n-setting wheel speeds to move forward-" << endl;
-	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", Values({100}));
-	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", Values({100}));
+	ThymioIIInterface->setVariable("thymio-II", "motor.left.target", Values({ 100 }));
+	ThymioIIInterface->setVariable("thymio-II", "motor.right.target", Values({ 100 }));
 
 	QTest::qSleep(5000);
 
@@ -88,4 +88,3 @@ int main(int argc, char *argv[])
 
 	return a.exec();
 }
-

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -24,8 +24,8 @@
 #include <cstdlib>
 
 #if defined(_WIN32) && defined(__MINGW32__)
-  /* This is a workaround for MinGW32, see libxml/xmlexports.h */
-  #define IN_LIBXML
+/* This is a workaround for MinGW32, see libxml/xmlexports.h */
+#	define IN_LIBXML
 #endif
 
 #include <libxml/parser.h>
@@ -41,7 +41,7 @@ using namespace Aseba;
 
 // code of the shell
 
-Shell::Shell(const char* target):
+Shell::Shell(const char* target) :
 	// connect to a Dashel stdin stream
 	shellStream(connect("stdin:")),
 	// connect to the Aseba target
@@ -85,7 +85,7 @@ void Shell::nodeDescriptionReceived(unsigned nodeId)
 	wcerr << "> " << UTF8ToWString(curShellCmd);
 }
 
-void Shell::incomingData(Dashel::Stream *stream)
+void Shell::incomingData(Dashel::Stream* stream)
 {
 	// dispatch to correct method in function of stream
 	if (stream == shellStream)
@@ -94,10 +94,10 @@ void Shell::incomingData(Dashel::Stream *stream)
 		incomingTargetData(stream);
 }
 
-void Shell::incomingTargetData(Dashel::Stream *stream)
+void Shell::incomingTargetData(Dashel::Stream* stream)
 {
 	// receive message
-	Message *message = 0;
+	Message* message = 0;
 	try
 	{
 		// deserialize message using Aseba::Message::receive() static function
@@ -114,9 +114,9 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 	// pass message to description manager, which builds
 	// the node descriptions in background
 	NodesManager::processMessage(message);
-	
+
 	// if variables, print
-	const Variables *variables(dynamic_cast<Variables *>(message));
+	const Variables* variables(dynamic_cast<Variables*>(message));
 	if (variables)
 	{
 		// as this is a shell, we just print the result of the variable
@@ -131,9 +131,9 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		wcerr << endl;
 		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
-	
+
 	// if user event, print
-	const UserMessage *userMessage(dynamic_cast<UserMessage *>(message));
+	const UserMessage* userMessage(dynamic_cast<UserMessage*>(message));
 	if (userMessage)
 	{
 		wcerr << '\r';
@@ -147,22 +147,22 @@ void Shell::incomingTargetData(Dashel::Stream *stream)
 		wcerr << endl;
 		wcerr << "> " << UTF8ToWString(curShellCmd);
 	}
-	
+
 	delete message;
 }
 
-void Shell::incomingShellData(Dashel::Stream *stream)
+void Shell::incomingShellData(Dashel::Stream* stream)
 {
 	// read one character
 	char c;
 	stream->read(&c, 1);
-	
-	// ignore \r on Windows
-	#ifdef WIN32
+
+// ignore \r on Windows
+#ifdef WIN32
 	if (c == '\r')
 		return;
-	#endif // WIN32
-	
+#endif // WIN32
+
 	// if end of line, execute command, else store character
 	if (c == '\n')
 		processShellCmd();
@@ -176,7 +176,7 @@ void Shell::processShellCmd()
 	const strings args(split(curShellCmd));
 	if (args.empty())
 		return;
-	
+
 	// following command, do different things
 	if (args[0] == "ls")
 	{
@@ -234,7 +234,7 @@ void Shell::processShellCmd()
 		wcerr << "  quit           quit shell" << endl;
 		wcerr << "  help           show this summary" << endl;
 	}
-	
+
 	// read for new command
 	curShellCmd = "";
 	wcerr << endl << "> ";
@@ -264,10 +264,10 @@ void Shell::listVariables(const strings& args)
 	const TargetDescription* desc(getDescription(nodeId));
 	if (!desc)
 		return;
-	
+
 	// dump target description
 	wcerr << "Target name " << desc->name << endl;
-	wcerr << "protocol version " << desc->protocolVersion << endl; 
+	wcerr << "protocol version " << desc->protocolVersion << endl;
 	wcerr << "bytecode size " << desc->bytecodeSize << endl;
 	wcerr << "variables size " << desc->variablesSize << endl;
 	wcerr << "stack size " << desc->stackSize << endl;
@@ -279,30 +279,30 @@ void Shell::listVariables(const strings& args)
 		// ... use it
 		const VariablesMap& varMap(allVarMapIt->second);
 		VariablesMap::const_iterator it(varMap.begin());
-		for (;it != varMap.end(); ++it)
+		for (; it != varMap.end(); ++it)
 			wcerr << "  " << it->first << " " << it->second.second << endl;
 	}
 	else
 	{
 		// ... otherwise shows variables from the target description
-		for (size_t i=0; i<desc->namedVariables.size(); ++i)
+		for (size_t i = 0; i < desc->namedVariables.size(); ++i)
 		{
 			const TargetDescription::NamedVariable& var(desc->namedVariables[i]);
 			wcerr << "  " << var.name << " " << var.size << endl;
 		}
 	}
 	wcerr << "local events: " << endl;
-	for (size_t i=0; i<desc->localEvents.size(); ++i)
+	for (size_t i = 0; i < desc->localEvents.size(); ++i)
 	{
-		const TargetDescription::LocalEvent &event(desc->localEvents[i]);
+		const TargetDescription::LocalEvent& event(desc->localEvents[i]);
 		wcerr << "  " << event.name << " - " << event.description << endl;
 	}
 	wcerr << "native functions:" << endl;
-	for (size_t i=0; i<desc->nativeFunctions.size(); ++i)
+	for (size_t i = 0; i < desc->nativeFunctions.size(); ++i)
 	{
 		const TargetDescription::NativeFunction& func(desc->nativeFunctions[i]);
 		wcerr << "  " << func.name << "(";
-		for (size_t j=0; j<func.parameters.size(); ++j)
+		for (size_t j = 0; j < func.parameters.size(); ++j)
 		{
 			const TargetDescription::NativeFunctionParameter& param(func.parameters[j]);
 			wcerr << param.name << "[";
@@ -311,7 +311,7 @@ void Shell::listVariables(const strings& args)
 			else
 				wcerr << "T<" << -param.size << ">";
 			wcerr << "]";
-			if (j+1 != func.parameters.size())
+			if (j + 1 != func.parameters.size())
 				wcerr << ", ";
 		}
 		wcerr << ") - ";
@@ -327,7 +327,7 @@ void Shell::getVariable(const strings& args)
 		wcerr << "wrong number of arguments, usage: get NODE_NAME VAR_NAME" << endl;
 		return;
 	}
-	
+
 	// get node id, variable position and length
 	unsigned nodeId, pos;
 	const bool exists(getNodeAndVarPos(args[1], args[2], nodeId, pos));
@@ -352,18 +352,18 @@ void Shell::setVariable(const strings& args)
 		wcerr << "missing argument, usage: set NODE_NAME VAR_NAME VAR_DATA+" << endl;
 		return;
 	}
-	
+
 	// get node id, variable position and length
 	unsigned nodeId, pos;
 	const bool exists(getNodeAndVarPos(args[1], args[2], nodeId, pos));
 	if (!exists)
 		return;
-	
+
 	// send the message
 	VariablesDataVector data;
-	for (size_t i=3; i<args.size(); ++i)
+	for (size_t i = 3; i < args.size(); ++i)
 		data.push_back(atoi(args[i].c_str()));
- 	SetVariables setVariables(nodeId, pos, data);
+	SetVariables setVariables(nodeId, pos, data);
 	setVariables.serialize(targetStream);
 	targetStream->flush();
 }
@@ -382,10 +382,10 @@ void Shell::emit(const strings& args)
 		wcerr << "event " << UTF8ToWString(args[1]) << " is unknown" << endl;
 		return;
 	}
-	
+
 	// build event and emit
 	VariablesDataVector data;
-	for (size_t i=2; i<args.size(); ++i)
+	for (size_t i = 2; i < args.size(); ++i)
 		data.push_back(atoi(args[i].c_str()));
 	UserMessage userMessage(pos, data);
 	userMessage.serialize(targetStream);
@@ -400,22 +400,22 @@ void Shell::load(const strings& args)
 		wcerr << "wrong number of arguments, usage: load FILENAME" << endl;
 		return;
 	}
-	
+
 	// open document
 	const string& fileName(args[1]);
-	xmlDoc *doc(xmlReadFile(fileName.c_str(), nullptr, 0));
+	xmlDoc* doc(xmlReadFile(fileName.c_str(), nullptr, 0));
 	if (!doc)
 	{
 		wcerr << "cannot read XML from file " << UTF8ToWString(fileName) << endl;
 		return;
 	}
-    xmlNode *domRoot(xmlDocGetRootElement(doc));
-	
+	xmlNode* domRoot(xmlDocGetRootElement(doc));
+
 	// clear existing data
 	commonDefinitions.events.clear();
 	commonDefinitions.constants.clear();
 	allVariables.clear();
-	
+
 	// load new data
 	int noNodeCount(0);
 	bool wasError(false);
@@ -424,110 +424,113 @@ void Shell::load(const strings& args)
 		wcerr << "root node is not \"network\", XML considered invalid" << endl;
 		wasError = true;
 	}
-	else for (xmlNode *domNode(xmlFirstElementChild(domRoot)); domNode; domNode = domNode->next)
-	{
-		if (domNode->type == XML_ELEMENT_NODE)
+	else
+		for (xmlNode* domNode(xmlFirstElementChild(domRoot)); domNode; domNode = domNode->next)
 		{
-			// an Aseba node, which contains a virtual machine
-			if (xmlStrEqual(domNode->name, BAD_CAST("node")))
+			if (domNode->type == XML_ELEMENT_NODE)
 			{
-				// get attributes, child and content
-				xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-				if (!name)
+				// an Aseba node, which contains a virtual machine
+				if (xmlStrEqual(domNode->name, BAD_CAST("node")))
 				{
-					wcerr << "missing \"name\" attribute in \"node\" entry" << endl;
-				}
-				else
-				{
-					const string _name((const char *)name);
-					xmlChar * text(xmlNodeGetContent(domNode));
-					if (!text)
+					// get attributes, child and content
+					xmlChar* name(xmlGetProp(domNode, BAD_CAST("name")));
+					if (!name)
 					{
-						wcerr << "missing text in \"node\" entry" << endl;
+						wcerr << "missing \"name\" attribute in \"node\" entry" << endl;
 					}
 					else
 					{
-						// got the identifier of the node and compile the code
-						unsigned preferedId(0);
-						xmlChar *storedId = xmlGetProp(domNode, BAD_CAST("nodeId"));
-						if (storedId)
-							preferedId = unsigned(atoi((char*)storedId));
-						bool ok;
-						unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
-						if (ok)
+						const string _name((const char*)name);
+						xmlChar* text(xmlNodeGetContent(domNode));
+						if (!text)
 						{
-							if (!compileAndSendCode(UTF8ToWString((const char *)text), nodeId, _name))
-								wasError = true;
+							wcerr << "missing text in \"node\" entry" << endl;
 						}
 						else
-							noNodeCount++;
-						
-						// free attribute and content
-						xmlFree(text);
+						{
+							// got the identifier of the node and compile the code
+							unsigned preferedId(0);
+							xmlChar* storedId = xmlGetProp(domNode, BAD_CAST("nodeId"));
+							if (storedId)
+								preferedId = unsigned(atoi((char*)storedId));
+							bool ok;
+							unsigned nodeId(getNodeId(UTF8ToWString(_name), preferedId, &ok));
+							if (ok)
+							{
+								if (!compileAndSendCode(UTF8ToWString((const char*)text), nodeId, _name))
+									wasError = true;
+							}
+							else
+								noNodeCount++;
+
+							// free attribute and content
+							xmlFree(text);
+						}
+						xmlFree(name);
 					}
-					xmlFree(name);
 				}
-			}
-			// a global event
-			else if (xmlStrEqual(domNode->name, BAD_CAST("event")))
-			{
-				// get attributes
-				xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-				if (!name)
-					wcerr << "missing \"name\" attribute in \"event\" entry" << endl;
-				xmlChar *size(xmlGetProp(domNode, BAD_CAST("size"))); 
-				if (!size)
-					wcerr << "missing \"size\" attribute in \"event\" entry" << endl;
-				// add event
-				if (name && size)
+				// a global event
+				else if (xmlStrEqual(domNode->name, BAD_CAST("event")))
 				{
-					int eventSize(atoi((const char *)size));
-					if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
+					// get attributes
+					xmlChar* name(xmlGetProp(domNode, BAD_CAST("name")));
+					if (!name)
+						wcerr << "missing \"name\" attribute in \"event\" entry" << endl;
+					xmlChar* size(xmlGetProp(domNode, BAD_CAST("size")));
+					if (!size)
+						wcerr << "missing \"size\" attribute in \"event\" entry" << endl;
+					// add event
+					if (name && size)
 					{
-						wcerr << "Event " << name << " has a length " << eventSize << "larger than maximum" <<  ASEBA_MAX_EVENT_ARG_SIZE << endl;
-						wasError = true;
-						break;
+						int eventSize(atoi((const char*)size));
+						if (eventSize > ASEBA_MAX_EVENT_ARG_SIZE)
+						{
+							wcerr << "Event " << name << " has a length " << eventSize << "larger than maximum"
+								  << ASEBA_MAX_EVENT_ARG_SIZE << endl;
+							wasError = true;
+							break;
+						}
+						else
+						{
+							commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char*)name), eventSize));
+						}
 					}
-					else
-					{
-						commonDefinitions.events.push_back(NamedValue(UTF8ToWString((const char *)name), eventSize));
-					}
+					// free attributes
+					if (name)
+						xmlFree(name);
+					if (size)
+						xmlFree(size);
 				}
-				// free attributes
-				if (name)
-					xmlFree(name);
-				if (size)
-					xmlFree(size);
-			}
-			// a global constant
-			else if (xmlStrEqual(domNode->name, BAD_CAST("constant")))
-			{
-				// get attributes
-				xmlChar *name(xmlGetProp(domNode, BAD_CAST("name")));
-				if (!name)
-					wcerr << "missing \"name\" attribute in \"constant\" entry" << endl;
-				xmlChar *value(xmlGetProp(domNode, BAD_CAST("value"))); 
-				if (!value)
-					wcerr << "missing \"value\" attribute in \"constant\" entry" << endl;
-				// add constant if attributes are valid
-				if (name && value)
+				// a global constant
+				else if (xmlStrEqual(domNode->name, BAD_CAST("constant")))
 				{
-					commonDefinitions.constants.push_back(NamedValue(UTF8ToWString((const char *)name), atoi((const char *)value)));
+					// get attributes
+					xmlChar* name(xmlGetProp(domNode, BAD_CAST("name")));
+					if (!name)
+						wcerr << "missing \"name\" attribute in \"constant\" entry" << endl;
+					xmlChar* value(xmlGetProp(domNode, BAD_CAST("value")));
+					if (!value)
+						wcerr << "missing \"value\" attribute in \"constant\" entry" << endl;
+					// add constant if attributes are valid
+					if (name && value)
+					{
+						commonDefinitions.constants.push_back(
+							NamedValue(UTF8ToWString((const char*)name), atoi((const char*)value)));
+					}
+					// free attributes
+					if (name)
+						xmlFree(name);
+					if (value)
+						xmlFree(value);
 				}
-				// free attributes
-				if (name)
-					xmlFree(name);
-				if (value)
-					xmlFree(value);
+				else
+					wcerr << "Unknown XML node seen in .aesl file: " << domNode->name << endl;
 			}
-			else
-				wcerr << "Unknown XML node seen in .aesl file: " << domNode->name << endl;
 		}
-	}
 
 	// release memory
 	xmlFreeDoc(doc);
-	
+
 	// check if there was an error
 	if (wasError)
 	{
@@ -536,11 +539,12 @@ void Shell::load(const strings& args)
 		commonDefinitions.constants.clear();
 		allVariables.clear();
 	}
-	
+
 	// check if there was some matching problem
 	if (noNodeCount)
 	{
-		wcerr << noNodeCount << " scripts have no corresponding nodes in the current network and have not been loaded." << endl;
+		wcerr << noNodeCount << " scripts have no corresponding nodes in the current network and have not been loaded."
+			  << endl;
 	}
 }
 
@@ -551,12 +555,12 @@ bool Shell::compileAndSendCode(const wstring& source, unsigned nodeId, const str
 	Error error;
 	BytecodeVector bytecode;
 	unsigned allocatedVariablesCount;
-	
+
 	Compiler compiler;
 	compiler.setTargetDescription(getDescription(nodeId));
 	compiler.setCommonDefinitions(&commonDefinitions);
 	bool result = compiler.compile(is, bytecode, allocatedVariablesCount, error);
-	
+
 	if (result)
 	{
 		// send bytecode
@@ -591,7 +595,7 @@ void Shell::stop(const strings& args)
 		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
-	
+
 	// build stop message and send
 	Stop stopMsg(nodeId);
 	stopMsg.serialize(targetStream);
@@ -613,7 +617,7 @@ void Shell::run(const strings& args)
 		wcerr << "invalid node name " << UTF8ToWString(args[1]) << endl;
 		return;
 	}
-	
+
 	// build run message and send
 	Run runMsg(nodeId);
 	runMsg.serialize(targetStream);
@@ -641,7 +645,7 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 		if (varIt != varMap.end())
 			pos = varIt->second.first;
 	}
-	
+
 	// if variable is not user-defined, check whether it is provided by this node
 	if (pos == unsigned(-1))
 	{
@@ -649,14 +653,15 @@ bool Shell::getNodeAndVarPos(const string& nodeName, const string& variableName,
 		pos = getVariablePos(nodeId, UTF8ToWString(variableName), &ok);
 		if (!ok)
 		{
-			wcerr << "variable " << UTF8ToWString(variableName) << " does not exists in node " << UTF8ToWString(nodeName);
+			wcerr << "variable " << UTF8ToWString(variableName) << " does not exists in node "
+				  << UTF8ToWString(nodeName);
 			return false;
 		}
 	}
 	return true;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	// check command line arguments
 	if (argc != 2)
@@ -664,10 +669,10 @@ int main(int argc, char *argv[])
 		wcerr << "Usage: " << argv[0] << " TARGET" << endl;
 		return 1;
 	}
-	
+
 	// initialize Dashel plugins
 	Dashel::initPlugins();
-	
+
 	// create the shell
 	Shell shell(argv[1]);
 	// check whether connection was successful
@@ -676,11 +681,12 @@ int main(int argc, char *argv[])
 		wcerr << "Connection failure" << endl;
 		return 2;
 	}
-	
+
 	// run the Dashel Hub
-	do {
+	do
+	{
 		shell.pingNetwork();
 	} while (shell.run1s());
-	
+
 	return 0;
 }

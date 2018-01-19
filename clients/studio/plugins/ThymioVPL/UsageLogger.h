@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -21,7 +21,7 @@
 #ifndef VPL_USAGE_LOGGER_H
 #define VPL_USAGE_LOGGER_H
 
-#ifdef PROTOBUF_FOUND 
+#ifdef PROTOBUF_FOUND
 
 #include <google/protobuf/stubs/common.h>
 
@@ -51,22 +51,22 @@
 
 namespace Aseba { namespace ThymioVPL
 {
-	
+
 class UsageLogger : public QObject
 {
 	Q_OBJECT
-	
+
 public:
 	static UsageLogger & getLogger();
 	static int getRow(Block * b);
 	static void setLoggingState(bool enabled);
-	
+
 	public slots:
 	void logGUIEvents(unsigned int senderId, QObject *originalSender, QObject * logicalParent);
 
 	public:
 	void setScene(Scene * scene);
-	
+
 	// Actions logged
 	void logOpenHelp();
 	void logSaveSnapshot();
@@ -93,7 +93,7 @@ public:
 	void logTabletData(const VariablesDataVector& data);
 	void logSignal(const QObject * sender, const char * signal, unsigned int senderId, QObject * logicalParent);
 	void logBlockAction(BlockActionType type, QString blockName, QString blockType, int row, int elementId, int * sliderValue, unsigned int * soundValue, unsigned int * timeValue, int * buttonValue);
-	
+
 private:
 	UsageLogger();
 	virtual ~UsageLogger();
@@ -101,7 +101,7 @@ private:
 	LogSignalMapper signalMapper;
 	QString groupName;
 	static bool loggingEnabled;
-	
+
 protected:
 	virtual void storeAction(Action * action);
 	Action * getActionWithCurrentState();
@@ -115,7 +115,7 @@ protected:
 	void logAddBlock(BlockType type,int row, Block *block);
 	void askForGroupName();
 	unsigned int getMilliseconds();
-	
+
 	std::ofstream * fileOut;
 	Scene * scene;
 };
@@ -124,8 +124,8 @@ protected:
 
 #else /*PROTOBUF_FOUND*/
 
-#define USAGE_LOG(x) 
-#define ENABLE_USAGE_LOG() 
+#define USAGE_LOG(x)
+#define ENABLE_USAGE_LOG()
 
 #endif
 

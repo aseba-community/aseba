@@ -30,16 +30,14 @@
 
 #define SIMPLIFIED_EPUCK
 
-AsebaVMDescription vmDescription_en = {
-	"e-puck",
-	{
-		{ 1, ASEBA_PID_VAR_NAME },
+AsebaVMDescription vmDescription_en = { "e-puck",
+	{ { 1, ASEBA_PID_VAR_NAME },
 		{ 1, "wheel.left_speed" },
 		{ 1, "wheel.right_speed" },
 		{ 1, "color.red" },
 		{ 1, "color.green" },
 		{ 1, "color.blue" },
-		#ifdef SIMPLIFIED_EPUCK
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "prox.front_front_right" },
 		{ 1, "prox.front_right" },
 		{ 1, "prox.right" },
@@ -49,48 +47,44 @@ AsebaVMDescription vmDescription_en = {
 		{ 1, "prox.front_left" },
 		{ 1, "prox.front_front_left" },
 		{ 8, "prox" },
-		#else
+#else
 		{ 8, "prox" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam.red_left" },
 		{ 1, "cam.red_middle" },
 		{ 1, "cam.red_right" },
 		{ 3, "cam.red" },
-		#else
+#else
 		{ 60, "cam.red" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam.green_left" },
 		{ 1, "cam.green_middle" },
 		{ 1, "cam.green_right" },
 		{ 3, "cam.green" },
-		#else
+#else
 		{ 60, "cam.green" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam.blue_left" },
 		{ 1, "cam.blue_middle" },
 		{ 1, "cam.blue_right" },
 		{ 3, "cam.blue" },
-		#else
+#else
 		{ 60, "cam.blue" },
-		#endif
+#endif
 		{ 1, "energy" },
-		{ 0, NULL }
-	}
-};
+		{ 0, NULL } } };
 
-AsebaVMDescription vmDescription_fr = {
-	"e-puck",
-	{
-		{ 1, ASEBA_PID_VAR_NAME },
+AsebaVMDescription vmDescription_fr = { "e-puck",
+	{ { 1, ASEBA_PID_VAR_NAME },
 		{ 1, "roues_vitesse_gauche" },
 		{ 1, "roues_vitesse_droite" },
 		{ 1, "couleur_rouge" },
 		{ 1, "couleur_vert" },
 		{ 1, "couleur_bleu" },
-		#ifdef SIMPLIFIED_EPUCK
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "dist_avant_avant_droite" },
 		{ 1, "dist_avant_droite" },
 		{ 1, "dist_droite" },
@@ -100,38 +94,32 @@ AsebaVMDescription vmDescription_fr = {
 		{ 1, "dist_avant_gauche" },
 		{ 1, "dist_avant_avant_gauche" },
 		{ 8, "dist" },
-		#else
+#else
 		{ 8, "prox" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam_rouge_gauche" },
 		{ 1, "cam_rouge_milieu" },
 		{ 1, "cam_rouge_droite" },
 		{ 3, "cam_rouge" },
-		#else
+#else
 		{ 60, "camR" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam_vert_gauche" },
 		{ 1, "cam_vert_milieu" },
 		{ 1, "cam_vert_droite" },
 		{ 3, "cam_vert" },
-		#else
+#else
 		{ 60, "camG" },
-		#endif
-		#ifdef SIMPLIFIED_EPUCK
+#endif
+#ifdef SIMPLIFIED_EPUCK
 		{ 1, "cam_bleu_gauche" },
 		{ 1, "cam_bleu_milieu" },
 		{ 1, "cam_bleu_droite" },
 		{ 3, "cam_bleu" },
-		#else
+#else
 		{ 60, "camB" },
-		#endif
+#endif
 		{ 1, "energie" },
-		{ 0, NULL }
-	}
-};
-
-
-
-
+		{ 0, NULL } } };
