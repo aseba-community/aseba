@@ -87,18 +87,20 @@ pipeline {
 						echo "macos_enki_DIR=${env.macos_enki_DIR}"
 						echo "macos_dashel_DIR=${env.macos_dashel_DIR}"
 						CMake([label: 'macos',
+							   getCmakeArgs: "-DCMAKE_PREFIX_PATH=/usr/local/opt/qt5",
 							   envs: [ "enki_DIR=${env.macos_enki_DIR}", "dashel_DIR=${env.macos_dashel_DIR}" ] ])
 						stash includes: 'dist/**', name: 'dist-aseba-macos'
 					}
 				}
 				stage("Compile on windows") {
 					agent {
-						label 'windows'
+						label 'windows-qt5'
 					}
 					steps {
 						sh 'git submodule update --init'
 						unstash 'dist-externals-windows'
-						CMake([label: 'windows'])
+						CMake([label: 'windows',
+							   getCmakeArgs: "-DCMAKE_PREFIX_PATH=/c/msys32/mingw32/lib"])
 						stash includes: 'dist/**', name: 'dist-aseba-windows'
 					}
 				}
