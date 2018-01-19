@@ -9,7 +9,7 @@ pipeline {
 	// Jenkins will prompt for parameters when a branch is build manually
 	parameters {
 		string(defaultValue: 'aseba-community/dashel/master', description: 'Dashel project', name: 'project_dashel')
-		string(defaultValue: 'enki-community/enki/master', description: 'Enki project', name: 'project_enki')
+		string(defaultValue: 'enki-community/enki/aseba-1.6.x', description: 'Enki project', name: 'project_enki')
 	}
 
 	// Trigger the build
@@ -39,7 +39,7 @@ pipeline {
 				script {
 					// Failsafe values for the benefit of automatic jobs
 					def pr_dashel = env.project_dashel ?: 'aseba-community/dashel/master'
-					def pr_enki = env.project_enki ?: 'enki-community/enki/master'
+					def pr_enki = env.project_enki ?: 'enki-community/enki/aseba-1.6.x'
 
 					def p = ['debian','macos','windows'].collectEntries{
 						[ (it): {
