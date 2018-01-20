@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -54,7 +54,7 @@ namespace Aseba
 {
  	/** \addtogroup studio */
 	/*@{*/
-	
+
 	StudioInterface::StudioInterface(NodeTab* nodeTab):
 		nodeTab(nodeTab)
 	{
@@ -65,17 +65,17 @@ namespace Aseba
 	{
 		return nodeTab->target;
 	}
-	
+
 	unsigned StudioInterface::getNodeId() const
 	{
 		return nodeTab->id;
 	}
-	
+
 	unsigned StudioInterface::getProductId() const
 	{
 		return nodeTab->pid;
 	}
-	
+
 	void StudioInterface::setCommonDefinitions(const CommonDefinitions& commonDefinitions)
 	{
 		mainWindow->eventsDescriptionsModel->clear();
@@ -85,12 +85,12 @@ namespace Aseba
 		for (NamedValuesVector::const_iterator it(commonDefinitions.constants.begin()); it != commonDefinitions.constants.end(); ++it)
 			mainWindow->constantsDefinitionsModel->addNamedValue(*it);
 	}
-	
+
 	void StudioInterface::displayCode(const QList<QString>& code, int elementToHighlight)
 	{
 		nodeTab->editor->replaceAndHighlightCode(code, elementToHighlight);
 	}
-	
+
 	void StudioInterface::loadAndRun()
 	{
 		nodeTab->loadClicked();
@@ -101,22 +101,22 @@ namespace Aseba
 	{
 		nodeTab->target->stop(nodeTab->id);
 	}
-	
+
 	TargetVariablesModel * StudioInterface::getVariablesModel()
 	{
 		return nodeTab->vmMemoryModel;
 	}
-	
+
 	void StudioInterface::setVariableValues(unsigned addr, const VariablesDataVector &data)
 	{
 		nodeTab->setVariableValues(addr, data);
 	}
-	
+
 	bool StudioInterface::saveFile(bool as)
 	{
 		if (as)
 			return mainWindow->saveFile();
-		
+
 		return mainWindow->save();
 	}
 
@@ -124,22 +124,22 @@ namespace Aseba
 	{
 		mainWindow->openFile();
 	}
-	
+
 	bool StudioInterface::newFile()
 	{
 		return mainWindow->newFile();
 	}
-	
+
 	void StudioInterface::clearOpenedFileName(bool isModified)
 	{
 		mainWindow->clearOpenedFileName(isModified);
 	}
-	
+
 	QString StudioInterface::openedFileName() const
 	{
 		return mainWindow->actualFileName;
 	}
-	
+
 	//////
 
 	CompilationLogDialog::CompilationLogDialog(QWidget *parent) :
@@ -149,28 +149,28 @@ namespace Aseba
 		QVBoxLayout *l(new QVBoxLayout);
 		l->addWidget(te);
 		setLayout(l);
-		
+
 		QFont font;
 		font.setFamily("");
 		font.setStyleHint(QFont::TypeWriter);
 		font.setFixedPitch(true);
 		font.setPointSize(10);
-		
+
 		te->setFont(font);
 		te->setTabStopWidth( QFontMetrics(font).width(' ') * 4);
 		te->setReadOnly(true);
-		
+
 		setWindowTitle(tr("Aseba Studio: Output of last compilation"));
-		
+
 		resize(600, 560);
 	}
-	
+
 	void CompilationLogDialog::hideEvent( QHideEvent * event )
 	{
 		if (!isVisible())
 			emit hidden();
 	}
-	
+
 	//////
 
 	EditorsPlotsTabWidget::EditorsPlotsTabWidget()
@@ -186,7 +186,7 @@ namespace Aseba
 		// store user's preferences
 		writeSettings();
 	}
-	
+
 	void EditorsPlotsTabWidget::addTab(QWidget* widget, const QString& label, bool closable)
 	{
 		const int index = QTabWidget::addTab(widget, label);
@@ -308,7 +308,7 @@ namespace Aseba
 	}
 
 	//////
-	
+
 	void ScriptTab::createEditor()
 	{
 		// editor widget
@@ -317,9 +317,9 @@ namespace Aseba
 		linenumbers = new AeslLineNumberSidebar(editor);
 		highlighter = new AeslHighlighter(editor, editor->document());
 	}
-	
+
 	//////
-	
+
 	AbsentNodeTab::AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode, const SavedPlugins& savedPlugins) :
 		ScriptTab(id),
 		name(name),
@@ -332,11 +332,11 @@ namespace Aseba
 		layout->addWidget(editor);
 		setLayout(layout);
 	}
-	
+
 	//////
-	
+
 	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump);
-	
+
 	NodeTab::NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent) :
 		QSplitter(parent),
 		ScriptTab(id),
@@ -355,7 +355,7 @@ namespace Aseba
 		//rehighlighting = false;
 		errorPos = -1;
 		allocatedVariablesCount = 0;
-		
+
 		// create models
 		vmFunctionsModel = new TargetFunctionsModel(target->getDescription(id), showHidden, this);
 		vmMemoryModel = new TargetVariablesModel(this);
@@ -387,13 +387,13 @@ namespace Aseba
 		// create the chainsaw filter for native functions
 		functionsFlatModel = new TreeChainsawFilter(this);
 		functionsFlatModel->setSourceModel(vmFunctionsModel);
-		
+
 		// create the model for subroutines
 		vmSubroutinesModel = new TargetSubroutinesModel(this);
 
 		editor->setFocus();
 		setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-		
+
 		// get the value of the variables
 		// compile in this thread the first time
 		NodeTab::CompilationResult* result = compilationThread(*target->getDescription(id), *commonDefinitions, editor->toPlainText(), false);
@@ -411,11 +411,11 @@ namespace Aseba
 		// wait until thread has finished
 		compilationFuture.waitForFinished();
 	}
-	
+
 	void NodeTab::setupWidgets()
 	{
 		createEditor();
-		
+
 		// editor related notification widgets
 		cursorPosText = new QLabel;
 		compilationResultImage = new ClickableLabel;
@@ -431,14 +431,14 @@ namespace Aseba
 		memoryUsageText = new QLabel();
 		memoryUsageText->setAlignment(Qt::AlignLeft);
 		memoryUsageText->setWordWrap(true);
-		
+
 		// editor area
 		QHBoxLayout *editorAreaLayout = new QHBoxLayout;
 		editorAreaLayout->setSpacing(0);
 		editorAreaLayout->addWidget(breakpoints);
 		editorAreaLayout->addWidget(linenumbers);
 		editorAreaLayout->addWidget(editor);
-		
+
 		// keywords
 		keywordsToolbar = new QToolBar();
 		varButton = new QToolButton(); varButton->setText("var");
@@ -461,18 +461,18 @@ namespace Aseba
 		keywordsToolbar->addWidget(forButton);
 		keywordsToolbar->addWidget(subroutineButton);
 		keywordsToolbar->addWidget(callsubButton);
-		
+
 		QVBoxLayout *editorLayout = new QVBoxLayout;
 		editorLayout->addWidget(keywordsToolbar);
 		editorLayout->addLayout(editorAreaLayout);
 		editorLayout->addLayout(compilationResultLayout);
 		editorLayout->addWidget(memoryUsageText);
-		
+
 		// panel
-		
+
 		// buttons
 		executionModeLabel = new QLabel(tr("unknown"));
-		
+
 		loadButton = new QPushButton(QIcon(":/images/upload.png"), tr("Load"));
 		resetButton = new QPushButton(QIcon(":/images/reset.png"), tr("Reset"));
 		resetButton->setEnabled(false);
@@ -483,7 +483,7 @@ namespace Aseba
 		nextButton->setEnabled(false);
 		refreshMemoryButton = new QPushButton(QIcon(":/images/rescan.png"), tr("refresh"));
 		autoRefreshMemoryCheck = new QCheckBox(tr("auto"));
-		
+
 		QGridLayout* buttonsLayout = new QGridLayout;
 		buttonsLayout->addWidget(new QLabel(tr("<b>Execution</b>")), 0, 0);
 		buttonsLayout->addWidget(executionModeLabel, 0, 1);
@@ -491,7 +491,7 @@ namespace Aseba
 		buttonsLayout->addWidget(runInterruptButton, 1, 1);
 		buttonsLayout->addWidget(resetButton, 2, 0);
 		buttonsLayout->addWidget(nextButton, 2, 1);
-		
+
 		// memory
 		vmMemoryView = new QTreeView;
 		vmMemoryView->setModel(vmMemoryModel);
@@ -505,7 +505,7 @@ namespace Aseba
 		vmMemoryView->setDragEnabled(true);
 		//vmMemoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		//vmMemoryView->setHeaderHidden(true);
-		
+
 		QVBoxLayout *memoryLayout = new QVBoxLayout;
 		QHBoxLayout *memorySubLayout = new QHBoxLayout;
 		memorySubLayout->addWidget(new QLabel(tr("<b>Variables</b>")));
@@ -521,7 +521,7 @@ namespace Aseba
 		filterLabel->setBuddy(vmMemoryFilter);
 		memorySubLayout->addWidget(vmMemoryFilter);
 		memoryLayout->addLayout(memorySubLayout);
-		
+
 		// functions
 		vmFunctionsView = new QTreeView;
 		vmFunctionsView->setMinimumHeight(40);
@@ -539,7 +539,7 @@ namespace Aseba
 		#elif (!defined(_MSC_VER))
 		#warning "Some feature have been disabled because you are using Qt < 4.4.0"
 		#endif
-		
+
 		// local events
 		vmLocalEvents = new DraggableListWidget;
 		vmLocalEvents->setMinimumHeight(40);
@@ -552,7 +552,7 @@ namespace Aseba
 			item->setToolTip(QString::fromStdWString(target->getDescription(id)->localEvents[i].description));
 			vmLocalEvents->addItem(item);
 		}
-		
+
 		// toolbox
 		toolBox = new QToolBox;
 		toolBox->addItem(vmFunctionsView, tr("Native Functions"));
@@ -565,35 +565,35 @@ namespace Aseba
 		toolBoxLayout->addWidget(toolBox);
 		QWidget* toolBoxWidget = new QWidget;
 		toolBoxWidget->setLayout(toolBoxLayout);
-		
+
 		// panel
 		QSplitter *panelSplitter = new QSplitter(Qt::Vertical);
-		
+
 		QWidget* buttonsWidget = new QWidget;
 		buttonsWidget->setLayout(buttonsLayout);
 		panelSplitter->addWidget(buttonsWidget);
 		panelSplitter->setCollapsible(0, false);
-		
+
 		QWidget* memoryWidget = new QWidget;
 		memoryWidget->setLayout(memoryLayout);
 		panelSplitter->addWidget(memoryWidget);
 		panelSplitter->setStretchFactor(1, 9);
-		
+
 		panelSplitter->addWidget(toolBoxWidget);
 		panelSplitter->setStretchFactor(2, 4);
-		
+
 		addWidget(panelSplitter);
 		QWidget *editorWidget = new QWidget;
 		editorWidget->setLayout(editorLayout);
 		addWidget(editorWidget);
 		setSizes(QList<int>() << 270 << 500);
 	}
-	
+
 	void NodeTab::setupConnections()
 	{
 		// compiler
 		connect(&compilationWatcher, SIGNAL(finished()), SLOT(compilationCompleted()));
-		
+
 		// execution
 		connect(loadButton, SIGNAL(clicked()), SLOT(loadClicked()));
 		connect(resetButton, SIGNAL(clicked()), SLOT(resetClicked()));
@@ -601,11 +601,11 @@ namespace Aseba
 		connect(nextButton, SIGNAL(clicked()), SLOT(nextClicked()));
 		connect(refreshMemoryButton, SIGNAL(clicked()), SLOT(refreshMemoryClicked()));
 		connect(autoRefreshMemoryCheck, SIGNAL(stateChanged(int)), SLOT(autoRefreshMemoryClicked(int)));
-		
+
 		// memory
 		connect(vmMemoryModel, SIGNAL(variableValuesChanged(unsigned, const VariablesDataVector &)), SLOT(setVariableValues(unsigned, const VariablesDataVector &)));
 		connect(vmMemoryFilter, SIGNAL(textChanged(const QString &)), SLOT(updateHidden()));
-		
+
 		// editor
 		connect(editor, SIGNAL(textChanged()), SLOT(editorContentChanged()));
 		connect(editor, SIGNAL(cursorPositionChanged() ), SLOT(cursorMoved()));
@@ -613,13 +613,13 @@ namespace Aseba
 		connect(editor, SIGNAL(breakpointCleared(unsigned)), SLOT(clearBreakpoint(unsigned)));
 		connect(editor, SIGNAL(breakpointClearedAll()), SLOT(breakpointClearedAll()));
 		connect(editor, SIGNAL(refreshModelRequest(LocalContext)), SLOT(refreshCompleterModel(LocalContext)));
-		
+
 		connect(compilationResultImage, SIGNAL(clicked()), SLOT(goToError()));
 		connect(compilationResultText, SIGNAL(clicked()), SLOT(goToError()));
-		
+
 		// tools plugins
 		connect(mainWindow, SIGNAL(MainWindowClosed()), SLOT(closePlugins()));
-		
+
 		// keywords
 		signalMapper = new QSignalMapper(this);
 		signalMapper->setMapping(varButton, QString("var "));
@@ -631,7 +631,7 @@ namespace Aseba
 		signalMapper->setMapping(forButton, QString("for"));
 		signalMapper->setMapping(subroutineButton, QString("sub "));
 		signalMapper->setMapping(callsubButton, QString("callsub "));
-				
+
 		connect(varButton, SIGNAL(clicked()), signalMapper, SLOT(map()));
 		connect(ifButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
 		connect(elseifButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
@@ -643,21 +643,21 @@ namespace Aseba
 		connect(callsubButton, SIGNAL(clicked()),  signalMapper, SLOT(map()));
 
 		connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(keywordClicked(QString)));
-		
+
 		// following default settings
 		if (mainWindow->autoMemoryRefresh)
 			autoRefreshMemoryCheck->setChecked(true);
 	}
-	
+
 	void NodeTab::timerEvent ( QTimerEvent * event )
 	{
 		if (mainWindow->nodes->currentWidget() != this)
 			return;
-			
+
 		// only fetch what is visible
 		const QList<TargetVariablesModel::Variable> variables(variablesModel->getVariables());
 		assert(variables.size() == variablesModel->rowCount());
-		
+
 		unsigned currentReqCount(0);
 		unsigned currentReqPos(0);
 		for (int i = 0; i < variables.size(); ++i)
@@ -696,7 +696,7 @@ namespace Aseba
 			target->getVariables(id, currentReqPos, currentReqCount);
 		}
 	}
-	
+
 	void NodeTab::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
 		if ((name == ASEBA_PID_VAR_NAME) && (values.size() >= 1))
@@ -707,12 +707,12 @@ namespace Aseba
 				pid = values[0];
 				nodeToolRegistrer.update(pid, this, tools);
 				updateToolList();
-				
+
 				mainWindow->regenerateHelpMenu();
 			}
 		}
 	}
-	
+
 	ScriptTab::SavedPlugins NodeTab::savePlugins() const
 	{
 		SavedPlugins savedPlugins;
@@ -724,7 +724,7 @@ namespace Aseba
 		}
 		return savedPlugins;
 	}
-	
+
 	void NodeTab::notifyPluginsAboutToLoad()
 	{
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
@@ -732,7 +732,7 @@ namespace Aseba
 			(*it)->aboutToLoad();
 		}
 	}
-	
+
 	void NodeTab::restorePlugins(const SavedPlugins& savedPlugins, bool fromFile)
 	{
 		// first recreate plugins
@@ -747,7 +747,7 @@ namespace Aseba
 			interface->loadFromDom(it->second, fromFile);
 		}
 	}
-	
+
 	void NodeTab::updateToolList()
 	{
 		// delete menu entries
@@ -758,22 +758,22 @@ namespace Aseba
 			child->widget()->deleteLater();
 			delete child;
 		}
-		
+
 		// generate menu entries
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 			toolListLayout->addWidget((*it)->createMenuEntry());
-		
+
 		// if elements were added, ensure that this tab is visible
 		if (toolListLayout->count() != oldCount)
 			toolBox->setCurrentIndex(toolListIndex);
 	}	
-	
+
 	void NodeTab::resetClicked()
 	{
 		clearExecutionErrors();
 		target->reset(id);
 	}
-	
+
 	void NodeTab::loadClicked()
 	{
 		if (errorPos == -1)
@@ -785,11 +785,11 @@ namespace Aseba
 			reSetBreakpoints();
 			rehighlight();
 		}
-		
+
 		isSynchronized = true;
 		mainWindow->resetStatusText();
 	}
-	
+
 	void NodeTab::runInterruptClicked()
 	{
 		if (!runInterruptButton->property("isRunning").toBool())
@@ -797,18 +797,18 @@ namespace Aseba
 		else
 			target->pause(id);
 	}
-	
+
 	void NodeTab::nextClicked()
 	{
 		target->next(id);
 	}
-	
+
 	void NodeTab::refreshMemoryClicked()
 	{
 		// as we explicitely clicked, refresh all variables
 		target->getVariables(id, 0, allocatedVariablesCount);
 	}
-	
+
 	void NodeTab::autoRefreshMemoryClicked(int state)
 	{
 		if (state == Qt::Checked)
@@ -823,7 +823,7 @@ namespace Aseba
 			refreshMemoryClicked();
 		}
 	}
-	
+
 	void NodeTab::writeBytecode()
 	{
 		if (errorPos == -1)
@@ -832,18 +832,18 @@ namespace Aseba
 			target->writeBytecode(id);
 		}
 	}
-	
+
 	void NodeTab::reboot()
 	{
 		markTargetUnsynced();
 		target->reboot(id);
 	}
-	
+
 	static void write16(QIODevice& dev, const uint16_t v)
 	{
 		dev.write((const char*)&v, 2);
 	}
-	
+
 	static void write16(QIODevice& dev, const VariablesDataVector& data, const char *varName)
 	{
 		if (data.empty())
@@ -854,7 +854,7 @@ namespace Aseba
 		else
 			dev.write((const char *)&data[0], 2);
 	}
-	
+
 	static uint16_t crcXModem(const uint16_t oldCrc, const QString& s)
 	{
 		return crcXModem(oldCrc, s.toStdWString());
@@ -864,13 +864,13 @@ namespace Aseba
 	{
 		const QString& nodeName(target->getName(id));
 		QString bytecodeFileName = QFileDialog::getSaveFileName(mainWindow, tr("Save the binary code of %0").arg(nodeName), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "Aseba Binary Object (*.abo);;All Files (*)");
-		
+
 		QFile file(bytecodeFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
 			return;
-		
+
 		// See AS001 at https://aseba.wikidot.com/asebaspecifications
-		
+
 		// header
 		const char* magic = "ABO";
 		file.write(magic, 4);
@@ -881,7 +881,7 @@ namespace Aseba
 		write16(file, id);
 		write16(file, crcXModem(0, nodeName));
 		write16(file, target->getDescription(id)->crc());
-		
+
 		// bytecode
 		write16(file, bytecode.size());
 		uint16_t crc(0);
@@ -893,30 +893,30 @@ namespace Aseba
 		}
 		write16(file, crc);
 	}
-	
+
 	void NodeTab::setVariableValues(unsigned index, const VariablesDataVector &values)
 	{
 		target->setVariables(id, index, values);
 	}
-	
+
 	void NodeTab::insertVariableName(const QModelIndex &index)
 	{
 		// only top level names have to be inserted
 		if (!index.parent().isValid() && (index.column() == 0))
 			editor->insertPlainText(index.data().toString());
 	}
-	
+
 	void NodeTab::editorContentChanged()
 	{
 		// only recompile if source code has actually changed
 		if (editor->toPlainText() == lastCompiledSource)
 			return;
 		lastCompiledSource = editor->toPlainText();
-		
+
 		// notify plugins
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 			(*it)->codeChangedInEditor();
-		
+
 		// handle completion
 		QTextCursor cursor(editor->textCursor());
 		if (ConfigDialog::getAutoCompletion() && cursor.atBlockEnd())
@@ -924,13 +924,13 @@ namespace Aseba
 			// language completion
 			const QString& line(cursor.block().text());
 			QString keyword(line);
-			
+
 			// make sure the string does not have any trailing space
 			int nonWhitespace(0);
 			while ((nonWhitespace < keyword.size()) && ((keyword.at(nonWhitespace) == ' ') || (keyword.at(nonWhitespace) == '\t')))
 				++nonWhitespace;
 			keyword.remove(0,nonWhitespace);
-			
+
 			if (!keyword.trimmed().isEmpty())
 			{
 				QString prefix;
@@ -963,7 +963,7 @@ namespace Aseba
 				{
 					const QString tab = QString("\t");
 					QString headSpace = line.left(line.indexOf("else"));
-					
+
 					if( headSpace.size() >= tab.size())
 					{
 						headSpace = headSpace.left(headSpace.size() - tab.size());
@@ -971,7 +971,7 @@ namespace Aseba
 						{
 							prefix = "\n" + headSpace + "else";
 							postfix = "\n" + headSpace + "\t";
-							
+
 							cursor.select(QTextCursor::BlockUnderCursor);
 							cursor.removeSelectedText();
 						}
@@ -1043,32 +1043,32 @@ namespace Aseba
 		}
 
 	}
-	
+
 	NodeTab::CompilationResult* compilationThread(const TargetDescription targetDescription, const CommonDefinitions commonDefinitions, QString source, bool dump)
 	{
 		NodeTab::CompilationResult* result(new NodeTab::CompilationResult(dump));
-		
+
 		Compiler compiler;
 		compiler.setTargetDescription(&targetDescription);
 		compiler.setCommonDefinitions(&commonDefinitions);
 		compiler.setTranslateCallback(CompilerTranslator::translate);
-		
+
 		std::wistringstream is(source.toStdWString());
-		
+
 		if (dump)
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error, &result->compilationMessages);
 		else
 			result->success = compiler.compile(is, result->bytecode, result->allocatedVariablesCount, result->error);
-		
+
 		if (result->success)
 		{
 			result->variablesMap = *compiler.getVariablesMap();
 			result->subroutineTable = *compiler.getSubroutineTable();
 		}
-		
+
 		return result;
 	}
-	
+
 	void NodeTab::recompile()
 	{
 		// compile
@@ -1080,17 +1080,17 @@ namespace Aseba
 			compilationFuture = QtConcurrent::run(compilationThread, *target->getDescription(id), *commonDefinitions, editor->toPlainText(), dump);
 			compilationWatcher.setFuture(compilationFuture);
 			compilationDirty = false;
-			
+
 			// show progress icon
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/busy.png")));
 		}
 	}
-	
+
 	void NodeTab::compilationCompleted()
 	{
 		CompilationResult* result(compilationFuture.result());
 		assert(result);
-		
+
 		// as long as result is dirty, continue compilation
 		if (compilationDirty)
 		{
@@ -1098,24 +1098,24 @@ namespace Aseba
 			recompile();
 			return;
 		}
-		
+
 		// process results
 		processCompilationResult(result);
 	}
-	
+
 	void NodeTab::processCompilationResult(CompilationResult* result)
 	{
 		// clear old user data
 		// doRehighlight is required to prevent infinite recursion because there are no slot
 		// to differentiate user changes from highlight changes in documents
 		bool doRehighlight = clearEditorProperty("errorPos");
-		
+
 		if (result->dump)
 		{
 			mainWindow->compilationMessageBox->setWindowTitle(
 				tr("Aseba Studio: Output of last compilation for %0").arg(target->getName(id))
 			);
-			
+
 			if (result->success)
 				mainWindow->compilationMessageBox->setText(
 					tr("Compilation success.") + QString("\n\n") + 
@@ -1126,7 +1126,7 @@ namespace Aseba
 					QString::fromStdWString(result->error.toWString()) + ".\n\n" +
 					QString::fromStdWString(result->compilationMessages.str())
 				);
-				
+
 		}
 
 		// show memory usage
@@ -1142,7 +1142,7 @@ namespace Aseba
 			const QString bytecodeText = tr("bytecode: %1 on %2 (%3\%)").arg(bytecodeCount).arg(bytecodeTotal).arg((double)bytecodeCount*100./bytecodeTotal, 0, 'f', 1);
 			memoryUsageText->setText(trUtf8("<b>Memory usage</b> : %1, %2").arg(variableText).arg(bytecodeText));
 		}
-		
+
 		// update state following result
 		if (result->success)
 		{
@@ -1155,13 +1155,13 @@ namespace Aseba
 			// gain is not worth the implementation work.
 			//vmMemoryView->resizeColumnToContents(0);
 			vmSubroutinesModel->updateSubroutineTable(result->subroutineTable);
-			
+
 			updateHidden();
 			compilationResultText->setText(tr("Compilation success."));
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
 			loadButton->setEnabled(true);
 			emit uploadReadynessChanged(true);
-			
+
 			errorPos = -1;
 		}
 		else
@@ -1170,7 +1170,7 @@ namespace Aseba
 			compilationResultImage->setPixmap(QPixmap(QString(":/images/warning.png")));
 			loadButton->setEnabled(false);
 			emit uploadReadynessChanged(false);
-			
+
 			// we have an error, set the correct user data
 			if (result->error.pos.valid)
 			{
@@ -1184,23 +1184,23 @@ namespace Aseba
 				doRehighlight = true;
 			}
 		}
-		
+
 		// we have finished with the results
 		delete result;
-		
+
 		// clear bearkpoints of target if currently in debugging mode
 		if (editor->debugging)
 		{
 			//target->stop(id);
 			markTargetUnsynced();
 			doRehighlight = true;
-			
+
 		}
-		
+
 		if (doRehighlight)
 			rehighlight();
 	}
-	
+
 	//! When code is changed or target is rebooted, remove breakpoints from target but keep them locally as pending for next code load
 	void NodeTab::markTargetUnsynced()
 	{
@@ -1213,13 +1213,13 @@ namespace Aseba
 		executionModeLabel->setText(tr("unknown"));
 		mainWindow->nodes->setExecutionMode(mainWindow->getIndexFromId(id), Target::EXECUTION_UNKNOWN);
 	}
-	
+
 	void NodeTab::cursorMoved()
 	{
 		// fix tab
 		cursorPosText->setText(QString("Line: %0 Col: %1").arg(editor->textCursor().blockNumber() + 1).arg(editor->textCursor().columnNumber() + 1));
 	}
-	
+
 	void NodeTab::goToError()
 	{
 		if (errorPos >= 0)
@@ -1230,14 +1230,14 @@ namespace Aseba
 			editor->ensureCursorVisible();
 		}
 	}
-	
+
 	void NodeTab::clearExecutionErrors()
 	{
 		// remove execution error
 		if (clearEditorProperty("executionError"))
 			rehighlight();
 	}
-	
+
 	void NodeTab::refreshCompleterModel(LocalContext context)
 	{
 //		qDebug() << "New context: " << context;
@@ -1282,25 +1282,25 @@ namespace Aseba
 		// update memory view
 		vmMemoryModel->setVariablesData(start, variables);
 	}
-	
+
 	void NodeTab::setBreakpoint(unsigned line)
 	{
 		rehighlight();
 		target->setBreakpoint(id, line);
 	}
-	
+
 	void NodeTab::clearBreakpoint(unsigned line)
 	{
 		rehighlight();
 		target->clearBreakpoint(id, line);
 	}
-	
+
 	void NodeTab::breakpointClearedAll()
 	{
 		rehighlight();
 		target->clearBreakpoints(id);
 	}
-	
+
 	void NodeTab::executionPosChanged(unsigned line)
 	{
 		// change active state
@@ -1308,13 +1308,13 @@ namespace Aseba
 		if (setEditorProperty("active", QVariant(), line, true))
 			rehighlight();
 	}
-	
+
 	void NodeTab::executionModeChanged(Target::ExecutionMode mode)
 	{
 		// ignore those messages if we are not in debugging mode
 		if (!editor->debugging)
 			return;
-		
+
 		resetButton->setEnabled(true);
 		runInterruptButton->setEnabled(true);
 		compilationResultImage->setPixmap(QPixmap(QString(":/images/ok.png")));
@@ -1336,14 +1336,14 @@ namespace Aseba
 				editor->ensureCursorVisible();
 			}
 		}
-		
+
 		if (mode == Target::EXECUTION_RUN)
 		{
 			executionModeLabel->setText(tr("running"));
-			
+
 			runInterruptButton->setText(tr("Pause"));
 			runInterruptButton->setIcon(QIcon(":/images/pause.png"));
-			
+
 			runInterruptButton->setProperty("isRunning", true);
 
 			nextButton->setEnabled(false);
@@ -1354,7 +1354,7 @@ namespace Aseba
 		else if (mode == Target::EXECUTION_STEP_BY_STEP)
 		{
 			executionModeLabel->setText(tr("step by step"));
-			
+
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
 			runInterruptButton->setProperty("isRunning", false);
@@ -1369,13 +1369,13 @@ namespace Aseba
 		else if (mode == Target::EXECUTION_STOP)
 		{
 			executionModeLabel->setText(tr("stopped"));
-			
+
 			runInterruptButton->setText(tr("Run"));
 			runInterruptButton->setIcon(QIcon(":/images/play.png"));
 			runInterruptButton->setProperty("isRunning", false);
 
 			nextButton->setEnabled(false);
-			
+
 			if (clearEditorProperty("active"))
 				rehighlight();
 		}
@@ -1383,7 +1383,7 @@ namespace Aseba
 		// set the tab icon to show the current execution mode
 		mainWindow->nodes->setExecutionMode(mainWindow->getIndexFromId(id), mode);
 	}
-	
+
 	void NodeTab::breakpointSetResult(unsigned line, bool success)
 	{
 		clearEditorProperty("breakpointPending", line);
@@ -1391,19 +1391,19 @@ namespace Aseba
 			setEditorProperty("breakpoint", QVariant(), line);
 		rehighlight();
 	}
-	
+
 	void NodeTab::closePlugins()
 	{
 		for (NodeToolInterfaces::const_iterator it(tools.begin()); it != tools.end(); ++it)
 			(*it)->closeAsSoonAsPossible();
 	}
-	
+
 	void NodeTab::rehighlight()
 	{
 		//rehighlighting = true;
 		highlighter->rehighlight();
 	}
-	
+
 	void NodeTab::reSetBreakpoints()
 	{
 		target->clearBreakpoints(id);
@@ -1418,11 +1418,11 @@ namespace Aseba
 			lineCounter++;
 		}
 	}
-	
+
 	bool NodeTab::setEditorProperty(const QString &property, const QVariant &value, unsigned line, bool removeOld)
 	{
 		bool changed = false;
-		
+
 		QTextBlock block = editor->document()->begin();
 		unsigned lineCounter = 0;
 		while (block != editor->document()->end())
@@ -1459,18 +1459,18 @@ namespace Aseba
 					changed = true;
 				}
 			}
-			
+
 			block = block.next();
 			lineCounter++;
 		}
-		
+
 		return changed;
 	}
-	
+
 	bool NodeTab::clearEditorProperty(const QString &property, unsigned line)
 	{
 		bool changed = false;
-		
+
 		// find line, remove property
 		QTextBlock block = editor->document()->begin();
 		unsigned lineCounter = 0;
@@ -1493,14 +1493,14 @@ namespace Aseba
 			block = block.next();
 			lineCounter++;
 		}
-		
+
 		return changed;
 	}
-	
+
 	bool NodeTab::clearEditorProperty(const QString &property)
 	{
 		bool changed = false;
-		
+
 		// go through all blocks, remove property if found
 		QTextBlock block = editor->document()->begin();
 		while (block != editor->document()->end())
@@ -1518,10 +1518,10 @@ namespace Aseba
 			}
 			block = block.next();
 		}
-		
+
 		return changed;
 	}
-	
+
 	void NodeTab::switchEditorProperty(const QString &oldProperty, const QString &newProperty)
 	{
 		QTextBlock block = editor->document()->begin();
@@ -1613,11 +1613,11 @@ namespace Aseba
 		constantsDefinitionsModel = new ConstantsModel(&commonDefinitions.constants, this);
 		constantsDefinitionsModel->setExtraMimeType("application/aseba-constants");
 		constantsDefinitionsModel->setEditable(true);
-		
+
 		// create help viwer
 		helpViewer.setupWidgets();
 		helpViewer.setupConnections();
-		
+
 		// create config dialog + read settings on-disk
 		ConfigDialog::init(this);
 
@@ -1626,13 +1626,13 @@ namespace Aseba
 		setupMenu();
 		setupConnections();
 		setWindowIcon(QIcon(":/images/icons/asebastudio.svgz"));
-		
+
 		// cosmetic fix-up
 		updateWindowTitle();
 		if (readSettings() == false)
 			resize(1000,700);
 	}
-	
+
 	MainWindow::~MainWindow()
 	{
 		#ifdef HAVE_QWT
@@ -1641,10 +1641,10 @@ namespace Aseba
 			it.value()->detachFromMain();
 		}
 		#endif // HAVE_QWT
-		
+
 		delete target;
 	}
-	
+
 	void MainWindow::about()
 	{
 		const AboutBox::Parameters aboutParameters = {
@@ -1658,7 +1658,7 @@ namespace Aseba
 		AboutBox aboutBox(this, aboutParameters);
 		aboutBox.exec();
 	}
-	
+
 	bool MainWindow::newFile()
 	{
 		if (askUserBeforeDiscarding())
@@ -1676,20 +1676,20 @@ namespace Aseba
 			constantsDefinitionsModel->clearWasModified();
 			eventsDescriptionsModel->clear();
 			eventsDescriptionsModel->clearWasModified();
-			
+
 			// reset opened file name
 			clearOpenedFileName(false);
 			return true;
 		}
 		return false;
 	}
-	
+
 	void MainWindow::openFile(const QString &path)
 	{
 		// make sure we do not loose changes
 		if (askUserBeforeDiscarding() == false)
 			return;
-		
+
 		// notify plugins
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -1697,10 +1697,10 @@ namespace Aseba
 			if (tab)
 				tab->notifyPluginsAboutToLoad();
 		}
-		
+
 		// open the file
 		QString fileName = path;
-	
+
 		// if no file to open is passed, show a dialog
 		if (fileName.isEmpty())
 		{
@@ -1726,15 +1726,15 @@ namespace Aseba
 					dir = !stdLocations.empty() ? stdLocations[0] : "";
 				}
 			}
-			
+
 			fileName = QFileDialog::getOpenFileName(this,
 				tr("Open Script"), dir, "Aseba scripts (*.aesl)");
 		}
-		
+
 		QFile file(fileName);
 		if (!file.open(QFile::ReadOnly))
 			return;
-		
+
 		// load the document
 		QDomDocument document("aesl-source");
 		QString errorMsg;
@@ -1754,7 +1754,7 @@ namespace Aseba
 				Q_ASSERT(tab);
 				tab->editor->clear();
 			}
-			
+
 			// build list of tabs filled from file to be loaded
 			QSet<int> filledList;
 			QDomNode domNode = document.documentElement().firstChild();
@@ -1777,7 +1777,7 @@ namespace Aseba
 				}
 				domNode = domNode.nextSibling();
 			}
-			
+
 			// load file
 			int noNodeCount = 0;
 			actualFileName = fileName;
@@ -1801,7 +1801,7 @@ namespace Aseba
 							savedPlugins.push_back(savedContent);
 							toolPlugin = toolPlugin.nextSiblingElement();
 						}
-						
+
 						// get text
 						QString text;
 						for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
@@ -1810,7 +1810,7 @@ namespace Aseba
 							if (!t.isNull())
 								text += t.data();
 						}
-						
+
 						// reconstruct nodes
 						bool prefered;
 						const QString nodeName(element.attribute("name"));
@@ -1862,18 +1862,18 @@ namespace Aseba
 				}
 				domNode = domNode.nextSibling();
 			}
-			
+
 			// check if there was some matching problem
 			if (noNodeCount)
 				QMessageBox::warning(this,
 					tr("Loading"),
 					tr("%0 scripts have no corresponding nodes in the current network and have not been loaded.").arg(noNodeCount)
 				);
-			
+
 			// update recent files
 			updateRecentFiles(fileName);
 			regenerateOpenRecentMenu();
-			
+
 			// set source as unmodified
 			sourceModified = false;
 			constantsDefinitionsModel->clearWasModified();
@@ -1887,25 +1887,25 @@ namespace Aseba
 				tr("Error in XML source file: %0 at line %1, column %2").arg(errorMsg).arg(errorLine).arg(errorColumn)
 			);
 		}
-		
+
 		file.close();
 	}
-	
+
 	void MainWindow::openRecentFile()
 	{
 		QAction* entry = polymorphic_downcast<QAction*>(sender());
 		openFile(entry->text());
 	}
-	
+
 	bool MainWindow::save()
 	{
 		return saveFile(actualFileName);
 	}
-	
+
 	bool MainWindow::saveFile(const QString &previousFileName)
 	{
 		QString fileName = previousFileName;
-		
+
 		if (fileName.isEmpty())
 			fileName = QFileDialog::getSaveFileName(
 				this,
@@ -1913,28 +1913,28 @@ namespace Aseba
 				actualFileName.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) : actualFileName,
 				"Aseba scripts (*.aesl)"
 			);
-		
+
 		if (fileName.isEmpty())
 			return false;
-		
+
 		if (fileName.lastIndexOf(".") < 0)
 			fileName += ".aesl";
-		
+
 		QFile file(fileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
 			return false;
-		
+
 		actualFileName = fileName;
 		updateRecentFiles(fileName);
-		
+
 		// initiate DOM tree
 		QDomDocument document("aesl-source");
 		QDomElement root = document.createElement("network");
 		document.appendChild(root);
-		
+
 		root.appendChild(document.createTextNode("\n\n\n"));
 		root.appendChild(document.createComment("list of global events"));
-		
+
 		// events
 		for (size_t i = 0; i < commonDefinitions.events.size(); i++)
 		{
@@ -1943,10 +1943,10 @@ namespace Aseba
 			element.setAttribute("size", QString::number(commonDefinitions.events[i].value));
 			root.appendChild(element);
 		}
-		
+
 		root.appendChild(document.createTextNode("\n\n\n"));
 		root.appendChild(document.createComment("list of constants"));
-		
+
 		// constants
 		for (size_t i = 0; i < commonDefinitions.constants.size(); i++)
 		{
@@ -1955,18 +1955,18 @@ namespace Aseba
 			element.setAttribute("value", QString::number(commonDefinitions.constants[i].value));
 			root.appendChild(element);
 		}
-		
+
 		// keywords
 		root.appendChild(document.createTextNode("\n\n\n"));
 		root.appendChild(document.createComment("show keywords state"));
-		
+
 		QDomElement keywords = document.createElement("keywords"); 
 		if( showKeywordsAct->isChecked() ) 
 			keywords.setAttribute("flag", "true");
 		else
 			keywords.setAttribute("flag", "false");
 		root.appendChild(keywords);
-		
+
 		// source code
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -1974,15 +1974,15 @@ namespace Aseba
 			if (tab)
 			{
 				QString nodeName;
-				
+
 				const NodeTab* nodeTab = dynamic_cast<const NodeTab*>(tab);
 				if (nodeTab)
 					nodeName = target->getName(nodeTab->nodeId());
-				
+
 				const AbsentNodeTab* absentNodeTab = dynamic_cast<const AbsentNodeTab*>(tab);
 				if (absentNodeTab)
 					nodeName = absentNodeTab->name;
-				
+
 				const QString& nodeContent = tab->editor->toPlainText();
 				ScriptTab::SavedPlugins savedPlugins(tab->savePlugins());
 				// is there something to save?
@@ -1990,7 +1990,7 @@ namespace Aseba
 				{
 					root.appendChild(document.createTextNode("\n\n\n"));
 					root.appendChild(document.createComment(QString("node %0").arg(nodeName)));
-					
+
 					QDomElement element = document.createElement("node");
 					element.setAttribute("name", nodeName);
 					element.setAttribute("nodeId", tab->nodeId());
@@ -2013,10 +2013,10 @@ namespace Aseba
 			}
 		}
 		root.appendChild(document.createTextNode("\n\n\n"));
-		
+
 		QTextStream out(&file);
 		document.save(out, 0);
-		
+
 		sourceModified = false;
 		constantsDefinitionsModel->clearWasModified();
 		eventsDescriptionsModel->clearWasModified();
@@ -2024,17 +2024,17 @@ namespace Aseba
 
 		return true;
 	}
-	
+
 	void MainWindow::exportMemoriesContent()
 	{
 		QString exportFileName = QFileDialog::getSaveFileName(this, tr("Export memory content"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
-		
+
 		QFile file(exportFileName);
 		if (!file.open(QFile::WriteOnly | QFile::Truncate))
 			return;
-		
+
 		QTextStream out(&file);
-		
+
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
@@ -2042,7 +2042,7 @@ namespace Aseba
 			{
 				const QString nodeName(target->getName(tab->nodeId()));
 				const QList<TargetVariablesModel::Variable>& variables(tab->vmMemoryModel->getVariables());
-				
+
 				for (int j = 0; j < variables.size(); ++j)
 				{
 					const TargetVariablesModel::Variable& variable(variables[j]);
@@ -2056,20 +2056,20 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	void MainWindow::importMemoriesContent()
 	{
 		QString importFileName = QFileDialog::getOpenFileName(this, tr("Import memory content"), "", "All Files (*);;CSV files (*.csv);;Text files (*.txt)");
-		
+
 		QFile file(importFileName);
 		if (!file.open(QFile::ReadOnly))
 			return;
-		
+
 		QTextStream in(&file);
-		
+
 		QSet<QString> nodesNotFound;
 		QStringList variablesNotFound;
-		
+
 		while (!in.atEnd())
 		{
 			QString line(in.readLine());
@@ -2102,7 +2102,7 @@ namespace Aseba
 			else
 				nodesNotFound.insert(nodeName);
 		}
-		
+
 		if (!nodesNotFound.isEmpty() || !variablesNotFound.isEmpty())
 		{
 			QString msg;
@@ -2124,7 +2124,7 @@ namespace Aseba
 			);
 		}
 	}
-	
+
 	void MainWindow::copyAll()
 	{
 		QString toCopy;
@@ -2147,7 +2147,7 @@ namespace Aseba
 		}
 		 QApplication::clipboard()->setText(toCopy);
 	}
-	
+
 	void MainWindow::findTriggered()
 	{
 		ScriptTab* tab = dynamic_cast<ScriptTab*>(nodes->currentWidget());
@@ -2156,7 +2156,7 @@ namespace Aseba
 		findDialog->replaceGroupBox->setChecked(false);
 		findDialog->show();
 	}
-	
+
 	void MainWindow::replaceTriggered()
 	{
 		findDialog->replaceGroupBox->setChecked(true);
@@ -2185,7 +2185,7 @@ namespace Aseba
 		}
 		ConfigDialog::setShowLineNumbers(state);
 	}
-	
+
 	void MainWindow::goToLine()
 	{
 		assert(currentScriptTab);
@@ -2201,14 +2201,14 @@ namespace Aseba
 		if (ok)
 			editor->setTextCursor(QTextCursor(document->findBlockByLineNumber(line-1)));
 	}
-	
+
 	void MainWindow::zoomIn()
 	{
 		assert(currentScriptTab);
 		QTextEdit* editor(currentScriptTab->editor);
 		editor->zoomIn();
 	}
-	
+
 	void MainWindow::zoomOut()
 	{
 		assert(currentScriptTab);
@@ -2232,7 +2232,7 @@ namespace Aseba
 		assert(currentScriptTab);
 		currentScriptTab->editor->clearAllBreakpoints();
 	}
-	
+
 	void MainWindow::resetAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2242,7 +2242,7 @@ namespace Aseba
 				tab->resetClicked();
 		}
 	}
-	
+
 	void MainWindow::loadAll()
 	{	
 		for (int i = 0; i < nodes->count(); i++)
@@ -2252,7 +2252,7 @@ namespace Aseba
 				tab->loadClicked();
 		}
 	}
-	
+
 	void MainWindow::runAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2262,7 +2262,7 @@ namespace Aseba
 				target->run(tab->nodeId());
 		}
 	}
-	
+
 	void MainWindow::pauseAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2272,7 +2272,7 @@ namespace Aseba
 				target->pause(tab->nodeId());
 		}
 	}
-	
+
 	void MainWindow::stopAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2319,7 +2319,7 @@ namespace Aseba
 		}
 		logger->setStyleSheet("");
 	}
-	
+
 	void MainWindow::uploadReadynessChanged()
 	{
 		bool ready = true;
@@ -2335,21 +2335,21 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		loadAllAct->setEnabled(ready);
 		writeAllBytecodesAct->setEnabled(ready);
 	}
-	
+
 	void MainWindow::sendEvent()
 	{
 		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
-		
+
 		const unsigned eventId = currentRow.row();
 		const QString eventName = QString::fromStdWString(commonDefinitions.events[eventId].name);
 		const int argsCount = commonDefinitions.events[eventId].value;
 		VariablesDataVector data(argsCount);
-		
+
 		if (argsCount > 0)
 		{
 			QString argList;
@@ -2387,23 +2387,23 @@ namespace Aseba
 					return;
 			}
 		}
-		
+
 		target->sendEvent(eventId, data);
 		userEvent(eventId, data);
 	}
-	
+
 	void MainWindow::sendEventIf(const QModelIndex &index)
 	{
 		if (index.column() == 0)
 			sendEvent();
 	}
-	
+
 	void MainWindow::toggleEventVisibleButton(const QModelIndex &index)
 	{
 		if (index.column() == 2)
 			eventsDescriptionsModel->toggle(index);
 	}
-		
+
 	void MainWindow::plotEvent()
 	{
 		#ifdef HAVE_QWT
@@ -2413,7 +2413,7 @@ namespace Aseba
 		plotEvent(eventId);
 		#endif // HAVE_QWT
 	}
-	
+
 	void MainWindow::eventContextMenuRequested(const QPoint & pos)
 	{
 		#ifdef HAVE_QWT
@@ -2432,7 +2432,7 @@ namespace Aseba
 		}
 		#endif // HAVE_QWT
 	}
-	
+
 	void MainWindow::plotEvent(const unsigned eventId)
 	{
 		#ifdef HAVE_QWT
@@ -2442,14 +2442,14 @@ namespace Aseba
 		nodes->addTab(new EventViewer(eventId, eventName, eventVariablesCount, &eventsViewers), tabTitle, true);
 		#endif // HAVE_QWT
 	}
-	
+
 	void MainWindow::logEntryDoubleClicked(QListWidgetItem * item)
 	{
 		if (item->data(Qt::UserRole).type() == QVariant::Point)
 		{
 			int node = item->data(Qt::UserRole).toPoint().x();
 			int line = item->data(Qt::UserRole).toPoint().y();
-			
+
 			NodeTab* tab = getTabFromId(node);
 			Q_ASSERT(tab);
 			nodes->setCurrentWidget(tab);
@@ -2457,7 +2457,7 @@ namespace Aseba
 			tab->editor->setFocus();
 		}
 	}
-	
+
 	void MainWindow::tabChanged(int index)
 	{
 		// remove old connections, if any
@@ -2468,12 +2468,12 @@ namespace Aseba
 			disconnect(pasteAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(paste()));
 			disconnect(undoAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(undo()));
 			disconnect(redoAct, SIGNAL(triggered()), currentScriptTab->editor, SLOT(redo()));
-			
+
 			disconnect(currentScriptTab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 			disconnect(currentScriptTab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 			disconnect(currentScriptTab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
 			disconnect(currentScriptTab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
-			
+
 			pasteAct->setEnabled(false);
 			findDialog->hide();
 			findDialog->editor = 0;
@@ -2483,7 +2483,7 @@ namespace Aseba
 			zoomInAct->setEnabled(false);
 			zoomOutAct->setEnabled(false);
 		}
-		
+
 		// reconnect to new
 		if (index >= 0)
 		{
@@ -2492,13 +2492,13 @@ namespace Aseba
 			{
 				connect(copyAct, SIGNAL(triggered()), tab->editor, SLOT(copy()));
 				connect(tab->editor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-				
+
 				findDialog->editor = tab->editor;
 				findAct->setEnabled(true);
 				goToLineAct->setEnabled(true);
 				zoomInAct->setEnabled(true);
 				zoomOutAct->setEnabled(true);
-				
+
 				NodeTab *nodeTab = dynamic_cast<NodeTab*>(tab);
 				if (nodeTab)
 				{
@@ -2506,17 +2506,17 @@ namespace Aseba
 					connect(pasteAct, SIGNAL(triggered()), tab->editor, SLOT(paste()));
 					connect(undoAct, SIGNAL(triggered()), tab->editor, SLOT(undo()));
 					connect(redoAct, SIGNAL(triggered()), tab->editor, SLOT(redo()));
-					
+
 					connect(tab->editor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
 					connect(tab->editor, SIGNAL(undoAvailable(bool)), undoAct, SLOT(setEnabled(bool)));
 					connect(tab->editor, SIGNAL(redoAvailable(bool)), redoAct, SLOT(setEnabled(bool)));
-					
+
 					if (compilationMessageBox->isVisible())
 						nodeTab->recompile();
-					
+
 					// because this is a new tab, get content of variables
 					target->getVariables(nodeTab->id, 0, nodeTab->allocatedVariablesCount);
-					
+
 					showCompilationMsg->setEnabled(true);
 					findDialog->replaceGroupBox->setEnabled(true);
 					// paste and replace are only available when the editor is in read/write mode
@@ -2528,13 +2528,13 @@ namespace Aseba
 					showCompilationMsg->setEnabled(false);
 					findDialog->replaceGroupBox->setEnabled(false);
 				}
-				
+
 				// TODO: it would be nice to find a way to setup this correctly
 				cutAct->setEnabled(false);
 				copyAct->setEnabled(false);
 				undoAct->setEnabled(false);
 				redoAct->setEnabled(false);
-				
+
 				currentScriptTab = tab;
 			}
 			else
@@ -2543,7 +2543,7 @@ namespace Aseba
 		else
 			currentScriptTab = 0;
 	}
-	
+
 	void MainWindow::showCompilationMessages(bool doShow)
 	{
 		// this slot shouldn't be callable when an unactive tab is show
@@ -2551,7 +2551,7 @@ namespace Aseba
 		if (nodes->currentWidget())
 			polymorphic_downcast<NodeTab *>(nodes->currentWidget())->recompile();
 	}
-	
+
 	void MainWindow::compilationMessagesWasHidden()
 	{
 		showCompilationMsg->setChecked(false);
@@ -2567,7 +2567,7 @@ namespace Aseba
 		}
 		ConfigDialog::setShowMemoryUsage(show);
 	}
-	
+
 	void MainWindow::addEventNameClicked()
 	{
 		QString eventName;
@@ -2593,7 +2593,7 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	void MainWindow::removeEventNameClicked()
 	{
 		QModelIndex currentRow = eventsDescriptionsView->selectionModel()->currentIndex();
@@ -2623,7 +2623,7 @@ namespace Aseba
 	{
 		eventsUpdated(true);
 	}
-	
+
 	void MainWindow::eventsDescriptionsSelectionChanged()
 	{
 		bool isSelected = eventsDescriptionsView->selectionModel()->currentIndex().isValid();
@@ -2633,11 +2633,11 @@ namespace Aseba
 		plotEventButton->setEnabled(isSelected);
 		#endif // HAVE_QWT
 	}
-	
+
 	void MainWindow::resetStatusText()
 	{
 		bool flag = true;
-		
+
 		for (int i = 0; i < nodes->count(); i++)
 		{
 			NodeTab* tab = dynamic_cast<NodeTab*>(nodes->widget(i));
@@ -2650,14 +2650,14 @@ namespace Aseba
 				}
 			}
 		}
-		
+
 		if (flag) 
 		{
 			statusText->clear();
 			statusText->hide();
 		}
 	}
-	
+
 	void MainWindow::addConstantClicked()
 	{
 		bool ok;
@@ -2677,23 +2677,23 @@ namespace Aseba
 			}
 		}
 	}
-	
+
 	void MainWindow::removeConstantClicked()
 	{
 		QModelIndex currentRow = constantsView->selectionModel()->currentIndex();
 		Q_ASSERT(currentRow.isValid());
 		constantsDefinitionsModel->delNamedValue(currentRow.row());
-		
+
 		recompileAll();
 		updateWindowTitle();
 	}
-	
+
 	void MainWindow::constantsSelectionChanged()
 	{
 		bool isSelected = constantsView->selectionModel()->currentIndex().isValid();
 		removeConstantButton->setEnabled(isSelected);
 	}
-	
+
 	void MainWindow::recompileAll()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2703,7 +2703,7 @@ namespace Aseba
 				tab->recompile();
 		}
 	}
-	
+
 	void MainWindow::writeAllBytecodes()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2713,7 +2713,7 @@ namespace Aseba
 				tab->writeBytecode();
 		}
 	}
-	
+
 	void MainWindow::rebootAllNodes()
 	{
 		for (int i = 0; i < nodes->count(); i++)
@@ -2723,7 +2723,7 @@ namespace Aseba
 				tab->reboot();
 		}
 	}
-	
+
 	void MainWindow::sourceChanged()
 	{
 		sourceModified = true;
@@ -2734,7 +2734,7 @@ namespace Aseba
 	{
 		helpViewer.showHelp(HelpViewer::USERMANUAL);
 	}
-	
+
 	//! A new node has connected to the network.
 	void MainWindow::nodeConnected(unsigned node)
 	{
@@ -2743,7 +2743,7 @@ namespace Aseba
 		tab->showKeywords(showKeywordsAct->isChecked());
 		tab->linenumbers->showLineNumbers(showLineNumbers->isChecked());
 		tab->showMemoryUsage(showMemoryUsageAct->isChecked());
-		
+
 		// check if there is an absent node tab with this id and name, and copy data
 		const int absentIndex(getAbsentIndexFromId(node));
 		const AbsentNodeTab* absentTab(getAbsentTabFromId(node));
@@ -2754,14 +2754,14 @@ namespace Aseba
 			tab->updateToolList();
 			nodes->removeAndDeleteTab(absentIndex);
 		}
-		
+
 		// connect and show new tab
 		connect(tab, SIGNAL(uploadReadynessChanged(bool)), SLOT(uploadReadynessChanged()));
 		nodes->addTab(tab, target->getName(node));
-		
+
 		regenerateToolsMenus();
 	}
-	
+
 	//! A node has disconnected from the network.
 	void MainWindow::nodeDisconnected(unsigned node)
 	{
@@ -2776,7 +2776,7 @@ namespace Aseba
 		}
 		const NodeTab* tab = getTabFromId(node);
 		auto tabName = nodes->tabText(index).replace(QString("&"), QString(""));
-		
+
 		// clang-format off
 		nodes->addTab(
 			new AbsentNodeTab(
@@ -2788,13 +2788,13 @@ namespace Aseba
 			tabName
 		);
 		// clang-format on
-		
+
 		nodes->removeAndDeleteTab(index);
-		
+
 		regenerateToolsMenus();
 		regenerateHelpMenu();
 	}
-	
+
 	//! A user event has arrived from the network.
 	void MainWindow::userEvent(unsigned id, const VariablesDataVector &data)
 	{	
@@ -2809,30 +2809,30 @@ namespace Aseba
 
 			for (size_t i = 0; i < data.size(); i++)
 				text += QString("%0 ").arg(data[i]);
-			
+
 			if (logger->count() > 50)
 				delete logger->takeItem(0);
 			QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
 			logger->scrollToBottom();
 			Q_UNUSED(item);
 		}
-		
+
 		#ifdef HAVE_QWT
-		
+
 		// iterate over all viewer for this event
 		QList<EventViewer*> viewers = eventsViewers.values(id);
 		for (int i = 0; i < viewers.size(); ++i)
 			viewers.at(i)->addData(data);
-		
+
 		#endif // HAVE_QWT
 	}
-	
+
 	//! Some user events have been dropped, i.e. not sent to the gui
 	void MainWindow::userEventsDropped(unsigned amount)
 	{
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
 		text += QString("\n%0 user events not shown").arg(amount);
-		
+
 		if (logger->count() > 50)
 			delete logger->takeItem(0);
 		QListWidgetItem * item = new QListWidgetItem(QIcon(":/images/info.png"), text, logger);
@@ -2840,99 +2840,99 @@ namespace Aseba
 		Q_UNUSED(item);
 		logger->setStyleSheet(" QListView::item { background: rgb(255,128,128); }");
 	}
-	
+
 	//! A node did an access out of array bounds exception.
 	void MainWindow::arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned size, unsigned index)
 	{
 		addErrorEvent(node, line, tr("array access at %0 out of bounds [0..%1]").arg(index).arg(size-1));
 	}
-	
+
 	//! A node did a division by zero exception.
 	void MainWindow::divisionByZero(unsigned node, unsigned line)
 	{
 		addErrorEvent(node, line, tr("division by zero"));
 	}
-	
+
 	//! A new event was run and the current killed on a node
 	void MainWindow::eventExecutionKilled(unsigned node, unsigned line)
 	{
 		addErrorEvent(node, line, tr("event execution killed"));
 	}
-	
+
 	//! A node has produced an error specific to it
 	void MainWindow::nodeSpecificError(unsigned node, unsigned line, const QString& message)
 	{
 		addErrorEvent(node, line, message);
 	}
-	
+
 	//! Generic part of error events reporting
 	void MainWindow::addErrorEvent(unsigned node, unsigned line, const QString& message)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		if (tab->setEditorProperty("executionError", QVariant(), line, true))
 		{
 			//tab->rehighlighting = true;
 			tab->highlighter->rehighlight();
 		}
-		
+
 		QString text = QTime::currentTime().toString("hh:mm:ss.zzz");
 		text += "\n" + tr("%0:%1: %2").arg(target->getName(node)).arg(line + 1).arg(message);
-		
+
 		if (logger->count() > 50)
 			delete logger->takeItem(0);
 		QListWidgetItem *item = new QListWidgetItem(QIcon(":/images/warning.png"), text, logger);
 		item->setData(Qt::UserRole, QPoint(node, line));
 		logger->scrollToBottom();
 	}
-	
-	
+
+
 	//! The program counter of a node has changed, causing a change of position in source code.
 	void MainWindow::executionPosChanged(unsigned node, unsigned line)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		tab->executionPosChanged(line);
 	}
-	
+
 	//! The mode of execution of a node (stop, run, step by step) has changed.
 	void MainWindow::executionModeChanged(unsigned node, Target::ExecutionMode mode)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		tab->executionModeChanged(mode);
 	}
-	
+
 	//! The execution state logic thinks variables might need a refresh
 	void MainWindow::variablesMemoryEstimatedDirty(unsigned node)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		tab->refreshMemoryClicked();
 	}
-	
+
 	//! The content of the variables memory of a node has changed.
 	void MainWindow::variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		tab->vmMemoryModel->setVariablesData(start, variables);
 	}
-	
+
 	//! The result of a set breakpoint is known
 	void MainWindow::breakpointSetResult(unsigned node, unsigned line, bool success)
 	{
 		NodeTab* tab = getTabFromId(node);
 		Q_ASSERT(tab);
-		
+
 		tab->breakpointSetResult(line, success);
 	}
-	
+
 	//! Get the tab widget index of a corresponding node id
 	int MainWindow::getIndexFromId(unsigned node) const
 	{
@@ -2947,7 +2947,7 @@ namespace Aseba
 		}
 		return -1;
 	}
-	
+
 	//! Get the tab widget pointer of a corresponding node id
 	NodeTab* MainWindow::getTabFromId(unsigned node) const
 	{
@@ -2962,7 +2962,7 @@ namespace Aseba
 		}
 		return 0;
 	}
-	
+
 	//! Get the tab widget pointer of a corresponding node name, and of preferedId if found, but the first found otherwise.
 	//! Do not consider tabs indices in filledList for non-prefered tabs
 	NodeTab* MainWindow::getTabFromName(const QString& name, unsigned preferedId, bool* isPrefered, QSet<int>* filledList) const
@@ -2992,7 +2992,7 @@ namespace Aseba
 		if (isPrefered) *isPrefered = false;
 		return freeSlotFound;
 	}
-	
+
 	//! Get the absent tab widget index of a corresponding node id
 	int MainWindow::getAbsentIndexFromId(unsigned node) const
 	{
@@ -3007,7 +3007,7 @@ namespace Aseba
 		}
 		return -1;
 	}
-	
+
 	//! Get the absent tab widget pointer of a corresponding node id
 	AbsentNodeTab* MainWindow::getAbsentTabFromId(unsigned node) const
 	{
@@ -3022,7 +3022,7 @@ namespace Aseba
 		}
 		return 0;
 	}
-	
+
 	void MainWindow::clearDocumentSpecificTabs()
 	{
 		bool changed = false;
@@ -3032,7 +3032,7 @@ namespace Aseba
 			for (int i = 0; i < nodes->count(); i++)
 			{
 				QWidget* tab = nodes->widget(i);
-				
+
 				#ifdef HAVE_QWT
 				if (dynamic_cast<AbsentNodeTab*>(tab) || dynamic_cast<EventViewer*>(tab))
 				#else // HAVE_QWT
@@ -3047,13 +3047,13 @@ namespace Aseba
 		}
 		while (changed);
 	}
-	
+
 	void MainWindow::setupWidgets()
 	{
 		currentScriptTab = 0;
 		nodes = new EditorsPlotsTabWidget;
 		nodes->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-		
+
 		QSplitter *splitter = new QSplitter();
 		splitter->addWidget(nodes);
 		setCentralWidget(splitter);
@@ -3063,7 +3063,7 @@ namespace Aseba
 		addConstantButton->setToolTip(tr("Add a new constant"));
 		removeConstantButton->setToolTip(tr("Remove this constant"));
 		removeConstantButton->setEnabled(false);
-		
+
 		constantsView = new FixedWidthTableView;
 		constantsView->setShowGrid(false);
 		constantsView->verticalHeader()->hide();
@@ -3079,7 +3079,7 @@ namespace Aseba
 		constantsView->setMinimumHeight(100);
 		constantsView->setSecondColumnLongestContent("-88888##");
 		constantsView->resizeRowsToContents();
-		
+
 		QGridLayout* constantsLayout = new QGridLayout;
 		constantsLayout->addWidget(new QLabel(tr("<b>Constants</b>")),0,0);
 		constantsLayout->setColumnStretch(0, 1);
@@ -3089,7 +3089,7 @@ namespace Aseba
 		constantsLayout->setColumnStretch(2, 0);
 		constantsLayout->addWidget(constantsView, 1, 0, 1, 3);
 		//setColumnStretch
-		
+
 		/*QHBoxLayout* constantsAddRemoveLayout = new QHBoxLayout;;
 		constantsAddRemoveLayout->addStretch();
 		addConstantButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
@@ -3097,13 +3097,13 @@ namespace Aseba
 		removeConstantButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		removeConstantButton->setEnabled(false);
 		constantsAddRemoveLayout->addWidget(removeConstantButton);
-		
+
 		eventsDockLayout->addLayout(constantsAddRemoveLayout);
 		eventsDockLayout->addWidget(constantsView, 1);*/
-		
-		
+
+
 		/*eventsDockLayout->addWidget(new QLabel(tr("<b>Events</b>")));
-		
+
 		QHBoxLayout* eventsAddRemoveLayout = new QHBoxLayout;;
 		eventsAddRemoveLayout->addStretch();
 		addEventNameButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
@@ -3114,12 +3114,12 @@ namespace Aseba
 		sendEventButton = new QPushButton(QPixmap(QString(":/images/newmsg.png")), "");
 		sendEventButton->setEnabled(false);
 		eventsAddRemoveLayout->addWidget(sendEventButton);
-		
+
 		eventsDockLayout->addLayout(eventsAddRemoveLayout);
-				
+
 		eventsDockLayout->addWidget(eventsDescriptionsView, 1);*/
-		
-		
+
+
 		addEventNameButton = new QPushButton(QPixmap(QString(":/images/add.png")), "");
 		removeEventNameButton = new QPushButton(QPixmap(QString(":/images/remove.png")), "");
 		removeEventNameButton->setEnabled(false);
@@ -3152,7 +3152,7 @@ namespace Aseba
 		eventsDescriptionsView->setSecondColumnLongestContent("255###");
 		eventsDescriptionsView->resizeRowsToContents();
 		eventsDescriptionsView->setContextMenuPolicy(Qt::CustomContextMenu);
-		
+
 		QGridLayout* eventsLayout = new QGridLayout;
 		eventsLayout->addWidget(new QLabel(tr("<b>Global Events</b>")),0,0,1,4);
 		eventsLayout->addWidget(addEventNameButton,1,0);
@@ -3166,63 +3166,63 @@ namespace Aseba
 		eventsLayout->addWidget(plotEventButton,1,3);
 		#endif // HAVE_QWT
 		eventsLayout->addWidget(eventsDescriptionsView, 2, 0, 1, 4);
-		
+
 		/*logger = new QListWidget;
 		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		eventsDockLayout->addWidget(logger, 3);
 		clearLogger = new QPushButton(tr("Clear"));
 		eventsDockLayout->addWidget(clearLogger);*/
-		
+
 		logger = new QListWidget;
 		logger->setMinimumSize(80,100);
 		logger->setSelectionMode(QAbstractItemView::NoSelection);
 		clearLogger = new QPushButton(tr("Clear"));
 		statusText = new QLabel("");
 		statusText->hide();
-		
+
 		QVBoxLayout* loggerLayout = new QVBoxLayout;
 		loggerLayout->addWidget(statusText);
 		loggerLayout->addWidget(logger);
 		loggerLayout->addWidget(clearLogger);
-		
+
 		// panel
 		QSplitter* rightPanelSplitter = new QSplitter(Qt::Vertical);
-		
+
 		QWidget* constantsWidget = new QWidget;
 		constantsWidget->setLayout(constantsLayout);
 		rightPanelSplitter->addWidget(constantsWidget);
-		
+
 		QWidget* eventsWidget = new QWidget;
 		eventsWidget->setLayout(eventsLayout);
 		rightPanelSplitter->addWidget(eventsWidget);
-		
+
 		QWidget* loggerWidget = new QWidget;
 		loggerWidget->setLayout(loggerLayout);
 		rightPanelSplitter->addWidget(loggerWidget);
-		
+
 		// main window
 		splitter->addWidget(rightPanelSplitter);
 		splitter->setSizes(QList<int>() << 800 << 200);
-		
+
 		// dialog box
 		compilationMessageBox = new CompilationLogDialog(this);
 		connect(this, SIGNAL(MainWindowClosed()), compilationMessageBox, SLOT(close()));
 		findDialog = new FindDialog(this);
 		connect(this, SIGNAL(MainWindowClosed()), findDialog, SLOT(close()));
-		
+
 		// help viewer
 		helpViewer.setLanguage(target->getLanguage());
 		connect(this, SIGNAL(MainWindowClosed()), &helpViewer, SLOT(close()));
 	}
-	
+
 	void MainWindow::setupConnections()
 	{
 		// general connections
 		connect(nodes, SIGNAL(currentChanged(int)), SLOT(tabChanged(int)));
 		connect(logger, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(logEntryDoubleClicked(QListWidgetItem *)));
 		connect(ConfigDialog::getInstance(), SIGNAL(settingsChanged()), SLOT(applySettings()));
-		
+
 		// global actions
 		connect(loadAllAct, SIGNAL(triggered()), SLOT(loadAll()));
 		connect(resetAllAct, SIGNAL(triggered()), SLOT(resetAll()));
@@ -3247,7 +3247,7 @@ namespace Aseba
 		// logger
 		connect(clearLogger, SIGNAL(clicked()), logger, SLOT(clear()));
 		connect(clearLogger, SIGNAL(clicked()), SLOT(clearAllExecutionError()));
-		
+
 		// constants
 		connect(addConstantButton, SIGNAL(clicked()), SLOT(addConstantClicked()));
 		connect(removeConstantButton, SIGNAL(clicked()), SLOT(removeConstantClicked()));
@@ -3258,27 +3258,27 @@ namespace Aseba
 		// target events
 		connect(target, SIGNAL(nodeConnected(unsigned)), SLOT(nodeConnected(unsigned)));
 		connect(target, SIGNAL(nodeDisconnected(unsigned)), SLOT(nodeDisconnected(unsigned)));
-		
+
 		connect(target, SIGNAL(userEvent(unsigned, const VariablesDataVector &)), SLOT(userEvent(unsigned, const VariablesDataVector &)));
 		connect(target, SIGNAL(userEventsDropped(unsigned)), SLOT(userEventsDropped(unsigned)));
 		connect(target, SIGNAL(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)), SLOT(arrayAccessOutOfBounds(unsigned, unsigned, unsigned, unsigned)));
 		connect(target, SIGNAL(divisionByZero(unsigned, unsigned)), SLOT(divisionByZero(unsigned, unsigned)));
 		connect(target, SIGNAL(eventExecutionKilled(unsigned, unsigned)), SLOT(eventExecutionKilled(unsigned, unsigned)));
 		connect(target, SIGNAL(nodeSpecificError(unsigned, unsigned, QString)), SLOT(nodeSpecificError(unsigned, unsigned, QString)));
-		
+
 		connect(target, SIGNAL(executionPosChanged(unsigned, unsigned)), SLOT(executionPosChanged(unsigned, unsigned)));
 		connect(target, SIGNAL(executionModeChanged(unsigned, Target::ExecutionMode)), SLOT(executionModeChanged(unsigned, Target::ExecutionMode)));
 		connect(target, SIGNAL(variablesMemoryEstimatedDirty(unsigned)), SLOT(variablesMemoryEstimatedDirty(unsigned)));
-		
+
 		connect(target, SIGNAL(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)), SLOT(variablesMemoryChanged(unsigned, unsigned, const VariablesDataVector &)));
-		
+
 		connect(target, SIGNAL(breakpointSetResult(unsigned, unsigned, bool)), SLOT(breakpointSetResult(unsigned, unsigned, bool)));
 	}
-	
+
 	void MainWindow::regenerateOpenRecentMenu()
 	{
 		openRecentMenu->clear();
-		
+
 		// Add all other actions excepted the one we are processing
 		QSettings settings;
 		QStringList recentFiles = settings.value("recent files").toStringList();
@@ -3288,7 +3288,7 @@ namespace Aseba
 			openRecentMenu->addAction(fileName, this, SLOT(openRecentFile()));
 		}
 	}
-	
+
 	void MainWindow::updateRecentFiles(const QString& fileName)
 	{
 		QSettings settings;
@@ -3301,13 +3301,13 @@ namespace Aseba
 			recentFiles.pop_back();
 		settings.setValue("recent files", recentFiles);
 	}
-	
+
 	void MainWindow::regenerateToolsMenus()
 	{
 		writeBytecodeMenu->clear();
 		rebootMenu->clear();
 		saveBytecodeMenu->clear();
-		
+
 		unsigned activeVMCount(0);
 		for (int i = 0; i < nodes->count(); i++)
 		{
@@ -3316,34 +3316,34 @@ namespace Aseba
 			{
 				QAction *act = writeBytecodeMenu->addAction(tr("...inside %0").arg(target->getName(tab->nodeId())),tab, SLOT(writeBytecode()));
 				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
-				
+
 				rebootMenu->addAction(tr("...%0").arg(target->getName(tab->nodeId())),tab, SLOT(reboot()));
-				
+
 				act = saveBytecodeMenu->addAction(tr("...of %0").arg(target->getName(tab->nodeId())),tab, SLOT(saveBytecode()));
 				connect(tab, SIGNAL(uploadReadynessChanged(bool)), act, SLOT(setEnabled(bool)));
-				
+
 				++activeVMCount;
 			}
 		}
-		
+
 		writeBytecodeMenu->addSeparator();
 		writeAllBytecodesAct = writeBytecodeMenu->addAction(tr("...inside all nodes"), this, SLOT(writeAllBytecodes()));
-		
+
 		rebootMenu->addSeparator();
 		rebootMenu->addAction(tr("...all nodes"), this, SLOT(rebootAllNodes()));
-		
+
 		globalToolBar->setVisible(activeVMCount > 1);
 	}
-	
+
 	void MainWindow::generateHelpMenu()
 	{
 		helpMenu->addAction(tr("&User Manual..."), this, SLOT(showUserManual()), QKeySequence::HelpContents);
 		helpMenu->addSeparator();
-		
+
 		helpMenuTargetSpecificSeparator = helpMenu->addSeparator();
 		helpMenu->addAction(tr("Web site Aseba..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://aseba.wikidot.com/en:start")));
 		helpMenu->addAction(tr("Report bug..."), this, SLOT(openToUrlFromAction()))->setData(QUrl(tr("http://github.com/aseba-community/aseba/issues/new")));
-		
+
 		#ifdef Q_WS_MAC
 		helpMenu->addAction("about", this, SLOT(about()));
 		helpMenu->addAction("About &Qt...", qApp, SLOT(aboutQt()));
@@ -3353,7 +3353,7 @@ namespace Aseba
 		helpMenu->addAction(tr("About &Qt..."), qApp, SLOT(aboutQt()));
 		#endif // Q_WS_MAC
 	}
-	
+
 	void MainWindow::regenerateHelpMenu()
 	{
 		// remove old target-specific actions
@@ -3363,7 +3363,7 @@ namespace Aseba
 			helpMenu->removeAction(action);
 			delete action;
 		}
-		
+
 		// add back target-specific actions
 		typedef std::set<int> ProductIds;
 		ProductIds productIds;
@@ -3390,7 +3390,7 @@ namespace Aseba
 				targetSpecificHelp.append(action);
 				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
-				
+
 				case ASEBA_PID_CHALLENGE:
 				action = new QAction(tr("Challenge tutorial..."), helpMenu);
 				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
@@ -3398,7 +3398,7 @@ namespace Aseba
 				targetSpecificHelp.append(action);
 				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
-				
+
 				case ASEBA_PID_MARXBOT:
 				action = new QAction(tr("MarXbot user manual..."), helpMenu);
 				connect(action, SIGNAL(triggered()), SLOT(openToUrlFromAction()));
@@ -3406,25 +3406,25 @@ namespace Aseba
 				targetSpecificHelp.append(action);
 				helpMenu->insertAction(helpMenuTargetSpecificSeparator, action);
 				break;
-				
+
 				default:
 				break;
 			}
 		}
 	}
-	
+
 	void MainWindow::openToUrlFromAction() const
 	{
 		const QAction *action(reinterpret_cast<QAction *>(sender()));
 		QDesktopServices::openUrl(action->data().toUrl());
 	}
-	
+
 	void MainWindow::setupMenu()
 	{
 		// File menu
 		QMenu *fileMenu = new QMenu(tr("&File"), this);
 		menuBar()->addMenu(fileMenu);
-	
+
 		fileMenu->addAction(QIcon(":/images/filenew.png"), tr("&New"),
 							this, SLOT(newFile()), QKeySequence::New);
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Open..."), 
@@ -3432,56 +3432,56 @@ namespace Aseba
 		openRecentMenu = new QMenu(tr("Open &Recent"), fileMenu);
 		regenerateOpenRecentMenu();
 		fileMenu->addMenu(openRecentMenu)->setIcon(QIcon(":/images/fileopen.png"));
-		
+
 		fileMenu->addAction(QIcon(":/images/filesave.png"), tr("&Save..."),
 							this, SLOT(save()), QKeySequence::Save);
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Save &As..."),
 							this, SLOT(saveFile()), QKeySequence::SaveAs);
-		
+
 		fileMenu->addSeparator();
 		fileMenu->addAction(QIcon(":/images/filesaveas.png"), tr("Export &memories content..."),
 							this, SLOT(exportMemoriesContent()));
 		fileMenu->addAction(QIcon(":/images/fileopen.png"), tr("&Import memories content..."),
 							this, SLOT(importMemoriesContent()));
-		
+
 		fileMenu->addSeparator();
 		#ifdef Q_WS_MAC
 		fileMenu->addAction(QIcon(":/images/exit.png"), "quit", this, SLOT(close()), QKeySequence::Quit);
 		#else // Q_WS_MAC
 		fileMenu->addAction(QIcon(":/images/exit.png"), tr("&Quit"), this, SLOT(close()), QKeySequence::Quit);
 		#endif // Q_WS_MAC
-		
+
 		// Edit menu
 		cutAct = new QAction(QIcon(":/images/editcut.png"), tr("Cu&t"), this);
 		cutAct->setShortcut(QKeySequence::Cut);
 		cutAct->setEnabled(false);
-		
+
 		copyAct = new QAction(QIcon(":/images/editcopy.png"), tr("&Copy"), this);
 		copyAct->setShortcut(QKeySequence::Copy);
 		copyAct->setEnabled(false);
-		
+
 		pasteAct = new QAction(QIcon(":/images/editpaste.png"), tr("&Paste"), this);
 		pasteAct->setShortcut(QKeySequence::Paste);
 		pasteAct->setEnabled(false);
-		
+
 		undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
 		undoAct->setShortcut(QKeySequence::Undo);
 		undoAct->setEnabled(false);
-		
+
 		redoAct = new QAction(QIcon(":/images/redo.png"), tr("Re&do"), this);
 		redoAct->setShortcut(QKeySequence::Redo);
 		redoAct->setEnabled(false);
-		
+
 		findAct = new QAction(QIcon(":/images/find.png"), tr("&Find..."), this);
 		findAct->setShortcut(QKeySequence::Find);
 		connect(findAct, SIGNAL(triggered()), SLOT(findTriggered()));
 		findAct->setEnabled(false);
-		
+
 		replaceAct = new QAction(QIcon(":/images/edit.png"), tr("&Replace..."), this);
 		replaceAct->setShortcut(QKeySequence::Replace);
 		connect(replaceAct, SIGNAL(triggered()), SLOT(replaceTriggered()));
 		replaceAct->setEnabled(false);
-		
+
 		goToLineAct = new QAction(QIcon(":/images/goto.png"), tr("&Go To Line..."), this);
 		goToLineAct->setShortcut(tr("Ctrl+G", "Edit|Go To Line"));
 		goToLineAct->setEnabled(false);
@@ -3513,7 +3513,7 @@ namespace Aseba
 		editMenu->addSeparator();
 		editMenu->addAction(commentAct);
 		editMenu->addAction(uncommentAct);
-		
+
 		// View menu
 		showKeywordsAct = new QAction(tr("Show &keywords"), this);
 		showKeywordsAct->setCheckable(true);
@@ -3531,12 +3531,12 @@ namespace Aseba
 		showLineNumbers->setShortcut(tr("F11", "View|Show Line Numbers"));
 		showLineNumbers->setCheckable(true);
 		connect(showLineNumbers, SIGNAL(toggled(bool)), SLOT(showLineNumbersChanged(bool)));
-		
+
 		zoomInAct = new QAction(tr("&Increase font size"), this);
 		zoomInAct->setShortcut(QKeySequence::ZoomIn);
 		zoomInAct->setEnabled(false);
 		connect(zoomInAct, SIGNAL(triggered()), SLOT(zoomIn()));
-		
+
 		zoomOutAct = new QAction(tr("&Decrease font size"), this);
 		zoomOutAct->setShortcut(QKeySequence::ZoomOut);
 		zoomOutAct->setEnabled(false);
@@ -3561,13 +3561,13 @@ namespace Aseba
 		// Debug actions
 		loadAllAct = new QAction(QIcon(":/images/upload.png"), tr("&Load all"), this);
 		loadAllAct->setShortcut(tr("F7", "Load|Load all"));
-		
+
 		resetAllAct = new QAction(QIcon(":/images/reset.png"), tr("&Reset all"), this);
 		resetAllAct->setShortcut(tr("F8", "Debug|Reset all"));
-		
+
 		runAllAct = new QAction(QIcon(":/images/play.png"), tr("Ru&n all"), this);
 		runAllAct->setShortcut(tr("F9", "Debug|Run all"));
-		
+
 		pauseAllAct = new QAction(QIcon(":/images/pause.png"), tr("&Pause all"), this);
 		pauseAllAct->setShortcut(tr("F10", "Debug|Pause all"));
 
@@ -3579,7 +3579,7 @@ namespace Aseba
 		globalToolBar->addAction(resetAllAct);
 		globalToolBar->addAction(runAllAct);
 		globalToolBar->addAction(pauseAllAct);
-		
+
 		// Debug menu
 		toggleBreakpointAct = new QAction(tr("Toggle breakpoint"), this);
 		toggleBreakpointAct->setShortcut(tr("Ctrl+B", "Debug|Toggle breakpoint"));
@@ -3598,7 +3598,7 @@ namespace Aseba
 		debugMenu->addAction(resetAllAct);
 		debugMenu->addAction(runAllAct);
 		debugMenu->addAction(pauseAllAct);
-		
+
 		// Tool menu
 		QMenu *toolMenu = new QMenu(tr("&Tools"), this);
 		menuBar()->addMenu(toolMenu);
@@ -3617,13 +3617,13 @@ namespace Aseba
 		toolMenu->addMenu(rebootMenu);
 		saveBytecodeMenu = new QMenu(tr("Save the binary code..."), toolMenu);
 		toolMenu->addMenu(saveBytecodeMenu);
-		
+
 		// Help menu
 		helpMenu = new QMenu(tr("&Help"), this);
 		menuBar()->addMenu(helpMenu);
 		generateHelpMenu();
 		regenerateHelpMenu();
-		
+
 		// add dynamic stuff
 		regenerateToolsMenus();
 
@@ -3643,14 +3643,14 @@ namespace Aseba
 		QString docName(tr("Untitled"));
 		if (!actualFileName.isEmpty())
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
-		
+
 		QMessageBox msgBox;
 		msgBox.setWindowTitle(tr("Aseba Studio - Confirmation Dialog"));
 		msgBox.setText(tr("The document \"%0\" has been modified.").arg(docName));
 		msgBox.setInformativeText(tr("Do you want to save your changes or discard them?"));
 		msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Save);
-		
+
 		int ret = msgBox.exec();
 		switch (ret)
 		{
@@ -3705,19 +3705,19 @@ namespace Aseba
 		settings.setValue("MainWindow/geometry", saveGeometry());
 		settings.setValue("MainWindow/windowState", saveState());
 	}
-	
+
 	void MainWindow::updateWindowTitle()
 	{
 		const bool anythingModified = sourceModified || constantsDefinitionsModel->checkIfModified() || eventsDescriptionsModel->checkIfModified();
-		
+
 		QString modifiedText;
 		if (anythingModified)
 			modifiedText = tr("[modified] ");
-			
+
 		QString docName(tr("Untitled"));
 		if (!actualFileName.isEmpty())
 			docName = actualFileName.mid(actualFileName.lastIndexOf("/") + 1);
-		
+
 		setWindowTitle(tr("%0 %1- Aseba Studio").arg(docName).arg(modifiedText));
 	}
 
@@ -3728,14 +3728,14 @@ namespace Aseba
 		showHiddenAct->setChecked(ConfigDialog::getShowHidden());
 		showLineNumbers->setChecked(ConfigDialog::getShowLineNumbers());
 	}
-	
+
 	void MainWindow::clearOpenedFileName(bool isModified)
 	{
 		actualFileName.clear();
 		sourceModified = isModified;
 		updateWindowTitle();
 	}
-	
+
 	/*@}*/
 } // namespace Aseba
 

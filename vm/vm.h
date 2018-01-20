@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -34,7 +34,7 @@ extern "C" {
 
 /**
 	\defgroup vm Virtual Machine
-	
+
 Glue logic must implement:
 
 \verbatim
@@ -70,24 +70,24 @@ typedef struct
 {
 	// node id
 	uint16_t nodeId;
-	
+
 	// bytecode
 	uint16_t bytecodeSize; /*!< total amount of bytecode space */
 	uint16_t * bytecode; /*!< bytecode space of size bytecodeSize */
-	
+
 	// variables
 	uint16_t variablesSize; /*!< total amount of variables space */
 	int16_t * variables; /*!< variables of size variableCount */
-	
+
 	// execution stack
 	uint16_t stackSize; /*!< depth of execution stack */
 	int16_t * stack; /*!< execution stack of size stackSize */
-	
+
 	// execution
 	uint16_t flags;
 	uint16_t pc;
 	int16_t sp;
-	
+
 	// breakpoint
 	uint16_t breakpoints[ASEBA_MAX_BREAKPOINTS];
 	uint16_t breakpointsCount;

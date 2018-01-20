@@ -11,16 +11,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -57,18 +57,18 @@ namespace Enki
 	public:
 		const QString sceneFileName;
 		PlaygroundViewer& viewer;
-		
+
 	public:
 		PlaygroundSimulatorEnvironment(const QString& sceneFileName, PlaygroundViewer& viewer):
 			sceneFileName(sceneFileName),
 			viewer(viewer)
 		{}
-		
+
 		virtual void notify(const EnvironmentNotificationType type, const std::string& description, const strings& arguments) override
 		{
 			viewer.notifyAsebaEnvironment(type, description, arguments);
 		}
-		
+
 		virtual std::string getSDFilePath(const std::string& robotName, unsigned fileNumber) const override
 		{
 			auto paths = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
@@ -83,7 +83,7 @@ namespace Enki
 			std::cerr << fileName.toStdString() << std::endl;
 			return fileName.toStdString();
 		}
-		
+
 		virtual World* getWorld() const override
 		{
 			return viewer.getWorld();
@@ -133,25 +133,25 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
 	app.setApplicationName("Playground");
-	
-	
+
+
 	// Translation support
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name());
 	app.installTranslator(&qtTranslator);
-	
+
 	QTranslator translator;
 	translator.load(QString(":/asebaplayground_") + QLocale::system().name());
 	app.installTranslator(&translator);
-	
+
 	QTranslator aboutTranslator;
 	aboutTranslator.load(QString(":/qtabout_") + QLocale::system().name());
 	app.installTranslator(&aboutTranslator);
-	
+
 	// create document
 	QDomDocument domDocument("aseba-playground");
 	QString sceneFileName;
-	
+
 	// Get cmd line arguments
 	bool ask = true;
 	if (argc > 1)
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 		sceneFileName = argv[1];
 		ask = false;
 	}
-	
+
 	// Try to load xml config file
 	do
 	{
@@ -169,13 +169,13 @@ int main(int argc, char *argv[])
 			sceneFileName = QFileDialog::getOpenFileName(0, app.tr("Open Scenario"), lastFileName, app.tr("playground scenario (*.playground)"));
 		}
 		ask = true;
-		
+
 		if (sceneFileName.isEmpty())
 		{
 			std::cerr << "You must specify a valid setup scenario on the command line or choose one in the file dialog." << std::endl;
 			exit(1);
 		}
-		
+
 		QFile file(sceneFileName);
 		if (file.open(QIODevice::ReadOnly))
 		{
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	while (true);
-	
+
 	// Scan for colors
 	typedef QMap<QString, Enki::Color> ColorsMap;
 	ColorsMap colorsMap;
@@ -210,10 +210,10 @@ int main(int argc, char *argv[])
 			colorE.attribute("g").toDouble(),
 			colorE.attribute("b").toDouble()
 		);
-		
+
 		colorE = colorE.nextSiblingElement ("color");
 	}
-	
+
 	// Scan for areas
 	typedef QMap<QString, Enki::Polygon> AreasMap;
 	AreasMap areasMap;
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 		areasMap[areaE.attribute("name")] = p;
 		areaE = areaE.nextSiblingElement ("area");
 	}
-	
+
 	// Create the world
 	QDomElement worldE = domDocument.documentElement().firstChildElement("world");
 	Enki::Color worldColor(Enki::Color::gray);
@@ -269,18 +269,18 @@ int main(int argc, char *argv[])
 		worldColor,
 		groundTexture
 	);
-	
+
 	// Create viewer
 	Enki::PlaygroundViewer viewer(&world, worldE.attribute("energyScoringSystemEnabled", "false").toLower() == "true");
 	if (Enki::simulatorEnvironment)
 		qDebug() << "A simulator environment already exists, replacing";
 	Enki::simulatorEnvironment.reset(new Enki::PlaygroundSimulatorEnvironment(sceneFileName, viewer));
-	
+
 	// Zeroconf support to advertise targets
 #ifdef ZEROCONF_SUPPORT
 	Aseba::QtZeroconf zeroconf;
 #endif // ZEROCONF_SUPPORT
-	
+
 	// Scan for camera
 	QDomElement cameraE = domDocument.documentElement().firstChildElement("camera");
 	if (!cameraE.isNull())
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 			cameraE.attribute("pitch", QString::number((3*M_PI)/8)).toDouble()
 		);
 	}
-	
+
 	// Scan for walls
 	QDomElement wallE = domDocument.documentElement().firstChildElement("wall");
 	while (!wallE.isNull())
@@ -317,10 +317,10 @@ int main(int argc, char *argv[])
 		if (! wallE.attribute("angle").isNull())
 			wall->angle = wallE.attribute("angle").toDouble(); // radians
 		world.addObject(wall);
-		
+
 		wallE  = wallE.nextSiblingElement ("wall");
 	}
-	
+
 	// Scan for cylinders
 	QDomElement cylinderE = domDocument.documentElement().firstChildElement("cylinder");
 	while (!cylinderE.isNull())
@@ -338,10 +338,10 @@ int main(int argc, char *argv[])
 			!cylinderE.attribute("mass").isNull() ? cylinderE.attribute("mass").toDouble() : -1 // normally -1 because immobile
 		);
 		world.addObject(cylinder);
-		
+
 		cylinderE = cylinderE.nextSiblingElement("cylinder");
 	}
-	
+
 	// Scan for feeders
 	QDomElement feederE = domDocument.documentElement().firstChildElement("feeder");
 	while (!feederE.isNull())
@@ -350,11 +350,11 @@ int main(int argc, char *argv[])
 		feeder->pos.x = feederE.attribute("x").toDouble();
 		feeder->pos.y = feederE.attribute("y").toDouble();
 		world.addObject(feeder);
-	
+
 		feederE = feederE.nextSiblingElement ("feeder");
 	}
 	// TODO: if needed, custom color to feeder
-	
+
 	// Scan for doors
 	typedef QMap<QString, Enki::SlidingDoor*> DoorsMap;
 	DoorsMap doorsMap;
@@ -383,10 +383,10 @@ int main(int argc, char *argv[])
 			door->setColor(colorsMap[doorE.attribute("color")]);
 		doorsMap[doorE.attribute("name")] = door;
 		world.addObject(door);
-		
+
 		doorE = doorE.nextSiblingElement ("door");
 	}
-	
+
 	// Scan for activation, and link them with areas and doors
 	QDomElement activationE = domDocument.documentElement().firstChildElement("activation");
 	while (!activationE.isNull())
@@ -397,17 +397,17 @@ int main(int argc, char *argv[])
 			activationE = activationE.nextSiblingElement ("activation");
 			continue;
 		}
-		
+
 		if (doorsMap.find(activationE.attribute("door")) == doorsMap.end())
 		{
 			std::cerr << "Warning, door " << activationE.attribute("door").toStdString() << " undefined\n";
 			activationE = activationE.nextSiblingElement ("activation");
 			continue;
 		}
-		
+
 		const Enki::Polygon& area = *areasMap.find(activationE.attribute("area"));
 		Enki::Door* door = *doorsMap.find(activationE.attribute("door"));
-		
+
 		Enki::DoorButton* activation = new Enki::DoorButton(
 			Enki::Point(
 				activationE.attribute("x").toDouble(),
@@ -420,12 +420,12 @@ int main(int argc, char *argv[])
 			area,
 			door
 		);
-		
+
 		world.addObject(activation);
-		
+
 		activationE = activationE.nextSiblingElement ("activation");
 	}
-	
+
 	// load all robots in one loop
 	std::map<std::string, RobotType> robotTypes {
 		{ "thymio2", { "Thymio II", createRobotSingleVMNode<Enki::DashelAsebaThymio2> } },
@@ -448,7 +448,7 @@ int main(int argc, char *argv[])
 			const auto cppRobotName(qRobotNameFull.toStdString());
 			const unsigned port(robotE.attribute("port", QString("%1").arg(ASEBA_DEFAULT_PORT+asebaServerCount)).toUInt());
 			const int16_t nodeId(robotE.attribute("nodeId", "1").toInt());
-			
+
 			// create
 			const auto& creator(typeIt->second.factory);
 #ifdef ZEROCONF_SUPPORT
@@ -458,22 +458,22 @@ int main(int argc, char *argv[])
 #endif // ZEROCONF_SUPPORT
 			asebaServerCount++;
 			countOfThisType++;
-			
+
 			// setup in the world
 			robot->pos.x = robotE.attribute("x").toDouble();
 			robot->pos.y = robotE.attribute("y").toDouble();
 			robot->angle = robotE.attribute("angle").toDouble();
 			world.addObject(robot);
-			
+
 			// log
 			viewer.log(app.tr("New robot %0 of type %1 on port %2").arg(qRobotNameRaw).arg(qTypeName).arg(port), Qt::white);
 		}
 		else
 			viewer.log("Error, unknown robot type " + type, Qt::red);
-		
+
 		robotE = robotE.nextSiblingElement ("robot");
 	}
-	
+
 	// Scan for external processes
 	QList<QProcess*> processes;
 	QDomElement procssE(domDocument.documentElement().firstChildElement("process"));
@@ -513,21 +513,21 @@ int main(int argc, char *argv[])
 		}
 		procssE = procssE.nextSiblingElement("process");
 	}
-	
+
 	// Show and run
 	viewer.setWindowTitle(app.tr("Aseba Playground - Simulate your robots!"));
 	viewer.show();
-	
+
 	// If D-Bus is used, register the viewer object
 	#ifdef HAVE_DBUS
 	new Enki::EnkiWorldInterface(&viewer);
 	QDBusConnection::sessionBus().registerObject("/world", &viewer);
 	QDBusConnection::sessionBus().registerService("ch.epfl.mobots.AsebaPlayground");
 	#endif // HAVE_DBUS
-	
+
 	// Run the application
 	const int exitValue(app.exec());
-	
+
 	// Stop and delete ongoing processes
 	foreach(QProcess*process,processes)
 	{
@@ -536,6 +536,6 @@ int main(int argc, char *argv[])
 			process->kill();
 		delete process;
 	}
-	
+
 	return exitValue;
 }

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -93,16 +93,16 @@ static int debug;
 
 unsigned char AsebaTxReady(unsigned char *data) {
 	size_t size = get_used(&AsebaUsb.tx);
-	
+
 	if(size == 0) {
 		tx_busy = 0;
 		debug = 0;
 		return 0;
 	}
-	
+
 	if(size > ASEBA_USB_MTU)
 		size = ASEBA_USB_MTU;
-	
+
 	memcpy_out_fifo(data, &AsebaUsb.tx, size);
 	debug ++;
 	return size;
@@ -110,12 +110,12 @@ unsigned char AsebaTxReady(unsigned char *data) {
 
 int AsebaUsbBulkRecv(unsigned char *data, unsigned char size) {
 	size_t free = get_free(&AsebaUsb.rx);
-	
+
 	if(size >= free)
 		return 1;
-	
+
 	memcpy_to_fifo(&AsebaUsb.rx, data, size);
-	
+
 	return 0;
 }
 
@@ -127,11 +127,11 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8_t *data, uint16_t length) {
 	// BUT if the usb connection is not available, we drop the packet
 	if(!usb_uart_serial_port_open())
 		return;
-	
+
 	// Sanity check, should never be true
 	if (length < 2)
 		return;
-	
+
 	do {
 		USBMaskInterrupts(flags);
 		if(get_free(&AsebaUsb.tx) > length + 4) {
@@ -139,25 +139,25 @@ void AsebaSendBuffer(AsebaVMState *vm, const uint8_t *data, uint16_t length) {
 			memcpy_to_fifo(&AsebaUsb.tx, (unsigned char *) &length, 2);
 			memcpy_to_fifo(&AsebaUsb.tx, (unsigned char *) &vm->nodeId, 2);
 			memcpy_to_fifo(&AsebaUsb.tx, (unsigned char *) data, length + 2);
-			
+
 			// Will callback AsebaUsbTxReady
 			if (!tx_busy) {
 				tx_busy = 1;
 				USBCDCKickTx();
 			}
-			
+
 			length = 0;
 		}
-		
-	
-		
+
+
+
 		// Usb can be disconnected while sending ...
 		if(!usb_uart_serial_port_open()) {
 			fifo_reset(&AsebaUsb.tx);
 			USBUnmaskInterrupts(flags);
 			break;
 		}		
-		
+
 		USBUnmaskInterrupts(flags);
 	} while(length);
 }
@@ -199,16 +199,16 @@ uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t * data, uint16_t maxLength, ui
 void AsebaUsbInit(unsigned char * sendQueue, size_t sendQueueSize, unsigned char * recvQueue, size_t recvQueueSize) {
 	AsebaUsb.tx.buffer = sendQueue;
 	AsebaUsb.tx.size = sendQueueSize;
-	
+
 	AsebaUsb.rx.buffer = recvQueue;
 	AsebaUsb.rx.size = recvQueueSize;
 }
 
 int AsebaUsbRecvBufferEmpty(void) {
 	// We are called with interrupt disabled ! Check if rx contain something meaningfull
-	
+
 	int u;
-	
+
 	u = get_used(&AsebaUsb.rx);
 	if(u > 6) {
 		int len;

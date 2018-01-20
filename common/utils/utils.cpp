@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -52,7 +52,7 @@ namespace Aseba
 {
 	/** \addtogroup utils */
 	/*@{*/
-	
+
 	UnifiedTime::UnifiedTime()
 	{
 		#ifndef WIN32
@@ -70,17 +70,17 @@ namespace Aseba
 		value = t / 10000l;                      // In milliseconds
 		#endif // WIN32
 	}
-	
+
 	UnifiedTime::UnifiedTime(Value ms) :
 		value(ms)
 	{
 	}
-	
+
 	UnifiedTime::UnifiedTime(Value seconds, Value milliseconds) :
 		value(seconds * 1000 + milliseconds)
 	{
 	}
-	
+
 	void UnifiedTime::sleep() const
 	{
 		#ifndef WIN32
@@ -93,7 +93,7 @@ namespace Aseba
 		Sleep((DWORD)value);
 		#endif // WIN32
 	}
-	
+
 	std::string UnifiedTime::toHumanReadableStringFromEpoch() const
 	{
 		std::ostringstream oss;
@@ -108,7 +108,7 @@ namespace Aseba
 		oss << "]";
 		return oss.str();
 	}
-	
+
 	std::string UnifiedTime::toRawTimeString() const
 	{
 		std::ostringstream oss;
@@ -117,15 +117,15 @@ namespace Aseba
 		oss << std::dec << seconds << "." << std::setfill('0') << std::setw(3) << milliseconds;
 		return oss.str();
 	}
-	
+
 	UnifiedTime UnifiedTime::fromRawTimeString(const std::string& rawTimeString)
 	{
 		size_t dotPos(rawTimeString.find('.'));
 		assert(dotPos != std::string::npos);
 		return UnifiedTime(atoll(rawTimeString.substr(0, dotPos).c_str()), atoll(rawTimeString.substr(dotPos + 1, std::string::npos).c_str()));
 	}
-	
-	
+
+
 	void dumpTime(std::ostream &stream, bool raw)
 	{
 		if (raw)
@@ -134,7 +134,7 @@ namespace Aseba
 			stream << UnifiedTime().toHumanReadableStringFromEpoch();
 		stream << " ";
 	}
-	
+
 	SoftTimer::SoftTimer(Callback callback, double period):
 		callback(callback),
 		period(period),
@@ -143,12 +143,12 @@ namespace Aseba
 		if (period < 0)
 			throw std::domain_error("Period must be greater or equal to zero");
 	}
-	
+
 	void SoftTimer::step(double dt)
 	{
 		if (period == 0)
 			return;
-		
+
 		assert(dt >= 0);
 		left -= dt;
 		while (left < 0)
@@ -157,16 +157,16 @@ namespace Aseba
 			left += period;
 		}
 	}
-	
+
 	void SoftTimer::setPeriod(double period)
 	{
 		if (period < 0)
 			throw std::domain_error("Period must be greater or equal to zero");
-		
+
 		this->period = period;
 		left = period;
 	}
-	
+
 	std::string WStringToUTF8(const std::wstring& s)
 	{
 		std::string os;
@@ -195,12 +195,12 @@ namespace Aseba
 		// TODO: add >UTF16 support
 		return os;
 	}
-	
+
 	/*
-	
+
 	This code is heavily inspired by http://www.cplusplus.com/forum/general/7142/
 	released under the following license:
-	
+
 	* Copyright (c) 2009, Helios (helios.vmg@gmail.com)
 	* All rights reserved.
 	*
@@ -268,7 +268,7 @@ namespace Aseba
 		// TODO: add >UTF16 support
 		return res;
 	}
-	
+
 	/*
 	 * Code from http://www.nongnu.org/avr-libc/
 	 * Released under http://www.nongnu.org/avr-libc/LICENSE.txt
@@ -289,14 +289,14 @@ namespace Aseba
 
 		return crc;
 	}
-	
+
 	static uint16_t crc_xmodem_update (uint16_t crc, const uint8_t* data, size_t len)
 	{
 		for (size_t i = 0; i < len; ++i)
 			crc = crc_xmodem_update(crc, data[i]);
 		return crc;
 	}
-	
+
 	uint16_t crcXModem(const uint16_t oldCrc, const std::wstring& s)
 	{
 		std::string utf8s(WStringToUTF8(s));
@@ -305,12 +305,12 @@ namespace Aseba
 			++l;
 		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8_t*>(utf8s.c_str()), l);
 	}
-	
+
 	uint16_t crcXModem(const uint16_t oldCrc, const uint16_t v)
 	{
 		return crc_xmodem_update(oldCrc, reinterpret_cast<const uint8_t*>(&v), 2);
 	}
-	
+
 	template<typename T>
 	std::vector<T> split(const T& s, const T& delim)
 	{
@@ -326,19 +326,19 @@ namespace Aseba
 			result.push_back(s.substr(delimPos));
 		return result;
 	}
-	
+
 	template<>
 	std::vector<std::string> split(const std::string& s)
 	{
 		return split<std::string>(s, "\t ");
 	}
-	
+
 	template<>
 	std::vector<std::wstring> split(const std::wstring& s)
 	{
 		return split<std::wstring>(s, L"\t ");
 	}
-	
+
 	template<typename T>
 	T join(typename std::vector<T>::const_iterator first, typename std::vector<T>::const_iterator last, const T& delim)
 	{
@@ -352,15 +352,15 @@ namespace Aseba
 		}
 		return result;
 	}
-	
+
 	template<typename C>
 	typename C::value_type join(const C& values, const typename C::value_type& delim)
 	{
 		return join<typename C::value_type>(values.begin(), values.end(), delim);
 	}
-	
+
 	template std::string join(const std::vector<std::string>&, const std::string& delim);
 	template std::wstring join(const std::vector<std::wstring>&, const std::wstring& delim);
-	
+
 	/*@}*/
 }

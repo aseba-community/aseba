@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -147,10 +147,10 @@ static __attribute((far))  int16_t vmStack[VM_STACK_SIZE];
 
 AsebaVMState vmState = {
 	0,
-	
+
 	VM_BYTECODE_SIZE,
 	vmBytecode,
-	
+
 	sizeof(vmVariables) / sizeof(int16_t),
 	(int16_t*)&vmVariables,
 
@@ -193,7 +193,7 @@ uint16_t AsebaShouldDropPacket(uint16_t source, const uint8_t* data) {
 	return AsebaVMShouldDropPacket(&vmState, source, data);
 }
 
-	
+
 const AsebaNativeFunctionDescription * const * AsebaGetNativeFunctionsDescriptions(AsebaVMState *vm) {
 	return nativeFunctionsDescription;
 }
@@ -274,20 +274,20 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 		return;
 	}
 	min++;
-	
+
 	// Now erase the pages
 	for(i = 0; i < PAGE_PER_CHUNK; i++) 
 		flash_erase_page(min_addr + i*INSTRUCTIONS_PER_PAGE * 2);
-		
+
 	// Then write the usage count and the bytecode
 	flash_prepare_write(min_addr);
 	flash_write_instruction(min);
 	flash_write_buffer((unsigned char *) vm->bytecode, VM_BYTECODE_SIZE*2);
 	flash_complete_write();
-	
-	
+
+
 	// Now, check the data
-	
+
 	if(min != flash_read_instr(min_addr)) {
 		AsebaVMEmitNodeSpecificError(vm, "Error: Unable to flash bytecode (1) !");
 		return;
@@ -306,9 +306,9 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 		bcptr += 3;
 		min_addr += 2;
 	}
-	
+
 	i = (VM_BYTECODE_SIZE * 2) % 3;
-	
+
 	if(i != 0) {
 		unsigned char data[2];
 		flash_read_chunk(min_addr, i, data);
@@ -317,9 +317,9 @@ void AsebaWriteBytecode(AsebaVMState *vm) {
 			return;
 		}
 	}
-	
+
 	AsebaVMEmitNodeSpecificError(vm, "Flashing OK");
-	
+
 }
 
 const static unsigned int _magic_[8] = {0xDE, 0xAD, 0xCA, 0xFE, 0xBE, 0xEF, 0x04, 0x02};
@@ -328,7 +328,7 @@ static void AsebaNative__system_settings_flash(AsebaVMState *vm) {
 	// Then write the next row with the correct magic.
 	// If no magic is found, erase the page, and then write the first one
 	// If the last magic is found, erase the page and then write the first one
-	
+
 	unsigned long setting_addr = aseba_settings_ptr;
 	int i = 0;
 	unsigned int mag;
@@ -338,17 +338,17 @@ static void AsebaNative__system_settings_flash(AsebaVMState *vm) {
 		if(mag != _magic_[i]) 
 			break;
 	}
-	
+
 	if(i == 0 || i == 8) {
 		flash_erase_page(setting_addr);
 		i = 0;
 	}
-	
+
 	setting_addr += INSTRUCTIONS_PER_ROW * 2 * i;
-	
+
 	flash_prepare_write(setting_addr);
 	temp = (((unsigned long) *((unsigned char * ) &settings)) << 16) | _magic_[i];
-	
+
 	flash_write_instruction(temp);
 	flash_write_buffer(((unsigned char *) &settings) + 1, sizeof(settings) - 1);
 	flash_complete_write();
@@ -372,26 +372,26 @@ static void load_code_from_flash(AsebaVMState *vm) {
 	if(!max)  
 		// Nothing to load
 		return;
-		
+
 	flash_read_chunk(max_addr + 2, VM_BYTECODE_SIZE*2, (unsigned char *) vm->bytecode);
-	
+
 	// Tell the VM to init
 	AsebaVMSetupEvent(vm, ASEBA_EVENT_INIT);
 }
 
 int load_settings_from_flash(void) {
-	
+
 	// Max size 95 int, min 1 int
 	COMPILATION_ASSERT(sizeof(settings) < ((INSTRUCTIONS_PER_ROW*3) - 2));
 	COMPILATION_ASSERT(sizeof(settings) > 1);
-	
+
 	// The the last "known" magic found
 	unsigned long temp = aseba_settings_ptr;
 	int i = 0;
 	unsigned int mag;
 
 
-	
+
 	for(i = 0; i < 8; i++) { 
 		mag = flash_read_low(temp + INSTRUCTIONS_PER_ROW * 2 * i);
 		if(mag != _magic_[i]) 
@@ -404,7 +404,7 @@ int load_settings_from_flash(void) {
 	temp += INSTRUCTIONS_PER_ROW * 2 * i;
 	*((unsigned char *) &settings) = (unsigned char) (flash_read_high(temp) & 0xFF);
 	flash_read_chunk(temp + 2, sizeof(settings) - 1, ((unsigned char *) &settings) + 1);
-	
+
 	return 0;	
 }
 // END of bytecode into flash section
@@ -467,14 +467,14 @@ static void __attribute__((noreturn)) error_handler(const char * file, int line,
 	strcat(error_string, ":");
 	ui2str(number, line);
 	strcat(error_string, number);
-	
-	
+
+
 	AsebaVMEmitNodeSpecificError(&vmState, error_string);
-	
+
 	AsebaCanFlushQueue();
-	
+
 	asm __volatile__ ("reset");
-	
+
 	for(;;); // Shutup GCC 
 }
 
@@ -485,12 +485,12 @@ void init_aseba_and_can(void) {
 	// Read the Device ID at _FUID3
 
  	vmState.nodeId = flash_read_low(FUID3);
- 	
+
  	// Get the section start pointer. Cannot get it in C, so use the assember-style
  	asm ("mov #tbloffset(.startof.(.aseba_bytecode)), %[l]" : [l] "=r" (low));
  	asm ("mov #tblpage(.startof.(.aseba_bytecode)), %[h]" : [h] "=r" (high));
  	aseba_flash_ptr = (unsigned long) high << 16 | low;
- 	
+
  	asm ("mov #tbloffset(.startof.(.aseba_settings)), %[l]" : [l] "=r" (low));
  	asm ("mov #tblpage(.startof.(.aseba_settings)), %[h]" : [h] "=r" (high));
  	aseba_settings_ptr = (unsigned long) high << 16 | low;
@@ -501,9 +501,9 @@ void init_aseba_and_can(void) {
 	AsebaCanInit(vmState.nodeId, (AsebaCanSendFrameFP)can_send_frame, can_is_frame_room, received_packet_dropped, sent_packet_dropped, sendQueue, SEND_QUEUE_SIZE, recvQueue, RECV_QUEUE_SIZE);
 	AsebaVMInit(&vmState);
 	vmVariables.id = vmState.nodeId;
-	
+
 	load_code_from_flash(&vmState);
-	
+
 	error_register_callback(error_handler);
 
 }
@@ -512,11 +512,11 @@ void __attribute((noreturn)) run_aseba_main_loop(void) {
 	while(1)
 	{
 		update_aseba_variables_read();
-		
+
 		AsebaVMRun(&vmState, 1000);
-		
+
 		AsebaProcessIncomingEvents(&vmState);
-		
+
 		update_aseba_variables_write();
 
 		// Either we are in step by step, so we go to sleep until further commands, or we are not executing an event,
@@ -545,7 +545,7 @@ void __attribute((noreturn)) run_aseba_main_loop(void) {
 							 : [b] "=x" (i) : [word] "r" (&events_flags) : "cc", "w0", "w1", "w2", "w3", "w4", "w5", "w6", "w7");
 							// Why putting "x" as constrain register. Because it's w8-w9, so it's preserved accross function call
 							// we do a rcall, so we must clobber w0-w7
-							
+
 			// If a local event is pending, then execute it.
 			// Else, we waked up from idle because of an interrupt, so re-execute the whole thing
 			// FIXME: do we want to kill execution upon local events? that would be consistant so Steph votes yes, but
@@ -562,4 +562,4 @@ void __attribute((noreturn)) run_aseba_main_loop(void) {
 	}
 }
 
-	
+

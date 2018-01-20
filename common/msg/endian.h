@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -25,7 +25,7 @@ namespace Aseba
 {
 	/** \addtogroup msg */
 	/*@{*/
-	
+
 	//! ByteSwapper, code inspired by DPS (http://dps.epfl.ch/), released in GPL
 	/** Mail to ask for LPGL relicensing sent to the author, Sebastian Gerlach */
 	struct ByteSwapper
@@ -41,7 +41,7 @@ namespace Aseba
 			for (size_t i = 0; i < size; ++i)
 				reinterpret_cast<uint8_t*>(data)[i] = temp[size-1-i];
 		}
-		
+
 		/*! Swap value v (generic, mutable-value version) */
 		/** \param data reference to value to swap */
 		template<typename T> 
@@ -49,7 +49,7 @@ namespace Aseba
 		{
 			swapp<sizeof(T)>(&v);
 		}
-		
+
 		/*! Swap value v (generic, const-value version) */
 		/** \param data const reference to value to swap 
 		 *  \return swapped value
@@ -98,23 +98,23 @@ namespace Aseba
 			((a>>40)&0x000000000000ff00LL)|
 			((a>>56)&0x00000000000000ffLL);
 	}
-	
+
 	#ifdef __BIG_ENDIAN__
-	
+
 	template<typename T>
 	T swapEndianCopy(const T& v) { return ByteSwapper::swap<T>(v); }
 	template<typename T>
 	void swapEndian(T& v) { ByteSwapper::swap<T>(v); }
-	
+
 	#else
-	
+
 	template<typename T>
 	T swapEndianCopy(const T& v) { return v; }
 	template<typename T>
 	void swapEndian(T& v) { /* do nothing */ }
-	
+
 	#endif
-	
+
 	/*@}*/
 } // namespace Aseba
 

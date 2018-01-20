@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -73,7 +73,7 @@ static void can_tx_cb(void)
 	global_flag = 1;
 
 	AsebaCanFrameSent();
-	
+
 	// A message is waiting on the uart (it's complete but still waiting because we were full)
 	// Check if we can send it now
 	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16_t *)uartRecvBuffer)[0])) 
@@ -93,12 +93,12 @@ static void can_rx_cb(const can_frame* frame)
 	if(global_flag)
 		OUTPUT_ERROR(global_flag);
 	global_flag = 2;
-	
+
 	// we do a nasty cast because the two data structure are compatible, i.e. they have the same leading members
 	AsebaCanFrameReceived((CanFrame *) frame);
-	
+
 	uint16_t source;
-		
+
 	if(uartSendPos == uartSendSize) 
 	{
 		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
@@ -115,7 +115,7 @@ static void can_rx_cb(const can_frame* frame)
 		}
 	}
 	global_flag = 0;
-	
+
 }
 
 static bool uart_rx_cb(int __attribute((unused)) uart_id, unsigned char data, void * __attribute((unused)) user_data)
@@ -123,14 +123,14 @@ static bool uart_rx_cb(int __attribute((unused)) uart_id, unsigned char data, vo
 	if(global_flag)
 		OUTPUT_ERROR(global_flag);
 	global_flag = 3;
-	
+
 	// TODO: in case of bug, we might want to test for overflow here, but it should never happen if higher layer conform to specification
 	uartRecvBuffer[uartRecvPos++] = data;
-	
+
 	// if we have received the header and all the message payload data forward it to the can layer
 	if ((uartRecvPos >= 6) && (uartRecvPos == 6 + ((uint16_t *)uartRecvBuffer)[0])) 
 	{
-			
+
 		uint16_t source = ((uint16_t *)uartRecvBuffer)[1];
 		if (AsebaCanSendSpecificSource(uartRecvBuffer+4, uartRecvPos-4, source) == 1)
 		{
@@ -153,7 +153,7 @@ static bool uart_tx_cb(int __attribute((unused)) uart_id, unsigned char* data, v
 	if(global_flag)
 		OUTPUT_ERROR(global_flag);
 	global_flag = 4;
-	
+
 	if (uartSendPos < uartSendSize)
 	{
 		*data = uartSendBuffer[uartSendPos++];
@@ -163,10 +163,10 @@ static bool uart_tx_cb(int __attribute((unused)) uart_id, unsigned char* data, v
 	else
 	{
 		// We finished sending the previous packet
-	
+
 		// ...and if there is a new message on CAN, read it
 		uint16_t source;
-			
+
 		int amount = AsebaCanRecv(uartSendBuffer+4, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 		if (amount > 0)
 		{
@@ -178,7 +178,7 @@ static bool uart_tx_cb(int __attribute((unused)) uart_id, unsigned char* data, v
 			global_flag = 0;
 			return true;
 		}
-	
+
 		global_flag = 0;
 		return false;
 	}
@@ -213,20 +213,20 @@ void __attribute__((noreturn)) error_handler(const char __attribute((unused))  *
 int main(void)
 {
 	int i;
-			
+
 	if(_POR) {
 		_POR = 0;
 		asm __volatile("reset");
 	}
-	
+
 	clock_init_internal_rc_30();
-	
+
 	// Wait about 1 s before really starting. The Bluetooth chip need a LOT of time before 
 	// having stable output (else we recieve "Phantom" character on uart)
-	
+
 	for(i = 0; i < 1000; i++) 
 		clock_delay_us(1000);
-	
+
 	gpio_write(LED0, 1);
 	gpio_write(LED1, 1);
 	gpio_set_dir(LED0, GPIO_OUTPUT);
@@ -236,13 +236,13 @@ int main(void)
 
 
 	adc1_init_simple(NULL, 1, 0x0UL, 30);
-	
+
 	can_init(can_rx_cb, can_tx_cb, DMA_CHANNEL_0, DMA_CHANNEL_1, CAN_SELECT_MODE, 1000, PRIO_CAN);
 	uart_init(U_UART, 921600, UART_CTS, UART_RTS, TIMER_UART, uart_rx_cb, uart_tx_cb, PRIO_UART_TH, PRIO_UART, NULL);
 
 	AsebaCanInit(0, (AsebaCanSendFrameFP)can_send_frame, can_is_frame_room, received_packet_dropped, sent_packet_dropped, sendQueue, SEND_QUEUE_SIZE, recvQueue, RECV_QUEUE_SIZE);
 
-	
+
 	while (1)
 	{
 		// Sleep until something happens

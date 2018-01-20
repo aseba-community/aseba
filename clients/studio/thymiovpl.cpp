@@ -4,28 +4,28 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
- 
+
 Current issues:
 - improve layout
 
 Possible issues:
 - udev not available on tablet?
- 
+
 */
 
 #include <signal.h>
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(asebaqtabout);
 	QApplication app(argc, argv);
 	Dashel::initPlugins();
-	
+
 	// Information used by QSettings with default constructor
 	QCoreApplication::setOrganizationName(ASEBA_ORGANIZATION_NAME);
 	QCoreApplication::setOrganizationDomain(ASEBA_ORGANIZATION_DOMAIN);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	// override dashel signal handling
 	signal(SIGTERM, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
-	
+
 	bool useAnyTarget(false);
 	bool debugLog(false);
 	bool execFeedback(false);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
 	QTranslator compilerTranslator;
 	app.installTranslator(&compilerTranslator);
-	
+
 	QTranslator aboutTranslator;
 	app.installTranslator(&aboutTranslator);
 #ifdef ANDROID
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 		translators.push_back(&translator);
 		translators.push_back(&compilerTranslator);
 		translators.push_back(&aboutTranslator);
-		
+
 		Aseba::ThymioVPLStandalone vpl(translators, commandLineTarget, useAnyTarget, debugLog, execFeedback);
 		vpl.show();
 		app.setOverrideCursor(Qt::ArrowCursor);

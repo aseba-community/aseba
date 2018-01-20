@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -47,7 +47,7 @@ namespace Aseba
 			try
 			{
 				uint16_t temp;
-				
+
 				// this may happen if target has disconnected
 				temp = bswap16(length - 2);
 				stream->write(&temp, 2);
@@ -74,7 +74,7 @@ namespace Aseba
 				toDisconnect.push_back(this->stream);
 				clearBreakpoints();
 			}
-			
+
 			// set new stream as current stream
 			this->stream = stream;
 			SEND_NOTIFICATION(LOG_INFO, "new client connected", stream->getTargetName());
@@ -91,20 +91,20 @@ namespace Aseba
 			stream->read(&c, 1);
 			return;
 		}
-		
+
 		try
 		{
 			// receive data
 			uint16_t temp;
 			uint16_t len;
-			
+
 			stream->read(&temp, 2);
 			len = bswap16(temp);
 			stream->read(&temp, 2);
 			lastMessageSource = bswap16(temp);
 			lastMessageData.resize(len+2);
 			stream->read(&lastMessageData[0], lastMessageData.size());
-		
+
 			// execute event on all VM that are linked to this connection
 			for (auto vmStateToEnvironmentKV: vmStateToEnvironment)
 			{
@@ -138,7 +138,7 @@ namespace Aseba
 			SEND_NOTIFICATION(LOG_INFO, "client disconnected properly", stream->getTargetName());
 		}
 	}
-	
+
 	//! Clear breakpoints on all VM that are linked to this connection
 	void SimpleDashelConnection::clearBreakpoints()
 	{
@@ -148,7 +148,7 @@ namespace Aseba
 				vmStateToEnvironmentKV.first->breakpointsCount = 0;
 		}
 	}
-	
+
 	//! Disconnect old streams
 	void SimpleDashelConnection::closeOldStreams()
 	{
@@ -159,5 +159,5 @@ namespace Aseba
 		}
 		toDisconnect.clear();
 	}
-	
+
 } // namespace Aseba

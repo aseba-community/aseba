@@ -82,7 +82,7 @@ struct AsebaNode
 	std::valarray<unsigned short> bytecode;
 	std::valarray<signed short> stack;
 	TargetDescription d;
-	
+
 	struct Variables
 	{
 		int16_t user[256];
@@ -95,40 +95,40 @@ struct AsebaNode
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(64);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
+
 		vm.variables = reinterpret_cast<int16_t *>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
-		
+
 		AsebaVMInit(&vm);
-		
+
 		// fill description accordingly
 		d.name = L"testvm";
 		d.protocolVersion = ASEBA_PROTOCOL_VERSION;
-		
+
 		d.bytecodeSize = vm.bytecodeSize;
 		d.variablesSize = vm.variablesSize;
 		d.stackSize = vm.stackSize;
-		
+
 		/*d.namedVariables.push_back(TargetDescription::NamedVariable("id", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("source", 1));
 		d.namedVariables.push_back(TargetDescription::NamedVariable("args", 32));*/
-		
+
 		const AsebaNativeFunctionDescription* const* nativeDescs(AsebaGetNativeFunctionsDescriptions(&vm));
 		while (*nativeDescs)
 		{
 			const AsebaNativeFunctionDescription* nativeDesc(*nativeDescs);
 			std::string name(nativeDesc->name);
 			std::string doc(nativeDesc->doc);
-			
+
 			TargetDescription::NativeFunction native{
 				std::wstring(name.begin(), name.end()),
 				std::wstring(doc.begin(), doc.end())
 			};
-			
+
 			const AsebaNativeFunctionArgumentDescription* params(nativeDesc->arguments);
 			while (params->size)
 			{
@@ -140,18 +140,18 @@ struct AsebaNode
 				);
 				++params;
 			}
-			
+
 			d.nativeFunctions.push_back(native);
-			
+
 			++nativeDescs;
 		}
-		
+
 		TargetDescription::LocalEvent testLocalEvent;
 		testLocalEvent.name = L"test";
 		testLocalEvent.description = L"test local event";
 		d.localEvents.push_back(testLocalEvent);
 	}
-	
+
 	const TargetDescription* getTargetDescription() const
 	{
 		return &d;
@@ -161,21 +161,21 @@ struct AsebaNode
 	{
 		if (bytecode.size() > vm.bytecodeSize)
 			return false;
-		
+
 		std::vector<std::unique_ptr<Message>> messagesVector;
 		sendBytecode(messagesVector, 1, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 		for (auto& message: messagesVector)
 			processMessage(*message);
 		return true;
 	}
-	
+
 	void run(int stepCount)
 	{
 		// bytecode was loaded, send run message to VM
 		processMessage(Run(1));
 		AsebaVMRun(&vm, stepCount);
 	}
-	
+
 	void runEvent(int stepCount)
 	{
 		// reset VM and run it with user event
@@ -183,7 +183,7 @@ struct AsebaNode
 		AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
 		AsebaVMRun(&vm, stepCount);
 	}
-	
+
 	void processMessage(const Message& message)
 	{
 		Message::SerializationBuffer data;
@@ -235,9 +235,9 @@ int main(int argc, char** argv)
 	bool memCmp = false;
 	int stepCount = DEFAULT_STEPS;
 	std::string memCmpFileName;
-	
+
 	std::locale::global(std::locale(""));
-	
+
 	// parse the arguments
 	for(;;)
 	{
@@ -295,11 +295,11 @@ int main(int argc, char** argv)
 				exit(EXIT_FAILURE);
 		}
 	}
-	
+
 	const bool should_any_fail(should_compilation_fail || should_execution_fail || should_postexecution_fail || should_memcmp_fail);
 
 	std::string filename;
-	
+
 	// check for the source file
 	if (optind == (argc-1))
 	{
@@ -310,14 +310,14 @@ int main(int argc, char** argv)
 		usage(argc, argv);
 		exit(EXIT_FAILURE);
 	}
-	
+
 	// read source
 	const std::wstring wSource = read_source(filename);
-	
+
 	// dump source
 	if (source)
 		dump_source(wSource);
-	
+
 	// parse source
 	std::wistringstream ifs(wSource);
 
@@ -343,9 +343,9 @@ int main(int argc, char** argv)
 		compiler.compile(ifs, bytecode, varCount, outError, nullptr);
 
 	//ifs.close();
-	
+
 	checkForError("Compilation", should_compilation_fail, (outError.message != L"not defined"), outError.toWString());
-	
+
 	// run
 	if (!node.loadBytecode(bytecode))
 	{
@@ -353,17 +353,17 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 	node.run(stepCount);
-	
+
 	// is execution completed?
 	const bool stillExecuting(node.vm.flags & ASEBA_VM_EVENT_ACTIVE_MASK);
 	checkForError("PostInitExecution", should_postexecution_fail, stillExecuting, WFormatableString(L"VM was still running after %0 steps").arg(stepCount));
-	
+
 	// setup extra event
 	if (event)
 	{
 		node.runEvent(stepCount);
 	}
-	
+
 	checkForError("Execution", should_execution_fail, AsebaExecutionErrorOccurred());
 
 	if (memDump)
@@ -374,7 +374,7 @@ int main(int argc, char** argv)
 			std::wcout << node.vm.variables[i] << std::endl;
 		}
 	}
-	
+
 	if (memCmp)
 	{
 		std::ifstream ifs;
@@ -408,13 +408,13 @@ int main(int argc, char** argv)
 		}
 		ifs.close();
 	}
-	
+
 	if (should_any_fail)
 	{
 		std::cerr << "All tests passed successfully, but failure was expected" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 
@@ -428,21 +428,21 @@ std::wstring read_source(const std::string& filename)
 		std::cerr << "Error opening source file " << filename << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
+
 	ifs.seekg (0, std::ios::end);
 	std::streampos length = ifs.tellg();
 	ifs.seekg (0, std::ios::beg);
-	
+
 	std::string utf8Source;
 	utf8Source.resize(length);
 	ifs.read(&utf8Source[0], length);
 	ifs.close();
-	
+
 	/*for (size_t i = 0; i < utf8Source.length(); ++i)
 		std::cerr << "source char " << i << " is 0x" << std::hex << (unsigned)(unsigned char)utf8Source[i] << " (" << char(utf8Source[i]) << ")" << std::endl;
 	*/
 	const std::wstring s = UTF8ToWString(utf8Source);
-	
+
 	/*std::cerr << "len utf8 " << utf8Source.length() << " len final " << s.length() << std::endl;
 	for (size_t i = 0; i < s.length(); ++i)
 		std::wcerr << "dest char " << i << " is 0x" << std::hex << (unsigned)s[i] << " (" << s[i] << ")"<< std::endl;

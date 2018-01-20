@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -38,7 +38,7 @@ namespace Aseba
 {
 	using namespace Dashel;
 	using namespace std;
-	
+
 	//! Show list of known commands
 	void dumpCommandList(ostream &stream)
 	{
@@ -55,7 +55,7 @@ namespace Aseba
 		stream << "* sleep: put the vm to sleep [dest]\n";
 		stream << "* wusb : write hex file to [dest] [file name] [reset]\n";
 	}
-	
+
 	//! Show usage
 	void dumpHelp(ostream &stream, const char *programName)
 	{
@@ -69,7 +69,7 @@ namespace Aseba
 		stream << "    -V, --version   : shows the version number\n";
 		stream << "Report bugs to: aseba-dev@gna.org" << std::endl;
 	}
-	
+
 	//! Show version
 	void dumpVersion(std::ostream &stream)
 	{
@@ -85,7 +85,7 @@ namespace Aseba
 		dumpHelp(cerr, programName);
 		exit(4);
 	}
-	
+
 	//! Produce an error message and dump help and quit
 	void errorUnknownCommand(const char *cmd)
 	{
@@ -94,35 +94,35 @@ namespace Aseba
 		dumpCommandList(cerr);
 		exit(5);
 	}
-	
+
 	//! Produce an error message and quit
 	void errorReadPage(int pageNumber)
 	{
 		cerr << "Error, can't read page " << pageNumber << endl;
 		exit(6);
 	}
-	
+
 	//! Produce an error message and quit
 	void errorOpenFile(const char *fileName)
 	{
 		cerr << "Error, can't open file " << fileName << endl;
 		exit(7);
 	}
-	
+
 	//! Produce an error message and quit
 	void errorServerDisconnected()
 	{
 		cerr << "Server closed connection before command was completely sent." << endl;
 		exit(9);
 	}
-	
+
 	//! Produce an error message and quit
 	void errorHexFile(const string &message)
 	{
 		cerr << "HEX file error: " << message << endl;
 		exit(10);
 	}
-	
+
 	//! Produce an error message and quit
 	void errorBootloader(const string& message)
 	{
@@ -130,14 +130,14 @@ namespace Aseba
 		exit(9);
 	}
 
-	
+
 	class CmdBootloaderInterface:public BootloaderInterface
 	{
 	public:
 		CmdBootloaderInterface(Stream* stream, int dest):
 			BootloaderInterface(stream, dest)
 		{}
-	
+
 	protected:
 		// reporting function
 		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple)
@@ -146,60 +146,60 @@ namespace Aseba
 			cout.flush();
 			//cout << "First data: " << hex << (int) data[0] << "," << hex << (int) data[1] << "," << hex << (int) data[2] << endl;
 		}
-		
+
 		virtual void writePageWaitAck()
 		{
 			cout << "Waiting ack ... ";
 			cout.flush();
 		}
-		
+
 		virtual void writePageSuccess()
 		{
 			cout << "Success" << endl;
 		}
-		
+
 		virtual void writePageFailure()
 		{
 			cout << "Failure" << endl;
 		}
-		
+
 		virtual void writeHexStart(const string &fileName, bool reset, bool simple)
 		{
 			cout << "Flashing " << fileName << endl;
 		}
-		
+
 		virtual void writeHexEnteringBootloader()
 		{
 			cout << "Entering bootloader" << endl;
 		}
-		
+
 		virtual void writeHexGotDescription(unsigned pagesCount)
 		{
 			cout << "In bootloader, about to write " << pagesCount << " pages" << endl;
 		}
-		
+
 		virtual void writeHexWritten()
 		{
 			cout << "Write completed" << endl;
 		}
-		
+
 		virtual void writeHexExitingBootloader()
 		{
 			cout << "Exiting bootloader" << endl;
 		}
-		
+
 		virtual void errorWritePageNonFatal(unsigned pageNumber)
 		{
 			cerr << "Warning, error while writing page " << pageNumber << ", continuing ..." << endl;
 		}
 	};
-	
+
 	//! Process a command, return the number of arguments eaten (not counting the command itself)
 	int processCommand(Stream* stream, int argc, char *argv[])
 	{
 		const char *cmd = argv[0];
 		int argEaten = 0;
-		
+
 		if (strcmp(cmd, "presence") == 0)
 		{
 			GetDescription message;
@@ -230,11 +230,11 @@ namespace Aseba
 			argEaten = argc;
 			uint16_t type = atoi(argv[1]);
 			uint16_t length = argc-2;
-			
+
 			VariablesDataVector data(length);
 			for (size_t i = 0; i < length; i++)
 				data[i] = atoi(argv[i+2]);
-			
+
 			UserMessage message(type, data);
 			message.serialize(stream);
 			stream->flush();
@@ -245,9 +245,9 @@ namespace Aseba
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
-			
+
 			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
-			
+
 			vector<uint8_t> data(bootloader.getPageSize());
 			if (bootloader.readPage(atoi(argv[2]), &data[0]))
 			{
@@ -265,7 +265,7 @@ namespace Aseba
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
-			
+
 			CmdBootloaderInterface bootloader(stream, atoi(argv[1]));
 			vector <uint8_t> data(2048);
 			cout << "Page: " << atoi(argv[2]) << endl;
@@ -286,7 +286,7 @@ namespace Aseba
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
-			
+
 			if (argc > 3 && !strcmp(argv[3], "reset")) 
 			{
 				reset = 1;
@@ -331,7 +331,7 @@ namespace Aseba
 			if (argc < 3)
 				errorMissingArgument(argv[0]);
 			argEaten = 2;
-			
+
 			// try to read hex file
 			try
 			{
@@ -346,24 +346,24 @@ namespace Aseba
 		else if (strcmp(cmd, "eb") == 0)
 		{
 			uint16_t dest;
-			
+
 			if(argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;
-			
+
 			dest = atoi(argv[1]);
-			
+
 			BootloaderReset msg(dest);
 			msg.serialize(stream);
 			stream->flush();
-			
+
 			// Wait ack from bootloader (mean we got out of it)
 			// Or bootloader description (mean we just entered it)
 			// WRONG; FIXME 
 			while (true)
 			{
 				Message *message = Message::receive(stream);
-				
+
 				// handle ack
 				BootloaderAck *ackMessage = dynamic_cast<BootloaderAck *>(message);
 				if (ackMessage && (ackMessage->source == dest))
@@ -372,22 +372,22 @@ namespace Aseba
 					delete message;
 					break;
 				}
-				
+
 				//BootloaderDescription * bMessage = dynamic_cast<BootloaderDescription *>(message);
-				
+
 				delete message;
 			}
 		}
 		else if (strcmp(cmd, "sb") == 0)
 		{
 			uint16_t dest;
-			
+
 			if(argc < 2)
 				errorMissingArgument(argv[0]);
 			argEaten = 1;
-			
+
 			dest = atoi(argv[1]);
-			
+
 			Reboot msg(dest);
 			msg.serialize(stream);
 			stream->flush();
@@ -406,7 +406,7 @@ namespace Aseba
 			stream->flush();
 		} else 
 			errorUnknownCommand(cmd);
-		
+
 		return argEaten;
 	}
 }
@@ -414,16 +414,16 @@ namespace Aseba
 int main(int argc, char *argv[])
 {
 	Dashel::initPlugins();
-	
+
 	const char *target = ASEBA_DEFAULT_TARGET;
 	int argCounter = 1;
-	
+
 	if (argc == 1)
 	{
 		Aseba::dumpHelp(std::cout, argv[0]);
 		return 0;
 	}
-	
+
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
@@ -449,7 +449,7 @@ int main(int argc, char *argv[])
 			Dashel::Hub client;
 			Dashel::Stream* stream = client.connect(target);
 			assert(stream);
-			
+
 			// process command
 			try
 			{

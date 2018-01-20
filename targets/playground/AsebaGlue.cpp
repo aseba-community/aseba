@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -36,20 +36,20 @@ namespace Aseba
 {
 	// Mapping so that Aseba C callbacks can dispatch to the right objects
 	VMStateToEnvironment vmStateToEnvironment;
-	
+
 	NamedRobot::NamedRobot(std::string robotName):
 		robotName(std::move(robotName))
 	{
 	}
-	
+
 	// SingleVMNodeGlue
-	
+
 	SingleVMNodeGlue::SingleVMNodeGlue(std::string robotName, int16_t nodeId):
 		NamedRobot(std::move(robotName))
 	{
 		vm.nodeId = nodeId;
 	}
-	
+
 	// RecvBufferNodeConnection
 
 	uint16_t RecvBufferNodeConnection::getBuffer(uint8_t* data, uint16_t maxLength, uint16_t* source)

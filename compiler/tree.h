@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -39,10 +39,10 @@ namespace Aseba
 
 	//! Return the string corresponding to the binary operator
 	std::wstring binaryOperatorToString(AsebaBinaryOperator op);
-	
+
 	//! Return the string corresponding to the unary operator
 	std::wstring unaryOperatorToString(AsebaUnaryOperator op);
-	
+
 	//! An abstract node of syntax tree
 	struct Node
 	{
@@ -53,7 +53,7 @@ namespace Aseba
 			BOOL,
 			INT
 		};
-		
+
 		//! Constructor
 		Node(const SourcePos& sourcePos) : sourcePos(sourcePos) { }
 	protected:
@@ -71,7 +71,7 @@ namespace Aseba
 		virtual Node* shallowCopy() const = 0;
 		//! Return a deep copy of the object (children are also copied)
 		virtual Node* deepCopy() const;
-		
+
 		//! Check the consistency in vectors' size
 		virtual void checkVectorSize() const;
 		//! Second pass to expand "abstract" nodes into more concrete ones
@@ -86,7 +86,7 @@ namespace Aseba
 		virtual unsigned getStackDepth() const;
 		//! Generate bytecode
 		virtual void emit(PreLinkBytecode& bytecodes) const = 0;
-		
+
 		//! Return a string representation of this node
 		virtual std::wstring toWString() const = 0;
 		//! Return a string representation of the name of this node
@@ -111,7 +111,7 @@ namespace Aseba
 		NodesVector children; //!< children of this node
 		SourcePos sourcePos; //!< position is source
 	};
-	
+
 	//! Node for L"block", i.e. a vector of statements
 	struct BlockNode : Node
 	{
@@ -124,7 +124,7 @@ namespace Aseba
 		std::wstring toWString() const override { return L"Block"; }
 		std::wstring toNodeName() const override { return L"block"; }
 	};
-	
+
 	//! Node for L"program", i.e. a block node with some special behaviour later on
 	struct ProgramNode: BlockNode
 	{
@@ -137,7 +137,7 @@ namespace Aseba
 		std::wstring toWString() const override { return L"ProgramBlock"; }
 		std::wstring toNodeName() const override { return L"program block"; }
 	};
-	
+
 	//! Node for assignation.
 	//! children[0] is store code
 	//! children[1] expression to store
@@ -156,7 +156,7 @@ namespace Aseba
 		std::wstring toWString() const override { return L"Assign"; }
 		std::wstring toNodeName() const override { return L"assignment"; }
 	};
-	
+
 	//! Node for L"if" and L"when".
 	//! children[0] is expression
 	//! children[1] is true block
@@ -165,7 +165,7 @@ namespace Aseba
 	{
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		unsigned endLine; //!< line of end keyword
-		
+
 		//! Constructor
 		IfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		IfWhenNode* shallowCopy() const override { return new IfWhenNode(*this); }
@@ -177,7 +177,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"if/when"; }
 	};
-	
+
 	//! Node for L"if" and L"when" with operator folded inside.
 	//! children[0] is left part of expression
 	//! children[1] is right part of expression
@@ -188,7 +188,7 @@ namespace Aseba
 		AsebaBinaryOperator op; //!< operator
 		bool edgeSensitive; //!< if true, true block is triggered only if previous comparison was false ("when" block). If false, true block is triggered every time comparison is true
 		unsigned endLine; //!< line of end keyword
-		
+
 		//! Constructor
 		FoldedIfWhenNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		FoldedIfWhenNode* shallowCopy() const override { return new FoldedIfWhenNode(*this); }
@@ -200,7 +200,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"folded if/when"; }
 	};
-	
+
 	//! Node for L"while".
 	//! children[0] is expression
 	//! children[1] is block
@@ -217,7 +217,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"while"; }
 	};
-	
+
 	//! Node for L"while" with operator folded inside.
 	//! children[0] is left part of expression
 	//! children[1] is right part of expression
@@ -225,7 +225,7 @@ namespace Aseba
 	struct FoldedWhileNode : Node
 	{
 		AsebaBinaryOperator op; //!< operator
-		
+
 		//! Constructor
 		FoldedWhileNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		FoldedWhileNode* shallowCopy() const override { return new FoldedWhileNode(*this); }
@@ -237,13 +237,13 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"folded while"; }
 	};
-	
+
 	//! Node for L"onevent" 
 	//! no children
 	struct EventDeclNode : Node
 	{
 		unsigned eventId; //!< the event id associated with this context
-		
+
 		EventDeclNode(const SourcePos& sourcePos, unsigned eventId = 0);
 		EventDeclNode* shallowCopy() const override { return new EventDeclNode(*this); }
 
@@ -253,7 +253,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"event declaration"; }
 	};
-	
+
 	//! Node for L"emit".
 	//! may have children for pushing constants somewhere
 	struct EmitNode : Node
@@ -261,7 +261,7 @@ namespace Aseba
 		unsigned eventId; //!< id of event to emit
 		unsigned arrayAddr; //!< address of the first element of the array to send
 		unsigned arraySize; //!< size of the array to send. 0 if event has no argument
-		
+
 		//! Constructor
 		EmitNode(const SourcePos& sourcePos) : Node(sourcePos), eventId(0), arrayAddr(0), arraySize(0) { }
 		EmitNode* shallowCopy() const override { return new EmitNode(*this); }
@@ -272,13 +272,13 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"emit"; }
 	};
-	
+
 	//! Node for L"sub"
 	//! no children
 	struct SubDeclNode : Node
 	{
 		unsigned subroutineId; //!< the associated subroutine
-		
+
 		SubDeclNode(const SourcePos& sourcePos, unsigned subroutineId);
 		SubDeclNode* shallowCopy() const override { return new SubDeclNode(*this); }
 
@@ -288,7 +288,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"subroutine declaration"; }
 	};
-	
+
 	//! Node for L"callsub"
 	//! no children
 	struct CallSubNode : Node
@@ -305,40 +305,40 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"subroutine call"; }
 	};
-	
+
 	//! Node for binary arithmetic.
 	//! children[0] is left expression
 	//! children[1] is right expression
 	struct BinaryArithmeticNode : Node
 	{
 		AsebaBinaryOperator op; //!< operator
-		
+
 		BinaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		BinaryArithmeticNode(const SourcePos& sourcePos, AsebaBinaryOperator op, Node *left, Node *right);
 		BinaryArithmeticNode* shallowCopy() const override { return new BinaryArithmeticNode(*this); }
 
 		void deMorganNotRemoval();
-		
+
 		ReturnType typeCheck(Compiler* compiler) override;
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
 		void emit(PreLinkBytecode& bytecodes) const override;
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"binary function"; }
-		
+
 		static BinaryArithmeticNode *fromComparison(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromShiftExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromAddExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromMultExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 		static BinaryArithmeticNode *fromBinaryExpression(const SourcePos& sourcePos, Compiler::Token::Type op, Node *left, Node *right);
 	};
-	
+
 	//! Node for unary arithmetic
 	//! children[0] is the expression to negate
 	struct UnaryArithmeticNode : Node
 	{
 		AsebaUnaryOperator op; //!< operator
-		
+
 		//! Constructor
 		UnaryArithmeticNode(const SourcePos& sourcePos) : Node(sourcePos) { }
 		UnaryArithmeticNode(const SourcePos& sourcePos, AsebaUnaryOperator op, Node *child);
@@ -350,7 +350,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"unary function"; }
 	};
-	
+
 	//! Node for pushing immediate value on stack.
 	//! Might generate either Small Immediate or Large Immediate bytecode
 	//! depending on the range of value
@@ -358,7 +358,7 @@ namespace Aseba
 	struct ImmediateNode : Node
 	{
 		int value; //!< value to push on stack
-		
+
 		//! Constructor
 		ImmediateNode(const SourcePos& sourcePos, int value) : Node(sourcePos), value(value) { }
 		ImmediateNode* shallowCopy() const override { return new ImmediateNode(*this); }
@@ -373,13 +373,13 @@ namespace Aseba
 
 		unsigned getVectorSize() const override { return 1; }
 	};
-	
+
 	//! Node for storing a variable from stack.
 	//! no children
 	struct StoreNode : Node
 	{
 		unsigned varAddr; //!< address of variable to store to
-		
+
 		//! Constructor
 		StoreNode(const SourcePos& sourcePos, unsigned varAddr) : Node(sourcePos), varAddr(varAddr) { }
 		StoreNode* shallowCopy() const override { return new StoreNode(*this); }
@@ -393,7 +393,7 @@ namespace Aseba
 		unsigned getVectorAddr() const override { return varAddr; }
 		unsigned getVectorSize() const override { return 1; }
 	};
-	
+
 	//! Node for loading a variable on stack.
 	//! no children
 	struct LoadNode : Node
@@ -422,7 +422,7 @@ namespace Aseba
 		unsigned arrayAddr; //!< address of the first element of the array
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
 		std::wstring arrayName; //!< name of the array (for debug)
-		
+
 		ArrayWriteNode(const SourcePos& sourcePos, unsigned arrayAddr, unsigned arraySize, std::wstring arrayName);
 		ArrayWriteNode* shallowCopy() const override { return new ArrayWriteNode(*this); }
 
@@ -435,7 +435,7 @@ namespace Aseba
 		unsigned getVectorAddr() const override { return arrayAddr; }
 		unsigned getVectorSize() const override { return 1; }
 	};
-	
+
 	//! Node for reading from an array.
 	//! children[0] is the index in the array
 	struct ArrayReadNode : Node
@@ -456,7 +456,7 @@ namespace Aseba
 		unsigned getVectorAddr() const override { return arrayAddr; }
 		unsigned getVectorSize() const override { return 1; }
 	};
-	
+
 	//! Node for loading the address of the argument of a native function
 	//! that is not known at compile time, but that does exist in memory
 	struct LoadNativeArgNode : Node
@@ -465,10 +465,10 @@ namespace Aseba
 		unsigned arrayAddr; //!< address of the first element of the array
 		unsigned arraySize; //!< size of the array, might be used to assert compile-time access checks
 		std::wstring arrayName; //!< name of the array (for debug)
-		
+
 		LoadNativeArgNode(MemoryVectorNode* memoryNode, unsigned tempAddr);
 		LoadNativeArgNode* shallowCopy() const override { return new LoadNativeArgNode(*this); }
-		
+
 		ReturnType typeCheck(Compiler* compiler) override { return ReturnType::INT; }
 		Node* optimize(std::wostream* dump) override;
 		unsigned getStackDepth() const override;
@@ -483,7 +483,7 @@ namespace Aseba
 	{
 		unsigned funcId; //!< identifier of the function to be called
 		std::vector<unsigned> templateArgs; //!< sizes of templated arguments
-		
+
 		CallNode(const SourcePos& sourcePos, unsigned funcId);
 		CallNode* shallowCopy() const override { return new CallNode(*this); }
 
@@ -494,7 +494,7 @@ namespace Aseba
 		std::wstring toWString() const override;
 		std::wstring toNodeName() const override { return L"native function call"; }
 	};
-	
+
 	//! Node for returning from an event or subroutine
 	//! has no children, just a jump of 0 offset that will be resolved at link time
 	struct ReturnNode : Node
@@ -624,7 +624,7 @@ namespace Aseba
 	};
 
 	/*@}*/
-	
+
 } // namespace Aseba
 
 #endif

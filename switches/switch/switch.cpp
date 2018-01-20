@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -51,7 +51,7 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	/** \addtogroup switch */
 	/*@{*/
 
@@ -88,7 +88,7 @@ namespace Aseba
 		}
 #endif // ZEROCONF_SUPPORT
 	}
-	
+
 	void Switch::connectionCreated(Stream *stream)
 	{
 		if (verbose)
@@ -97,7 +97,7 @@ namespace Aseba
 			cout << "* Incoming connection from " << stream->getTargetName() << endl;
 		}
 	}
-	
+
 	void Switch::incomingData(Stream *stream)
 	{
 #ifdef ZEROCONF_SUPPORT
@@ -109,7 +109,7 @@ namespace Aseba
 #endif // ZEROCONF_SUPPORT
 
 		Message* message(Message::receive(stream));
-		
+
 		// remap source
 		{
 			const IdRemapTable::const_iterator remapIt(idRemapTable.find(stream));
@@ -118,7 +118,7 @@ namespace Aseba
 			)
 				message->source = remapIt->second.first;
 		}
-		
+
 		// if requested, dump
 		if (dump)
 		{
@@ -127,16 +127,16 @@ namespace Aseba
 			message->dump(std::wcout);
 			std::wcout << std::endl;
 		}
-		
+
 		// write on all connected streams
 		CmdMessage* cmdMessage(dynamic_cast<CmdMessage*>(message));
 		for (StreamsSet::iterator it = dataStreams.begin(); it != dataStreams.end();++it)
 		{
 			Stream* destStream = *it;
-			
+
 			if ((forward) && (destStream == stream))
 				continue;
-			
+
 			try
 			{
 				const IdRemapTable::const_iterator remapIt(idRemapTable.find(destStream));
@@ -163,10 +163,10 @@ namespace Aseba
 				std::cerr << "error while writing" << std::endl;
 			}
 		}
-		
+
 		delete message;
 	}
-	
+
 	void Switch::connectionClosed(Stream *stream, bool abnormal)
 	{
 #ifdef ZEROCONF_SUPPORT
@@ -186,7 +186,7 @@ namespace Aseba
 				cout << "* Normal connection closed to " << stream->getTargetName() << endl;
 		}
 	}
-	
+
 	void Switch::broadcastDummyUserMessage()
 	{
 		Aseba::UserMessage uMsg;
@@ -198,12 +198,12 @@ namespace Aseba
 			(*it)->flush();
 		}
 	}
-	
+
 	void Switch::remapId(Dashel::Stream* stream, const uint16_t localId, const uint16_t targetId)
 	{
 		idRemapTable[stream] = IdPair(localId, targetId);
 	}
-	
+
 	/*@}*/
 };
 
@@ -232,7 +232,7 @@ void dumpVersion(std::ostream &stream)
 	stream << "Aseba protocol " << ASEBA_PROTOCOL_VERSION << std::endl;
 	stream << "Licence LGPLv3: GNU LGPL version 3 <http://www.gnu.org/licenses/lgpl.html>\n";
 }
- 
+
 int main(int argc, char *argv[])
 {
 	Dashel::initPlugins();
@@ -243,13 +243,13 @@ int main(int argc, char *argv[])
 	bool forward = true;
 	bool rawTime = false;
 	std::vector<std::string> additionalTargets;
-	
+
 	int argCounter = 1;
-	
+
 	while (argCounter < argc)
 	{
 		const char *arg = argv[argCounter];
-		
+
 		if ((strcmp(arg, "-v") == 0) || (strcmp(arg, "--verbose") == 0))
 		{
 			verbose = true;
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 		}
 		argCounter++;
 	}
-	
+
 	try
 	{
 		Aseba::Switch aswitch(port, name, verbose, dump, forward, rawTime);
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 		{
 			const std::string& target(additionalTargets[i]);
 			Dashel::Stream* stream = aswitch.connect(target);
-			
+
 			// see whether we have to remap the id of this stream
 			Dashel::ParameterSet remapIdDecoder;
 			remapIdDecoder.add("dummy:remapLocal=-1;remapTarget=1");
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	
+
 	return 0;
 }
 

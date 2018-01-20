@@ -86,10 +86,10 @@ namespace Aseba
 		);
 		titleLayout->addWidget(titleLabel);
 		titleLayout->addStretch();
-		
+
 		// create widget for holding tabs
 		auto tabs = new QTabWidget;
-		
+
 		// about tab
 		const QString aboutText =
 			"<p>" + parameters.description + "</p>" +
@@ -106,7 +106,7 @@ namespace Aseba
 		auto aboutEnclosingWidget = new QWidget;
 		aboutEnclosingWidget->setLayout(aboutEnclosingLayout);
 		tabs->addTab(aboutEnclosingWidget, tr("About"));
-		
+
 		// usage text
 		if (!parameters.usage.isEmpty())
 		{
@@ -117,7 +117,7 @@ namespace Aseba
 			usageEnclosingWidget->setLayout(usageEnclosingLayout);
 			tabs->addTab(usageEnclosingWidget, tr("Usage"));
 		}
-		
+
 		// author and thanksTo informations
 		for (const auto& personList : { std::make_pair(tr("Authors"), &authorList), std::make_pair(tr("Thanks To"), &thankToList) })
 		{
@@ -192,14 +192,14 @@ namespace Aseba
 					personListWidget->setItemWidget(item, label);
 				}
 			}
-			
+
 			auto personListEnclosingLayout = new QHBoxLayout;
 			personListEnclosingLayout->addWidget(personListWidget);
 			auto personListEnclosingWidget = new QWidget;
 			personListEnclosingWidget->setLayout(personListEnclosingLayout);
 			tabs->addTab(personListEnclosingWidget, personList.first);
 		}
-		
+
 		// libraries tab
 		const QString welcomeText = tr("The following software are used in Aseba:");
 		const QString libEntryText = tr("<b><a href=\"%3\">%1</a></b> version %2");
@@ -227,17 +227,17 @@ namespace Aseba
 		libraryEnclosingLayout->addWidget(libraryTextLabel);
 		auto libraryEnclosingWidget = new QWidget;
 		libraryEnclosingWidget->setLayout(libraryEnclosingLayout);
-		
+
 		// add elements into a tab widget
 		tabs->addTab(libraryEnclosingWidget, tr("Libraries"));
-		
+
 		// close button
 		auto buttonLayout = new QHBoxLayout();
 		buttonLayout->addStretch();
 		auto closeButton = new QPushButton(QIcon::fromTheme("window-close"), tr("close"));
 		buttonLayout->addWidget(closeButton);
 		// TODO: provide icon on resource path for Windows and macOS
-		
+
 		// add all elements to a main layout
 		auto mainLayout = new QVBoxLayout();
 		mainLayout->addLayout(titleLayout);
@@ -245,16 +245,16 @@ namespace Aseba
 		mainLayout->addWidget(tabs);
 		mainLayout->addLayout(buttonLayout);
 		setLayout(mainLayout);
-		
+
 		// set window title and minimum size
 		setWindowTitle(tr("About %1").arg(parameters.applicationName));
 		//resize(640, 460);
 		// uncomment to be able to resize the dialog
 		// setSizeGripEnabled(true);
-		
+
 		// connections
 		connect(closeButton, SIGNAL(clicked()), SLOT(close()));
 	}
-	
-	
+
+
 } // namespace Aseba

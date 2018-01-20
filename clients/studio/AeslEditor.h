@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -39,17 +39,17 @@ namespace Aseba
 	/*@{*/
 
 	class AeslEditor;
-	
+
 	class AeslHighlighter : public QSyntaxHighlighter
 	{
 		Q_OBJECT
-	
+
 	public:
 		AeslHighlighter(AeslEditor *editor, QTextDocument *parent = 0);
-	
+
 	protected:
 		void highlightBlock(const QString &text);
-	
+
 	private:
 		struct HighlightingRule
 		{
@@ -74,11 +74,11 @@ namespace Aseba
 
 		AeslEditor *editor;
 	};
-	
+
 	struct AeslEditorUserData : public QTextBlockUserData
 	{
 		QMap<QString, QVariant> properties;
-		
+
 		AeslEditorUserData(const QString &property, const QVariant &value = QVariant()) { properties.insert(property, value); }
 		virtual ~AeslEditorUserData() { }
 	};
@@ -137,7 +137,7 @@ namespace Aseba
 	protected:
 		const int borderSize;
 	};
-	
+
 	enum LocalContext {
 		UnknownContext,
 		VarDefContext,
@@ -151,14 +151,14 @@ namespace Aseba
 	class AeslEditor : public QTextEdit
 	{
 		Q_OBJECT
-		
+
 	signals:
 		void breakpointSet(unsigned line);
 		void breakpointCleared(unsigned line);
 		void breakpointClearedAll();
 
 		void refreshModelRequest(LocalContext context);
-		
+
 	public:
 		AeslEditor();
 		virtual ~AeslEditor() { }
@@ -182,12 +182,12 @@ namespace Aseba
 			UncommentSelection
 		};
 		void commentAndUncommentSelection(CommentOperation commentOperation);
-		
+
 		void replaceAndHighlightCode(const QList<QString>& code, int elementToHighlight);
-	
+
 	public:
 		bool debugging;
-	
+
 	protected slots:
 		void insertCompletion(const QString &completion);
 
@@ -213,7 +213,7 @@ namespace Aseba
 		LocalContext previousContext;
 		bool editingLeftValue;
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

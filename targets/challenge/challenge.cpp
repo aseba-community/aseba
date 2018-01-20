@@ -11,16 +11,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -96,31 +96,31 @@ namespace Enki
 	#define EPUCK_FEEDER_RADIUS				5
 	#define EPUCK_FEEDER_RADIUS_DEAD		6
 	#define EPUCK_FEEDER_RANGE				10
-	
+
 	#define EPUCK_FEEDER_COLOR_ACTIVE		Color::blue
 	#define EPUCK_FEEDER_COLOR_INACTIVE		Color::red
 	#define EPUCK_FEEDER_COLOR_DEAD			Color::gray
-	
+
 	#define EPUCK_FEEDER_D_ENERGY			4
 	#define EPUCK_FEEDER_RECHARGE_RATE		0.5
 	#define EPUCK_FEEDER_MAX_ENERGY			100
-	
+
 	#define EPUCK_FEEDER_LIFE_SPAN			60
 	#define EPUCK_FEEDER_DEATH_SPAN			10
-	
+
 	#define EPUCK_INITIAL_ENERGY			10
 	#define EPUCK_ENERGY_CONSUMPTION_RATE	1
-	
+
 	#define DEATH_ANIMATION_STEPS			30
 	#define PORT_BASE						ASEBA_DEFAULT_PORT
-	
+
 	extern GLint GenFeederBase();
 	extern GLint GenFeederCharge0();
 	extern GLint GenFeederCharge1();
 	extern GLint GenFeederCharge2();
 	extern GLint GenFeederCharge3();
 	extern GLint GenFeederRing();
-	
+
 	class FeedableEPuck: public EPuck
 	{
 	public:
@@ -128,14 +128,14 @@ namespace Enki
 		double score;
 		QString name;
 		int diedAnimation;
-	
+
 	public:
 		FeedableEPuck() : EPuck(CAPABILITY_BASIC_SENSORS | CAPABILITY_CAMERA), energy(EPUCK_INITIAL_ENERGY), score(0), diedAnimation(-1) { }
-		
+
 		virtual void controlStep(double dt)
 		{
 			EPuck::controlStep(dt);
-			
+
 			energy -= dt * EPUCK_ENERGY_CONSUMPTION_RATE;
 			score += dt;
 			if (energy < 0)
@@ -148,7 +148,7 @@ namespace Enki
 				diedAnimation--;
 		}
 	};
-	
+
 	class AsebaFeedableEPuck : public FeedableEPuck, public Dashel::Hub
 	{
 	public:
@@ -189,29 +189,29 @@ namespace Enki
 			int16_t user[1024];
 		} variables;
 		int port;
-		
+
 		uint16_t lastMessageSource;
 		std::valarray<uint8_t> lastMessageData;
-		
+
 	public:
 		AsebaFeedableEPuck(int id) :
 			stream(0)
 		{
 			asebaEPuckMap[&vm] = this;
-			
+
 			vm.nodeId = 1;
-			
+
 			bytecode.resize(512);
 			vm.bytecode = &bytecode[0];
 			vm.bytecodeSize = bytecode.size();
-			
+
 			stack.resize(64);
 			vm.stack = &stack[0];
 			vm.stackSize = stack.size();
-			
+
 			vm.variables = reinterpret_cast<int16_t *>(&variables);
 			vm.variablesSize = sizeof(variables) / sizeof(int16_t);
-			
+
 			port = PORT_BASE+id;
 			try
 			{
@@ -222,18 +222,18 @@ namespace Enki
 				QMessageBox::critical(0, QApplication::tr("Aseba Challenge"), QApplication::tr("Cannot create listening port %0: %1").arg(port).arg(e.what()));
 				abort();
 			}
-			
+
 			AsebaVMInit(&vm);
-			
+
 			variables.productId = ASEBA_PID_CHALLENGE;
 			variables.colorG = 100;
 		}
-		
+
 		virtual ~AsebaFeedableEPuck()
 		{
 			asebaEPuckMap.remove(&vm);
 		}
-		
+
 	public:
 		void connectionCreated(Dashel::Stream *stream)
 		{
@@ -243,31 +243,31 @@ namespace Enki
 				// schedule current stream for disconnection
 				if (this->stream)
 					toDisconnect.push_back(this->stream);
-				
+
 				// set new stream as current stream
 				this->stream = stream;
 				qDebug() << this << " : New client connected.";
 			}
 		}
-		
+
 		void incomingData(Dashel::Stream *stream)
 		{
 			uint16_t temp;
 			uint16_t len;
-			
+
 			stream->read(&temp, 2);
 			len = bswap16(temp);
 			stream->read(&temp, 2);
 			lastMessageSource = bswap16(temp);
 			lastMessageData.resize(len+2);
 			stream->read(&lastMessageData[0], lastMessageData.size());
-			
+
 			if (bswap16(*(uint16_t*)&lastMessageData[0]) >= 0xA000)
 				AsebaProcessIncomingEvents(&vm);
 			else
 				qDebug() << this << " : Non debug event dropped.";
 		}
-		
+
 		void connectionClosed(Dashel::Stream *stream, bool abnormal)
 		{
 			if (stream == this->stream)
@@ -281,7 +281,7 @@ namespace Enki
 			else
 				qDebug() << this << " : Client has disconnected properly.";
 		}
-		
+
 		double toDoubleClamp(int16_t val, double mul, double min, double max)
 		{
 			double v = static_cast<double>(val) * mul;
@@ -291,7 +291,7 @@ namespace Enki
 				v = min;
 			return v;
 		}
-		
+
 		void controlStep(double dt)
 		{
 			// get physical variables
@@ -316,7 +316,7 @@ namespace Enki
 			variables.prox[6] = static_cast<int16_t>(infraredSensor6.getValue());
 			variables.prox[7] = static_cast<int16_t>(infraredSensor7.getValue());
 			#endif
-			
+
 			#ifdef SIMPLIFIED_EPUCK
 			for (size_t i = 0; i < 3; i++)
 			{
@@ -342,12 +342,12 @@ namespace Enki
 				variables.camB[i] = static_cast<int16_t>(camera.image[i].b() * 100.);
 			}
 			#endif
-			
+
 			variables.energy = static_cast<int16_t>(energy);
-			
+
 			// do a network step
 			Hub::step();
-			
+
 			// disconnect old streams
 			for (size_t i = 0; i < toDisconnect.size(); ++i)
 			{
@@ -355,14 +355,14 @@ namespace Enki
 				qDebug() << this << " : Disconnected old client.";
 			}
 			toDisconnect.clear();
-			
+
 			// run VM
 			AsebaVMRun(&vm, 65535);
-			
+
 			// reschedule a periodic event if we are not in step by step
 			if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 				AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START);
-		
+
 			// set physical variables
 			leftSpeed = toDoubleClamp(variables.speedL, 1, -13, 13);
 			rightSpeed = toDoubleClamp(variables.speedR, 1, -13, 13);
@@ -371,12 +371,12 @@ namespace Enki
 			c.setG(toDoubleClamp(variables.colorG, 0.01, 0, 1));
 			c.setB(toDoubleClamp(variables.colorB, 0.01, 0, 1));
 			setColor(c);
-			
+
 			// set motion
 			FeedableEPuck::controlStep(dt);
 		}
 	};
-	
+
 	class EPuckFeeding : public LocalInteraction
 	{
 	public:
@@ -391,7 +391,7 @@ namespace Enki
 			this->owner = owner;
 			alive = true;
 		}
-		
+
 		void objectStep(double dt, World *w, PhysicalObject *po)
 		{
 			if (alive)
@@ -407,7 +407,7 @@ namespace Enki
 				}
 			}
 		}
-		
+
 		void finalize(double dt, World *w)
 		{
 			age += dt;
@@ -418,7 +418,7 @@ namespace Enki
 				energy += EPUCK_FEEDER_RECHARGE_RATE * dt;
 				if (energy > EPUCK_FEEDER_MAX_ENERGY)
 					energy = EPUCK_FEEDER_MAX_ENERGY;
-				
+
 				if (age > EPUCK_FEEDER_LIFE_SPAN)
 				{
 					alive = false;
@@ -439,12 +439,12 @@ namespace Enki
 			}
 		}
 	};
-	
+
 	class EPuckFeeder : public Robot
 	{
 	public:
 		EPuckFeeding feeding;
-	
+
 	public:
 		EPuckFeeder(double age) : feeding(this, age)
 		{
@@ -453,7 +453,7 @@ namespace Enki
 			setColor(EPUCK_FEEDER_COLOR_ACTIVE);
 		}
 	};
-	
+
 	class FeederModel : public ViewerWidget::CustomRobotModel
 	{
 	public:
@@ -470,7 +470,7 @@ namespace Enki
 			lists[4] = GenFeederCharge3();
 			lists[5] = GenFeederRing();
 		}
-		
+
 		void cleanup(ViewerWidget* viewer)
 		{
 			for (int i = 0; i < textures.size(); i++)
@@ -478,16 +478,16 @@ namespace Enki
 			for (int i = 0; i < lists.size(); i++)
 				glDeleteLists(lists[i], 1);
 		}
-		
+
 		virtual void draw(PhysicalObject* object) const
 		{
 			EPuckFeeder* feeder = polymorphic_downcast<EPuckFeeder*>(object);
 			double age = feeder->feeding.age;
 			bool alive = feeder->feeding.alive;
-			
+
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[0]);
-			
+
 			glPushMatrix();
 			double disp;
 			if (age < M_PI/2)
@@ -505,33 +505,33 @@ namespace Enki
 				else
 					disp = -1;
 			}
-			
+
 			glTranslated(0, 0, 4.3*disp-0.2);
-			
+
 			// body
 			glColor3d(1, 1, 1);
 			glCallList(lists[0]);
-			
+
 			// ring
 			glColor3d(0.6+object->getColor().components[0]-0.3*object->getColor().components[1]-0.3*object->getColor().components[2], 0.6+object->getColor().components[1]-0.3*object->getColor().components[0]-0.3*object->getColor().components[2], 0.6+object->getColor().components[2]-0.3*object->getColor().components[0]-0.3*object->getColor().components[1]);
 			glCallList(lists[5]);
-			
+
 			// food
 			glColor3d(0.3, 0.3, 1);
 			int foodAmount = (int)((feeder->feeding.energy * 5) / (EPUCK_FEEDER_MAX_ENERGY + 0.001));
 			assert(foodAmount <= 4);
 			for (int i = 0; i < foodAmount; i++)
 				glCallList(lists[1+i]);
-			
+
 			glPopMatrix();
-			
+
 			// shadow
 			glColor3d(1, 1, 1);
 			glBindTexture(GL_TEXTURE_2D, textures[1]);
 			glDisable(GL_LIGHTING);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-			
+
 			// bottom shadow
 			glPushMatrix();
 			// disable writing of z-buffer
@@ -551,14 +551,14 @@ namespace Enki
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDepthMask( GL_TRUE );
 			glPopMatrix();
-			
+
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glDisable(GL_BLEND);
 			glEnable(GL_LIGHTING);
-			
+
 			glDisable(GL_TEXTURE_2D);
 		}
-		
+
 		virtual void drawSpecial(PhysicalObject* object, int param) const
 		{
 			/*glEnable(GL_BLEND);
@@ -570,13 +570,13 @@ namespace Enki
 	};
 
 	// Challenge Viewer
-	
+
 	ChallengeViewer::ChallengeViewer(World* world, int ePuckCount) : ViewerWidget(world), ePuckCount(ePuckCount)
 	{
 		savingVideo = false;
 		autoCamera = false;
 		initTexturesResources();
-		
+
 		int res = QFontDatabase::addApplicationFont(":/fonts/SF Old Republic SC.ttf");
 		Q_ASSERT(res != -1);
 		Q_UNUSED(res);
@@ -584,14 +584,14 @@ namespace Enki
 		titleFont = QFont("SF Old Republic SC", 20);
 		entryFont = QFont("SF Old Republic SC", 23);
 		labelFont = QFont("SF Old Republic SC", 16);
-		
+
 		setMouseTracking(true);
 		setAttribute(Qt::WA_OpaquePaintEvent);
 		setAttribute(Qt::WA_NoSystemBackground);
 		setAutoFillBackground(false);
 		//resize(780, 560);
 	}
-	
+
 	void ChallengeViewer::addNewRobot()
 	{
 		bool ok;
@@ -606,7 +606,7 @@ namespace Enki
 			world->addObject(epuck);
 		}
 	}
-	
+
 	void ChallengeViewer::removeRobot()
 	{
 		std::set<AsebaFeedableEPuck *> toFree;
@@ -617,7 +617,7 @@ namespace Enki
 			if (epuck)
 				toFree.insert(epuck);
 		}
-		
+
 		for (std::set<AsebaFeedableEPuck *>::iterator it = toFree.begin(); it != toFree.end(); ++it)
 		{
 			world->removeObject(*it);
@@ -630,7 +630,7 @@ namespace Enki
 	{
 		autoCamera = state;
 	}
-	
+
 	void ChallengeViewer::timerEvent(QTimerEvent * event)
 	{
 		if (autoCamera)
@@ -663,7 +663,7 @@ namespace Enki
 		}
 
 		#endif // Q_WS_MAC
-		
+
 		ViewerWidget::mouseMoveEvent(event);
 	}
 */
@@ -674,7 +674,7 @@ namespace Enki
 		else
 			ViewerWidget::keyPressEvent(event);
 	}
-	
+
 	void ChallengeViewer::keyReleaseEvent ( QKeyEvent * event )
 	{
 		if (event->key() == Qt::Key_V)
@@ -682,7 +682,7 @@ namespace Enki
 		else
 			ViewerWidget::keyReleaseEvent (event);
 	}
-	
+
 	void ChallengeViewer::drawQuad2D(double x, double y, double w, double ar)
 	{
 		double thisAr = (double)width() / (double)height();
@@ -698,29 +698,29 @@ namespace Enki
 		glVertex2d(x, y+h);
 		glEnd();
 	}
-	
+
 	void ChallengeViewer::initializeGL()
 	{
 		ViewerWidget::initializeGL();
 	}
-	
+
 	void ChallengeViewer::displayWidgets()
 	{
 		// do not display any Enki widgets in challenge
 	}
-	
+
 	void ChallengeViewer::clickWidget(QMouseEvent *event)
 	{
 		// do not handle any Enki widgets in challenge
 	}
-	
+
 	void ChallengeViewer::renderObjectsTypesHook()
 	{
 		// render vrcs specific static types
 		managedObjects[&typeid(EPuckFeeder)] = new FeederModel(this);
 		managedObjectsAliases[&typeid(AsebaFeedableEPuck)] = &typeid(EPuck);
 	}
-	
+
 	void ChallengeViewer::displayObjectHook(PhysicalObject *object)
 	{
 		FeedableEPuck *epuck = dynamic_cast<FeedableEPuck*>(object);
@@ -728,7 +728,7 @@ namespace Enki
 		{
 			ViewerUserData *userData = dynamic_cast<ViewerUserData *>(epuck->userData);
 			assert(userData);
-			
+
 			double dist = (double)(DEATH_ANIMATION_STEPS - epuck->diedAnimation);
 			double coeff =  (double)(epuck->diedAnimation) / DEATH_ANIMATION_STEPS;
 			glColor3d(0.2*coeff, 0.2*coeff, 0.2*coeff);
@@ -739,7 +739,7 @@ namespace Enki
 		{
 		}*/
 	}
-	
+
 	void ChallengeViewer::sceneCompletedHook()
 	{
 		// create a map with names and scores
@@ -756,7 +756,7 @@ namespace Enki
 				renderText(epuck->pos.x, epuck->pos.y, 10, epuck->name, labelFont);
 			}
 		}
-		
+
 		// build score texture
 		QImage scoreBoard(512, 256, QImage::Format_ARGB32);
 		scoreBoard.setDotsPerMeterX(2350);
@@ -764,7 +764,7 @@ namespace Enki
 		QPainter painter(&scoreBoard);
 		//painter.fillRect(scoreBoard.rect(), QColor(224,224,255,196));
 		painter.fillRect(scoreBoard.rect(), QColor(224,255,224,196));
-		
+
 		// draw lines
 		painter.setBrush(Qt::NoBrush);
 		QPen pen(Qt::black);
@@ -776,17 +776,17 @@ namespace Enki
 		painter.drawLine(22, 34, 504, 34);
 		painter.drawLine(312, 12, 312, 247);
 		painter.drawLine(312, 240, 504, 240);
-		
+
 		// draw title
 		painter.setFont(titleFont);
 		painter.drawText(35, 28, "name");
 		painter.drawText(200, 28, "port");
 		painter.drawText(324, 28, "energy");
 		painter.drawText(430, 28, "points");
-		
+
 		// display entries
 		QMapIterator<int, QStringList> it(scores);
-		
+
 		it.toBack();
 		int pos = 61;
 		while (it.hasPrevious())
@@ -795,7 +795,7 @@ namespace Enki
 			painter.drawText(200, pos, it.value().at(1));
 			pos += 24;
 		}
-		
+
 		it.toBack();
 		painter.setFont(entryFont);
 		pos = 61;
@@ -807,13 +807,13 @@ namespace Enki
 			painter.drawText(445, pos, it.value().at(3));
 			pos += 24;
 		}
-		
+
 		glDisable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 		GLuint tex = bindTexture(scoreBoard, GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		glCullFace(GL_FRONT);
 		glColor4d(1, 1, 1, 0.75);
 		for (int i = 0; i < 4; i++)
@@ -833,7 +833,7 @@ namespace Enki
 			glEnd();
 			glPopMatrix();
 		}
-		
+
 		glCullFace(GL_BACK);
 		glColor3d(1, 1, 1);
 		for (int i = 0; i < 4; i++)
@@ -853,9 +853,9 @@ namespace Enki
 			glEnd();
 			glPopMatrix();
 		}
-		
+
 		deleteTexture(tex);
-		
+
 		glDisable(GL_TEXTURE_2D);
 		glColor4d(7./8.,7./8.,1,0.75);
 		glPushMatrix();
@@ -865,20 +865,20 @@ namespace Enki
 		glVertex3d(20,-20,20);
 		glVertex3d(20,20,20);
 		glVertex3d(-20,20,20);
-		
+
 		glVertex3d(-20,20,0);
 		glVertex3d(20,20,0);
 		glVertex3d(20,-20,0);
 		glVertex3d(-20,-20,0);
 		glEnd();
 		glPopMatrix();
-		
+
 		// save image
 		static int imageCounter = 0;
 		if (savingVideo)
 			grabFrameBuffer().save(QString("frame%0.bmp").arg(imageCounter++), "BMP");
 	}
-	
+
 	void ChallengeViewer::helpActivated()
 	{
 		// do not react to Enki's help activation
@@ -952,7 +952,7 @@ namespace Enki
 		connect(fullScreen, SIGNAL(toggled(bool)), SLOT(fullScreenStateChanged(bool)));
 		connect(helpButton, SIGNAL(clicked()), helpViewer, SLOT(show()));
 		connect(quitButton, SIGNAL(clicked()), SLOT(close()));
-		
+
 		autoCamera->setCheckState(Qt::Checked);
 
 		/*
@@ -968,11 +968,11 @@ namespace Enki
 		menu->addAction(autoCamera);
 		menu->addSeparator();
 		menu->addAction(tr("Help"), helpViewer, SLOT(show()));
-		
+
 		#endif // Q_WS_MAC
 		*/
 	}
-	
+
 	void ChallengeApplication::fullScreenStateChanged(bool fullScreen)
 	{
 		if (fullScreen)
@@ -1095,10 +1095,10 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 LanguageSelectionDialog::LanguageSelectionDialog()
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
-	
+
 	QLabel* text = new QLabel(tr("Please choose your language"));
 	layout->addWidget(text);
-	
+
 	languageSelectionBox = new QComboBox(this);
 	languageSelectionBox->addItem(QString::fromUtf8("English"), "en");
 	languageSelectionBox->addItem(QString::fromUtf8("Français"), "fr");
@@ -1119,11 +1119,11 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 		}
 	}
 	layout->addWidget(languageSelectionBox);
-	
+
 	QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
 	connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
 	layout->addWidget(okButton);
-	
+
 	setWindowTitle(tr("Language selection"));
 }
 
@@ -1131,54 +1131,54 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	
+
 	// Translation support
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
-	
+
 	//qDebug() << QLocale::system().name();
 	QTranslator translator;
 	translator.load(QString(":/asebachallenge_") + QLocale::system().name());
 	app.installTranslator(&translator);
-	
+
 	// choose the language
 	{
 		LanguageSelectionDialog languageSelectionDialog;
 		languageSelectionDialog.show();
 		languageSelectionDialog.exec();
-		
+
 		localName = languageSelectionDialog.languageSelectionBox->itemData(languageSelectionDialog.languageSelectionBox->currentIndex()).toString();
 		qtTranslator.load(QString("qt_") + localName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 		translator.load(QString(":/asebachallenge_") + localName);
 	}
-	
+
 	// Create the world
 	Enki::World world(140, 140, Enki::Color(0.4, 0.4, 0.4));
-	
+
 	// Add feeders
 	Enki::EPuckFeeder* feeders[4];
-	
+
 	feeders[0] = new Enki::EPuckFeeder(0);
 	feeders[0]->pos.x = 40;
 	feeders[0]->pos.y = 40;
 	world.addObject(feeders[0]);
-	
+
 	feeders[1] = new Enki::EPuckFeeder(15);
 	feeders[1]->pos.x = 100;
 	feeders[1]->pos.y = 40;
 	world.addObject(feeders[1]);
-	
+
 	feeders[2] = new Enki::EPuckFeeder(45);
 	feeders[2]->pos.x = 40;
 	feeders[2]->pos.y = 100;
 	world.addObject(feeders[2]);
-	
+
 	feeders[3] = new Enki::EPuckFeeder(30);
 	feeders[3]->pos.x = 100;
 	feeders[3]->pos.y = 100;
 	world.addObject(feeders[3]);
-	
+
 	// Add e-puck
 	int ePuckCount = 0;
 	for (int i = 1; i < argc; i++)
@@ -1190,14 +1190,14 @@ int main(int argc, char *argv[])
 		world.addObject(epuck);
 		ePuckCount++;
 	}
-	
+
 	// Create viewer
 	Enki::ChallengeApplication viewer(&world, ePuckCount);
-	
+
 	// Show and run
 	viewer.setWindowTitle("ASEBA Challenge - Stephane Magnenat (code) - Basilio Noris (gfx)");
 	viewer.setWindowIcon(QIcon(":/textures/asebachallenge.svgz"));
 	viewer.show();
-	
+
 	return app.exec();
 }

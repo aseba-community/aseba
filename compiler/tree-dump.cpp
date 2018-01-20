@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -26,7 +26,7 @@ namespace Aseba
 {
 	/** \addtogroup compiler */
 	/*@{*/
-	
+
 	std::wstring binaryOperatorToString(AsebaBinaryOperator op)
 	{
 		switch (op)
@@ -38,25 +38,25 @@ namespace Aseba
 			case ASEBA_OP_MULT: return L"*";
 			case ASEBA_OP_DIV: return L"/";
 			case ASEBA_OP_MOD: return L"modulo";
-			
+
 			case ASEBA_OP_BIT_OR: return L"binary or";
 			case ASEBA_OP_BIT_XOR: return L"binary xor";
 			case ASEBA_OP_BIT_AND: return L"binary and";
-			
+
 			case ASEBA_OP_EQUAL: return L"==";
 			case ASEBA_OP_NOT_EQUAL: return L"!=";
 			case ASEBA_OP_BIGGER_THAN: return L">";
 			case ASEBA_OP_BIGGER_EQUAL_THAN: return L">=";
 			case ASEBA_OP_SMALLER_THAN: return L"<";
 			case ASEBA_OP_SMALLER_EQUAL_THAN: return L"<=";
-			
+
 			case ASEBA_OP_OR: return L"or";
 			case ASEBA_OP_AND: return L"and";
-			
+
 			default: return L"? (binary operator)";
 		}
 	}
-	
+
 	std::wstring unaryOperatorToString(AsebaUnaryOperator op)
 	{
 		switch (op)
@@ -65,11 +65,11 @@ namespace Aseba
 			case ASEBA_UNARY_OP_ABS: return L"abs";
 			case ASEBA_UNARY_OP_BIT_NOT: return L"binary not";
 			case ASEBA_UNARY_OP_NOT: return L"not";
-			
+
 			default: return L"? (unary operator)";
 		}
 	}
-	
+
 	void Node::dump(std::wostream& dest, unsigned& indent) const
 	{
 		dest << sourcePos.toWString() << " ";
@@ -101,7 +101,7 @@ namespace Aseba
 		}
 		indent--;
 	}
-	
+
 	std::wstring IfWhenNode::toWString() const
 	{
 		std::wstring s;
@@ -111,7 +111,7 @@ namespace Aseba
 			s += L"If: ";
 		return s;
 	}
-	
+
 	std::wstring FoldedIfWhenNode::toWString() const
 	{
 		std::wstring s;
@@ -122,20 +122,20 @@ namespace Aseba
 		s += binaryOperatorToString(op);
 		return s;
 	}
-	
+
 	std::wstring WhileNode::toWString() const
 	{
 		std::wstring s = L"While: ";
 		return s;
 	};
-	
+
 	std::wstring FoldedWhileNode::toWString() const
 	{
 		std::wstring s = L"Folded While: ";
 		s += binaryOperatorToString(op);
 		return s;
 	};
-	
+
 	std::wstring EventDeclNode::toWString() const
 	{
 		if (eventId == ASEBA_EVENT_INIT)
@@ -143,7 +143,7 @@ namespace Aseba
 		else
 			return WFormatableString(L"ContextSwitcher: to event %0").arg(eventId);
 	}
-	
+
 	std::wstring EmitNode::toWString() const
 	{
 		std::wstring s = WFormatableString(L"Emit: %0 ").arg(eventId);
@@ -151,12 +151,12 @@ namespace Aseba
 			s += WFormatableString(L"addr %0 size %1 ").arg(arrayAddr).arg(arraySize);
 		return s;
 	}
-	
+
 	std::wstring SubDeclNode::toWString() const
 	{
 		return WFormatableString(L"Sub: %0").arg(subroutineId);
 	}
-	
+
 	std::wstring CallSubNode::toWString() const
 	{
 		std::wstring s = L"CallSub: ";
@@ -170,14 +170,14 @@ namespace Aseba
 		s += binaryOperatorToString(op);
 		return s;
 	}
-	
+
 	std::wstring UnaryArithmeticNode::toWString() const
 	{
 		std::wstring s = L"UnaryArithmetic: ";
 		s += unaryOperatorToString(op);
 		return s;
 	}
-	
+
 	std::wstring ImmediateNode::toWString() const
 	{
 		return WFormatableString(L"Immediate: %0").arg(value);
@@ -197,12 +197,12 @@ namespace Aseba
 	{
 		return WFormatableString(L"ArrayRead: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
 	}
-	
+
 	std::wstring ArrayWriteNode::toWString() const
 	{
 		return WFormatableString(L"ArrayWrite: addr %0 size %1 (var %2)").arg(arrayAddr).arg(arraySize).arg(arrayName);
 	}
-	
+
 	std::wstring LoadNativeArgNode::toWString() const
 	{
 		return WFormatableString(L"LoadNativeArgNode: addr %0 size %1 (var %2) using temp %3").arg(arrayAddr).arg(arraySize).arg(arrayName).arg(tempAddr);
@@ -215,7 +215,7 @@ namespace Aseba
 			s += WFormatableString(L", template %0 has size %1").arg(i).arg(templateArgs[i]);
 		return s;
 	}
-	
+
 	std::wstring TupleVectorNode::toWString() const
 	{
 		return WFormatableString(L"Tuple Vector: size %0").arg(getVectorSize());
@@ -246,5 +246,5 @@ namespace Aseba
 	}
 
 	/*@}*/
-	
+
 } // namespace Aseba

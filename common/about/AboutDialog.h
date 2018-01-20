@@ -30,11 +30,11 @@ namespace Aseba
 {
 	/** \addtogroup common */
 	/*@{*/
-	
+
 	class AboutBox: public QDialog
 	{
 		Q_OBJECT
-		
+
 	public:
 		using Tags = std::set<std::string>;
 		struct Parameters
@@ -49,7 +49,7 @@ namespace Aseba
 	public:
 		AboutBox(QWidget* parent, const Parameters& parameters);
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

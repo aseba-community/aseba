@@ -88,7 +88,7 @@ namespace Aseba
 	{
 		emit zeroconfTargetFound(target);
 	}
-	
+
 	//! Emit signal when target is removed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
 	void QtZeroconf::targetRemoved(const Aseba::Zeroconf::TargetInformation & target)

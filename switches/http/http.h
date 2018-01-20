@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -47,9 +47,9 @@ namespace Aseba
      \defgroup http Software router of messages on TCP and HTTP-over-TCP.
      */
     /*@{*/
-    
+
     class HttpRequest;
-    
+
     //! HTTP interface for aseba network
     class HttpInterface:  public Dashel::Hub, public Aseba::NodesManager
     {
@@ -91,12 +91,12 @@ namespace Aseba
         std::set<unsigned>          nodeDescriptionsReceived;
         std::set<unsigned>          nodeProgramsSent;
         NodeIdProgramMap            nodeProgram;
-        
+
         // debug variables
         bool verbose;
         int iterations;
         bool do_dump;
-        
+
         // Extract definitions from AESL files
         NodeIdCommonDefinitionsMap  commonDefinitions;
         NodeIdVariablesMap          allVariables;
@@ -107,7 +107,7 @@ namespace Aseba
 #ifdef ZEROCONF_SUPPORT
 		DashelhubZeroconf zeroconf;
 #endif // ZEROCONF_SUPPORT
-        
+
     public:
         //default values needed for unit testing
         HttpInterface(const strings& targets = std::vector<std::string>(), const std::string& http_port="3000", const std::string& aseba_port="33332", const int iterations=-1, bool dump=false, bool verbose=false);
@@ -122,7 +122,7 @@ namespace Aseba
         virtual void aeslLoadFile(const unsigned nodeId, const std::string& filename);
         virtual void aeslLoadMemory(const unsigned nodeId, const char* buffer, const int size);
         virtual void updateVariables(const unsigned nodeId);
-        
+
         virtual void scheduleResponse(Dashel::Stream* stream, HttpRequest* req);
         virtual void addHeaders(HttpRequest* req, strings& headers);
         virtual void finishResponse(HttpRequest* req, unsigned status, std::string result);
@@ -133,7 +133,7 @@ namespace Aseba
         virtual std::set<unsigned> allNodeIds();
         virtual unsigned updateNodeId(Dashel::Stream* stream, unsigned targetId);
         virtual bool run1s();
-        
+
     protected:
         /* // reimplemented from parent classes */
         virtual void connectionCreated(Dashel::Stream* stream);
@@ -155,7 +155,7 @@ namespace Aseba
         virtual void incomingVariables(const Variables *variables);
         virtual void incomingUserMsg(const UserMessage *userMsg);
         virtual void routeRequest(HttpRequest* req);
-        
+
         // helper functions
         //bool getNodeAndVarPos(const std::string& nodeName, const std::string& variableName, unsigned& nodeId, unsigned& pos) const;
 //        bool getVarPos(const unsigned nodeId, const std::string& variableName, unsigned& pos) const;
@@ -167,7 +167,7 @@ namespace Aseba
         std::string targetFromString(Dashel::Stream* stream) const;
         void connectToTargets();
     };
-    
+
     class HttpRequest
     {
     public:
@@ -189,7 +189,7 @@ namespace Aseba
         bool headers_done; // flag for header parsing
         bool status_sent;  // flag for SSE
         bool verbose;
-        
+
     public:
         HttpRequest();
         virtual ~HttpRequest() {};
@@ -208,7 +208,7 @@ namespace Aseba
         InterruptException(int s) : S(s) {}
         int S;
     };
-    
+
     /*@}*/
 };
 

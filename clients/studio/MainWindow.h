@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -72,7 +72,7 @@ namespace Aseba
 {
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	class TargetVariablesModel;
 	class TargetFunctionsModel;
 	class TargetMemoryModel;
@@ -89,15 +89,15 @@ namespace Aseba
 	class FindDialog;
 	class NodeTab;
 	class MainWindow;
-	
+
 	//! To access private members of MainWindow and its children, a plugin must inherit from this class
 	struct StudioInterface: DevelopmentEnvironmentInterface
 	{
 		NodeTab* nodeTab;
 		MainWindow *mainWindow;
-		
+
 		StudioInterface(NodeTab* nodeTab);
-		
+
 		Target * getTarget();
 		unsigned getNodeId() const;
 		unsigned getProductId() const;
@@ -113,11 +113,11 @@ namespace Aseba
 		void clearOpenedFileName(bool isModified);
 		QString openedFileName() const;
 	};
-	
+
 	class CompilationLogDialog: public QDialog
 	{
 		Q_OBJECT
-		
+
 	public:
 		CompilationLogDialog(QWidget *parent = 0);
 		void setText(const QString & text) { te->setText(text); }
@@ -154,51 +154,51 @@ namespace Aseba
 
 		int vmMemorySize[2];
 	};
-	
+
 	//! Tab holding code (instead of plot)
 	class ScriptTab
 	{
 	public:
 		typedef NodeToolInterface::SavedContent SavedContent;
 		typedef QList<SavedContent> SavedPlugins;
-		
+
 		ScriptTab(const unsigned id):id(id) {}
 		virtual ~ScriptTab() {}
-		
+
 		unsigned nodeId() const { return id; }
 		virtual SavedPlugins savePlugins() const = 0;
-		
+
 	protected:
 		void createEditor();
-		
+
 		unsigned id; //!< node identifier
-		
+
 		friend class MainWindow;
 		StudioAeslEditor* editor;
 		AeslLineNumberSidebar* linenumbers;
 		AeslBreakpointSidebar* breakpoints;
 		AeslHighlighter *highlighter;
 	};
-	
+
 	//! Tab for a target node that is not connected
 	class AbsentNodeTab : public QWidget, public ScriptTab
 	{
 		Q_OBJECT
-		
+
 	public:
 		AbsentNodeTab(const unsigned id, const QString& name, const QString& sourceCode, const SavedPlugins& savedPlugins);
-		
+
 		virtual SavedPlugins savePlugins() const { return savedPlugins; }
-	
+
 		const QString name;
 		SavedPlugins savedPlugins;
 	};
-	
+
 	//! Tab for a connected target node
 	class NodeTab : public QSplitter, public ScriptTab, public VariableListener
 	{
 		Q_OBJECT
-	
+
 	public:
 		struct CompilationResult
 		{
@@ -210,21 +210,21 @@ namespace Aseba
 			Compiler::SubroutineTable subroutineTable;
 			Error error;
 			std::wostringstream compilationMessages;
-			
+
 			CompilationResult(bool dump):dump(dump), success(false), allocatedVariablesCount(0) {}
 		};
-		
-		
+
+
 	public:
 		NodeTab(MainWindow* mainWindow, Target *target, const CommonDefinitions *commonDefinitions, const unsigned id, QWidget *parent = 0);
 		~NodeTab();
 		unsigned productId() const  { return pid; }
-		
+
 		void variablesMemoryChanged(unsigned start, const VariablesDataVector &variables);
-		
+
 	signals:
 		void uploadReadynessChanged(bool);
-	
+
 	protected:
 		virtual void timerEvent ( QTimerEvent * event );
 		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
@@ -234,12 +234,12 @@ namespace Aseba
 		void notifyPluginsAboutToLoad();
 		void restorePlugins(const SavedPlugins& savedPlugins, bool fromFile);
 		void updateToolList();
-	
+
 	public slots:
 		void clearExecutionErrors();
 		void refreshCompleterModel(LocalContext context);
 		//void sortCompleterModel();
-	
+
 	protected slots:
 		void resetClicked();
 		void loadClicked();
@@ -247,58 +247,58 @@ namespace Aseba
 		void nextClicked();
 		void refreshMemoryClicked();
 		void autoRefreshMemoryClicked(int state);
-		
+
 		void writeBytecode();
 		void reboot();
 		void saveBytecode();
-		
+
 		void setVariableValues(unsigned, const VariablesDataVector &);
 		void insertVariableName(const QModelIndex &);
-		
+
 		void editorContentChanged();
 		void recompile();
 		void markTargetUnsynced();
-	
+
 		// keywords
 		void keywordClicked(QString);
 		void showKeywords(bool show);
 
 		void showMemoryUsage(bool show);
-		
+
 		void cursorMoved();
 		void goToError();
-		
+
 		void setBreakpoint(unsigned line);
 		void clearBreakpoint(unsigned line);
 		void breakpointClearedAll();
-		
+
 		void executionPosChanged(unsigned line);
 		void executionModeChanged(Target::ExecutionMode mode);
-		
+
 		void breakpointSetResult(unsigned line, bool success);
-		
+
 		void closePlugins();
-		
+
 		void updateHidden();
-		
+
 		void compilationCompleted();
-	
+
 	protected:
 		void processCompilationResult(CompilationResult* result);
 		void rehighlight();
 		void reSetBreakpoints();
-		
+
 		// editor properties code
 		bool setEditorProperty(const QString &property, const QVariant &value, unsigned line, bool removeOld = false);
 		bool clearEditorProperty(const QString &property, unsigned line);
 		bool clearEditorProperty(const QString &property);
 		void switchEditorProperty(const QString &oldProperty, const QString &newProperty);
-		
+
 	protected:
 		friend class MainWindow;
 		friend class StudioAeslEditor;
 		friend class EditorsPlotsTabWidget;
-		
+
 		unsigned pid; //!< node product identifier
 		friend struct StudioInterface;
 		Target *target; //!< pointer to target
@@ -309,7 +309,7 @@ namespace Aseba
 		QLabel *compilationResultImage;
 		QLabel *compilationResultText;
 		QLabel *memoryUsageText;
-		
+
 		QLabel *executionModeLabel;
 		QPushButton *loadButton;
 		QPushButton *resetButton;
@@ -317,7 +317,7 @@ namespace Aseba
 		QPushButton *nextButton;
 		QPushButton *refreshMemoryButton;
 		QCheckBox *autoRefreshMemoryCheck;
-		
+
 		// keywords
 		QToolButton *varButton;
 		QToolButton *ifButton;
@@ -330,15 +330,15 @@ namespace Aseba
 		QToolButton *callsubButton;
 		QToolBar *keywordsToolbar;
 		QSignalMapper *signalMapper;
-		
+
 		TargetVariablesModel *vmMemoryModel;
 		TargetSubroutinesModel *vmSubroutinesModel;
 		QTreeView *vmMemoryView;
 		QLineEdit *vmMemoryFilter;
-		
+
 		TargetFunctionsModel *vmFunctionsModel;
 		QTreeView *vmFunctionsView;
-		
+
 		DraggableListWidget* vmLocalEvents;
 
 		QCompleter *completer;
@@ -346,25 +346,25 @@ namespace Aseba
 		QAbstractItemModel* variableAggregator;
 		QSortFilterProxyModel* sortingProxy;
 		TreeChainsawFilter* functionsFlatModel;
-		
+
 		QToolBox* toolBox;
 		QVBoxLayout* toolListLayout;
 		int toolListIndex;
 		NodeToolInterfaces tools;
-		
+
 		int refreshTimer; //!< id of timer for auto refresh of variables, if active
-		
+
 		QString lastCompiledSource; //!< content of last source considered for compilation following a textChanged signal
 		int errorPos; //!< position of last error, -1 if compilation was success
 		int currentPC; //!< current program counter
 		Target::ExecutionMode previousMode;
 		bool showHidden;
-		
+
 		QFuture<CompilationResult*> compilationFuture;
 		QFutureWatcher<CompilationResult*> compilationWatcher;
 		bool compilationDirty;
 		bool isSynchronized;
-		
+
 		BytecodeVector bytecode; //!< bytecode resulting of last successfull compilation
 		unsigned allocatedVariablesCount; //!< number of allocated variables
 	};
@@ -395,14 +395,14 @@ namespace Aseba
 	class MainWindow : public QMainWindow
 	{
 		Q_OBJECT
-	
+
 	public:
 		MainWindow(QVector<QTranslator*> translators, const QString& commandLineTarget, bool autoRefresh, QWidget *parent = 0);
 		~MainWindow();
 
 	signals:
 		void MainWindowClosed();
-		
+
 	private slots:
 		void about();
 		bool newFile();
@@ -427,15 +427,15 @@ namespace Aseba
 
 		void toggleBreakpoint();
 		void clearAllBreakpoints();
-		
+
 		void loadAll();
 		void resetAll();
 		void runAll();
 		void pauseAll();
 		void stopAll();
-		
+
 		void clearAllExecutionError();
-		
+
 		void uploadReadynessChanged();
 		void tabChanged(int);
 		void sendEvent();
@@ -448,51 +448,51 @@ namespace Aseba
 		void showCompilationMessages(bool doShown);
 		void compilationMessagesWasHidden();
 		void showMemoryUsage(bool show);
-		
+
 		void addEventNameClicked();
 		void removeEventNameClicked();
 		void eventsUpdated(bool indexChanged = false);
 		void eventsUpdatedDirty();
 		void eventsDescriptionsSelectionChanged();
-		
+
 		void resetStatusText(); // Jiwon
-		
+
 		void addConstantClicked();
 		void removeConstantClicked();
 		void constantsSelectionChanged();
-		
+
 		void nodeConnected(unsigned node);
 		void nodeDisconnected(unsigned node);
-		
+
 		void userEventsDropped(unsigned amount);
 		void userEvent(unsigned id, const VariablesDataVector &data);
 		void arrayAccessOutOfBounds(unsigned node, unsigned line, unsigned size, unsigned index);
 		void divisionByZero(unsigned node, unsigned line);
 		void eventExecutionKilled(unsigned node, unsigned line);
 		void nodeSpecificError(unsigned node, unsigned line, const QString& message);
-		
+
 		void executionPosChanged(unsigned node, unsigned line);
 		void executionModeChanged(unsigned node, Target::ExecutionMode mode);
 		void variablesMemoryEstimatedDirty(unsigned node);
-		
+
 		void variablesMemoryChanged(unsigned node, unsigned start, const VariablesDataVector &variables);
-		
+
 		void breakpointSetResult(unsigned node, unsigned line, bool success);
-	
+
 		void recompileAll();
 		void writeAllBytecodes();
 		void rebootAllNodes();
-		
+
 		void sourceChanged();
 		void updateWindowTitle();
 
 		void showUserManual();
-		
+
 		void openToUrlFromAction() const;
 
 	public slots:
 		void applySettings();
-	
+
 	private:
 		// utility functions
 		int getIndexFromId(unsigned node) const;
@@ -503,7 +503,7 @@ namespace Aseba
 		void addErrorEvent(unsigned node, unsigned line, const QString& message);
 		void clearDocumentSpecificTabs();
 		bool askUserBeforeDiscarding();
-		
+
 		// gui initialisation code
 		void regenerateOpenRecentMenu();
 		void updateRecentFiles(const QString& fileName);
@@ -517,23 +517,23 @@ namespace Aseba
 		bool readSettings();
 		void writeSettings();
 		void clearOpenedFileName(bool isModified);
-		
+
 		// tabs and nodes
 		friend class NodeTab;
 		friend class StudioAeslEditor;
 		friend struct StudioInterface;
 		EditorsPlotsTabWidget* nodes;
 		ScriptTab* currentScriptTab;
-		
+
 		#ifdef HAVE_QWT
-		
+
 		// events viewers. only one event per viewer
 		friend class EventViewer;
 		typedef QMultiMap<unsigned, EventViewer*> EventViewers;
 		EventViewers eventsViewers;
-		
+
 		#endif // HAVE_QWT
-		
+
 		// events
 		QPushButton* addEventNameButton;
 		QPushButton* removeEventNameButton;
@@ -545,26 +545,26 @@ namespace Aseba
 		QPushButton* clearLogger;
 		QLabel* statusText; // Jiwon
 		FixedWidthTableView* eventsDescriptionsView;
-		
+
 		// constants
 		QPushButton* addConstantButton;
 		QPushButton* removeConstantButton;
 		FixedWidthTableView* constantsView;
-		
+
 		// models
 		MaskableNamedValuesVectorModel* eventsDescriptionsModel;
 		ConstantsModel* constantsDefinitionsModel;
-		
+
 		// global buttons
 		QAction* loadAllAct;
 		QAction* resetAllAct;
 		QAction* runAllAct;
 		QAction* pauseAllAct;
 		QToolBar* globalToolBar;
-		
+
 		// open recent actions
 		QMenu *openRecentMenu;
-		
+
 		// tools
 		QMenu *writeBytecodeMenu;
 		QAction *writeAllBytecodesAct;
@@ -574,7 +574,7 @@ namespace Aseba
 		typedef QList<QAction*> ActionList;
 		QAction* helpMenuTargetSpecificSeparator;
 		ActionList targetSpecificHelp;
-		
+
 		// Menu action that need dynamic reconnection
 		QAction *cutAct;
 		QAction *copyAct;
@@ -595,7 +595,7 @@ namespace Aseba
 		QAction *showKeywordsAct; 
 		QAction* showCompilationMsg;
 		QAction* showMemoryUsageAct;
-		
+
 		// gui helper stuff
 		CompilationLogDialog *compilationMessageBox; //!< box to show last compilation messages
 		FindDialog* findDialog; //!< find dialog
@@ -603,12 +603,12 @@ namespace Aseba
 		bool sourceModified; //!< true if source code has been modified since last save
 		bool autoMemoryRefresh; //! < true if auto memory refresh is on by default
 		HelpViewer helpViewer;
-		
+
 		// compiler and source code related stuff
 		CommonDefinitions commonDefinitions;
 		Target *target;
 	};
-	
+
 	/*@}*/
 } // namespace Aseba
 

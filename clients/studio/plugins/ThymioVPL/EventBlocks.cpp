@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -43,16 +43,16 @@ namespace Aseba { namespace ThymioVPL
 		QRectF(32+(40+36)*1, 204, 40, 40),
 		QRectF(32+(40+36)*2, 204, 40, 40)
 	};
-	
+
 	ArrowButtonsEventBlock::ArrowButtonsEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtons("event", "button", true, parent),
 		advanced(advanced),
 		mode(MODE_ARROW)
 	{
 		const QColor color(Qt::red);
-		
+
 		// robot arrows
-		
+
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
@@ -69,17 +69,17 @@ namespace Aseba { namespace ThymioVPL
 		}
 		// center
 		GeometryShapeButton *button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
-		
+
 		button->addState(color);
 		buttons.push_back(button);
-		
+
 		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
 		setButtonsPos(advanced);
-		
+
 		// rc arrows
-		
+
 		// top, left, bottom, right
 		for(int i=0; i<4; i++) 
 		{
@@ -100,44 +100,44 @@ namespace Aseba { namespace ThymioVPL
 		}
 		// center
 		button = new GeometryShapeButton(QRectF(-25, -25, 50, 50), GeometryShapeButton::CIRCULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
-		
+
 		button->addState(color);
 		button->setPos(128, 100);
 		button->setVisible(false);
 		button->setValue(1);
 		buttons.push_back(button);
-		
+
 		connect(button, SIGNAL(stateChanged()), SLOT(ensureSingleRCArrowButtonSelected()));
 		connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 		connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 		USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
-		
+
 		// rc keypad
-		
+
 		for (int row=0; row<4; ++row)
 			for (int col=0; col<3; ++col)
 			{
 				button = new GeometryShapeButton(QRectF(0, 0, 48, 30), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor, Style::unusedButtonStrokeColor);
-				
+
 				button->addState(color);
 				button->setPos(40+col*64, 12+row*48);
 				button->setVisible(false);
 				if (row == 0 && col == 0)
 					button->setValue(1);
 				buttons.push_back(button);
-				
+
 				connect(button, SIGNAL(stateChanged()), SLOT(ensureSingleRCKeypadButtonSelected()));
 				connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 				connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 				USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),buttons.size()-1,this));
 			}
 	}
-	
+
 	void ArrowButtonsEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-		
+
 		// if simple mode, simply return
 		if (!advanced)
 		{
@@ -145,10 +145,10 @@ namespace Aseba { namespace ThymioVPL
 			BlockWithButtons::paint(painter, option, widget);
 			return;
 		}
-		
+
 		// paint block
 		Block::paint(painter, option, widget);
-		
+
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Qt::white);
 		if (mode == MODE_ARROW)
@@ -158,7 +158,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 			painter->drawRoundedRect(128-110, 128-122, 220, 186, 5, 5);
-		
+
 		// draw buttons
 		for (unsigned i=0; i<3; ++i)
 		{
@@ -175,7 +175,7 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawEllipse(buttonPoses[i]);
 		}
 	}
-	
+
 	int ArrowButtonsEventBlock::getValue(unsigned i) const
 	{
 		if (i < 5 && mode == MODE_ARROW)
@@ -189,7 +189,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			return 0;
 	}
-	
+
 	void ArrowButtonsEventBlock::setValue(unsigned i, int value)
 	{
 		if (i < 5)
@@ -217,7 +217,7 @@ namespace Aseba { namespace ThymioVPL
 			emit contentChanged();
 		}
 	}
-	
+
 	QVector<quint16> ArrowButtonsEventBlock::getValuesCompressed() const
 	{
 		QVector<quint16> result;
@@ -251,12 +251,12 @@ namespace Aseba { namespace ThymioVPL
 			assert(false);
 		return result;
 	}
-	
+
 	bool ArrowButtonsEventBlock::isAnyAdvancedFeature() const
 	{
 		return mode != MODE_ARROW;
 	}
-	
+
 	void ArrowButtonsEventBlock::setAdvanced(bool advanced)
 	{
 		if (!advanced)
@@ -267,7 +267,7 @@ namespace Aseba { namespace ThymioVPL
 		setButtonsPos(advanced);
 		update();
 	}
-	
+
 	void ArrowButtonsEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
@@ -283,19 +283,19 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 		}
-		
+
 		Block::mousePressEvent(event);
 	}
-	
+
 	void ArrowButtonsEventBlock::setMode(unsigned mode)
 	{
 		if (!advanced)
 			return;
-		
+
 		if (mode != this->mode)
 		{
 			this->mode = mode;
-			
+
 			if (mode == MODE_ARROW)
 			{
 				for (size_t i = 0; i<5; ++i)
@@ -331,12 +331,12 @@ namespace Aseba { namespace ThymioVPL
 			}
 			else
 				assert(false);
-			
+
 			update();
 			emit contentChanged();
 		}
 	}
-	
+
 	void ArrowButtonsEventBlock::setButtonsPos(bool advanced)
 	{
 		if (advanced)
@@ -360,7 +360,7 @@ namespace Aseba { namespace ThymioVPL
 			buttons[4]->setPos(128, 128);
 		}
 	}
-	
+
 	//! Return the currently-selected RC arrow button, or -1 if none is selected
 	int ArrowButtonsEventBlock::getSelectedRCArrowButton() const
 	{
@@ -369,7 +369,7 @@ namespace Aseba { namespace ThymioVPL
 				return i-5;
 		return -1;
 	}
-	
+
 	//! Return the currently-selected RC keypad, or -1 if none is selected
 	int ArrowButtonsEventBlock::getSelectedRCKeypadButton() const
 	{
@@ -378,7 +378,7 @@ namespace Aseba { namespace ThymioVPL
 					return i-10;
 		return -1;
 	}
-	
+
 	void ArrowButtonsEventBlock::ensureSingleRCArrowButtonSelected(int current)
 	{
 		for (size_t i=5; i<10; ++i)
@@ -387,7 +387,7 @@ namespace Aseba { namespace ThymioVPL
 			else if (buttons[i] == sender())
 				buttons[i]->setValue(1);
 	}
-	
+
 	void ArrowButtonsEventBlock::ensureSingleRCKeypadButtonSelected(int current)
 	{
 		for (size_t i=10; i<buttons.size(); ++i)
@@ -396,14 +396,14 @@ namespace Aseba { namespace ThymioVPL
 			else if (buttons[i] == sender())
 				buttons[i]->setValue(1);
 	}
-	
-	
+
+
 	// Prox Event
 	ProxEventBlock::ProxEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtonsAndRange("event", "prox", true, PIXEL_TO_VAL_SQUARE, 700, 4000, 1000, 2000, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
-		
+
 		// indication LEDs for front sensors
 		indicationLEDs.push_back(createIndicationLED(15,78));
 		indicationLEDs.push_back(createIndicationLED(54,43));
@@ -416,12 +416,12 @@ namespace Aseba { namespace ThymioVPL
 		// indication LEDs for back sensors
 		indicationLEDs.push_back(createIndicationLED(40,234));
 		indicationLEDs.push_back(createIndicationLED(216,234));
-		
+
 		// front sensors
 		for(int i=0; i<5; ++i) 
 		{
 			GeometryShapeButton *button = new GeometryShapeButton(QRectF(-16,-16,32,32), GeometryShapeButton::RECTANGULAR_BUTTON, this, Style::unusedButtonFillColor,  Style::unusedButtonStrokeColor);
-			
+
 			const qreal offset = (qreal)2-i;
 			button->setRotation(-20*offset);
 			button->setPos(128 - 150*qSin(0.34906585*offset) , 
@@ -433,7 +433,7 @@ namespace Aseba { namespace ThymioVPL
 				button->setStateCountLimit(buttonsCountSimple);
 
 			buttons.push_back(button);
-			
+
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
@@ -450,29 +450,29 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
-			
+
 			buttons.push_back(button);
-			
+
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
 			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i+5,this));
 		}
-		
+
 		updateIndicationLEDsOpacity();
 	}
-	
-	
+
+
 	// Prox Ground Event
 	ProxGroundEventBlock::ProxGroundEventBlock(bool advanced, QGraphicsItem *parent) : 
 		BlockWithButtonsAndRange("event", "proxground", false, PIXEL_TO_VAL_LINEAR, 0, 1023, 400, 450, Qt::black, Qt::white, advanced, parent)
 	{
 		buttonsCountSimple = 3;
-		
+
 		// indication LEDs
 		indicationLEDs.push_back(createIndicationLED(72,40));
 		indicationLEDs.push_back(createIndicationLED(184,40));
-		
+
 		// sensors
 		for(int i=0; i<2; ++i) 
 		{
@@ -484,19 +484,19 @@ namespace Aseba { namespace ThymioVPL
 			button->addState(Qt::darkGray, QColor(128,0,0));
 			if (!advanced)
 				button->setStateCountLimit(buttonsCountSimple);
-			
+
 			buttons.push_back(button);
-			
+
 			connect(button, SIGNAL(stateChanged()), SIGNAL(contentChanged()));
 			connect(button, SIGNAL(stateChanged()), SIGNAL(undoCheckpoint()));
 			connect(button, SIGNAL(stateChanged()), SLOT(updateIndicationLEDsOpacity()));
 			USAGE_LOG(logSignal(button,SIGNAL(stateChanged()),i,this));
 		}
-		
+
 		updateIndicationLEDsOpacity();
 	}
-	
-	
+
+
 	// Acc Event
 	const QRectF AccEventBlock::buttonPoses[3] = {
 		QRectF(32+(40+36)*0, 200, 40, 40),
@@ -504,7 +504,7 @@ namespace Aseba { namespace ThymioVPL
 		QRectF(32+(40+36)*2, 200, 40, 40)
 	};
 	const int AccEventBlock::resolution = 6;
-	
+
 	AccEventBlock::AccEventBlock(bool advanced, QGraphicsItem *parent) :
 		Block("event", "acc", parent),
 		mode(MODE_TAP),
@@ -524,19 +524,19 @@ namespace Aseba { namespace ThymioVPL
 		rollSvg->setVisible(false);
 		rollSvg->setTransformOriginPoint(128, 128);
 	}
-	
+
 	void AccEventBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-		
+
 		// paint parent
 		Block::paint(painter, option, widget);
-		
+
 		// if simple mode, simply return
 		if (tapSimpleSvg->isVisible())
 			return;
-		
+
 		// draw buttons
 		for (unsigned i=0; i<3; ++i)
 		{
@@ -553,7 +553,7 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawEllipse(buttonPoses[i]);
 		}
 	}
-	
+
 	int AccEventBlock::getValue(unsigned i) const
 	{
 		if (i == 0)
@@ -561,7 +561,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			return orientation;
 	}
-	
+
 	void AccEventBlock::setValue(unsigned i, int value)
 	{
 		if (i == 0)
@@ -569,12 +569,12 @@ namespace Aseba { namespace ThymioVPL
 		else
 			setOrientation(value);
 	}
-	
+
 	QVector<uint16_t> AccEventBlock::getValuesCompressed() const
 	{
 		return QVector<uint16_t>(1, (orientation<<2) | mode);
 	}
-	
+
 	void AccEventBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
@@ -590,7 +590,7 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 		}
-		
+
 		if (mode != MODE_TAP)
 		{
 			bool ok;
@@ -603,10 +603,10 @@ namespace Aseba { namespace ThymioVPL
 				return;
 			}
 		}
-		
+
 		Block::mousePressEvent(event);
 	}
-	
+
 	void AccEventBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -619,7 +619,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseMoveEvent(event);
 	}
-	
+
 	void AccEventBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -630,7 +630,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseReleaseEvent(event);
 	}
-	
+
 	int AccEventBlock::orientationFromPos(const QPointF& pos, bool* ok) const
 	{
 		const QPointF localPos(pos-QPointF(128,128));
@@ -646,7 +646,7 @@ namespace Aseba { namespace ThymioVPL
 		if (ok) *ok = false;
 		return 0;
 	}
-	
+
 	void AccEventBlock::setMode(unsigned mode)
 	{
 		if (tapSimpleSvg->isVisible())
@@ -654,7 +654,7 @@ namespace Aseba { namespace ThymioVPL
 		if (mode != this->mode)
 		{
 			this->mode = mode;
-			
+
 			if (mode == MODE_TAP)
 			{
 				pitchSvg->setRotation(0);
@@ -665,32 +665,32 @@ namespace Aseba { namespace ThymioVPL
 			quadrantSvg->setVisible(mode != MODE_TAP);
 			pitchSvg->setVisible(mode == MODE_PITCH);
 			rollSvg->setVisible(mode == MODE_ROLL);
-			
+
 			update();
 			emit contentChanged();
 		}
 	}
-	
+
 	void AccEventBlock::setOrientation(int orientation)
 	{
 		if (orientation != this->orientation)
 		{
 			this->orientation = orientation;
-			
+
 			pitchSvg->setRotation(-orientation * 90 / resolution);
 			rollSvg->setRotation(-orientation * 90 / resolution);
-			
+
 			update();
 			emit contentChanged();
 			setChangedFlag();
 		}
 	}
-	
+
 	bool AccEventBlock::isAnyAdvancedFeature() const
 	{
 		return (!tapSimpleSvg->isVisible() && !tapAdvancedSvg->isVisible());
 	}
-	
+
 	void AccEventBlock::setAdvanced(bool advanced)
 	{
 		if (!advanced)
@@ -705,15 +705,15 @@ namespace Aseba { namespace ThymioVPL
 			tapSimpleSvg->setVisible(false);
 		}
 	}
-	
+
 	// Clap Event
 	ClapEventBlock::ClapEventBlock( QGraphicsItem *parent ) :
 		BlockWithNoValues("event", "clap", parent)
 	{
 		new QGraphicsSvgItem (":/images/thymioclap.svgz", this);
 	}
-	
-	
+
+
 	// TimeoutEventBlock
 	TimeoutEventBlock::TimeoutEventBlock(QGraphicsItem *parent):
 		BlockWithNoValues("event", "timeout", parent)

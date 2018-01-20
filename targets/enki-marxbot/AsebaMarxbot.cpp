@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -64,7 +64,7 @@ extern "C" void AsebaSendBuffer(AsebaVMState *vm, const uint8_t* data, uint16_t 
 	Dashel::Stream* stream = marxBot.stream;
 	if (!stream)
 		return;
-	
+
 	// send to stream
 	try
 	{
@@ -104,7 +104,7 @@ extern "C" uint16_t AsebaGetBuffer(AsebaVMState *vm, uint8_t* data, uint16_t max
 		{
 			if (module.events.empty())
 				return 0;
-				
+
 			// I do not put const here to work around a bug in MSVC 2005 implementation of std::valarray
 			Enki::AsebaMarxbot::Event& event = module.events.front();
 			*source = event.source;
@@ -198,20 +198,20 @@ extern "C" void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason)
 namespace Enki
 {
 	using namespace Dashel;
-	
+
 	int AsebaMarxbot::marxbotNumber = 0;
-	
+
 	AsebaMarxbot::Module::Module()
 	{
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(64);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
 	}
-	
+
 	AsebaMarxbot::AsebaMarxbot() :
 		stream(0)
 	{
@@ -221,31 +221,31 @@ namespace Enki
 		leftMotor.vm.variables = reinterpret_cast<int16_t *>(&leftMotorVariables);
 		leftMotor.vm.variablesSize = sizeof(leftMotorVariables) / sizeof(int16_t);
 		modules.push_back(&leftMotor);
-		
+
 		rightMotor.vm.nodeId = 2;
 		rightMotorVariables.id = 2;
 		rightMotor.vm.variables = reinterpret_cast<int16_t *>(&rightMotorVariables);
 		rightMotor.vm.variablesSize = sizeof(rightMotorVariables) / sizeof(int16_t);
 		modules.push_back(&rightMotor);
-		
+
 		proximitySensors.vm.nodeId = 3;
 		proximitySensorVariables.id = 3;
 		proximitySensors.vm.variables = reinterpret_cast<int16_t *>(&proximitySensorVariables);
 		proximitySensors.vm.variablesSize = sizeof(proximitySensorVariables) / sizeof(int16_t);
 		modules.push_back(&proximitySensors);
-		
+
 		distanceSensors.vm.nodeId = 4;
 		distanceSensorVariables.id = 4;
 		distanceSensors.vm.variables = reinterpret_cast<int16_t *>(&distanceSensorVariables);
 		distanceSensors.vm.variablesSize = sizeof(distanceSensorVariables) / sizeof(int16_t);
 		modules.push_back(&distanceSensors);
-		
+
 		// fill map
 		asebaSocketMaps[&leftMotor.vm] = this;
 		asebaSocketMaps[&rightMotor.vm] = this;
 		asebaSocketMaps[&proximitySensors.vm] = this;
 		asebaSocketMaps[&distanceSensors.vm] = this;
-		
+
 		// connect to target
 		int port = ASEBA_DEFAULT_PORT + marxbotNumber;
 		try
@@ -258,14 +258,14 @@ namespace Enki
 			abort();
 		}
 		marxbotNumber++;
-		
+
 		// init VM
 		AsebaVMInit(&leftMotor.vm);
 		AsebaVMInit(&rightMotor.vm);
 		AsebaVMInit(&proximitySensors.vm);
 		AsebaVMInit(&distanceSensors.vm);
 	}
-	
+
 	AsebaMarxbot::~AsebaMarxbot()
 	{
 		// clean map
@@ -274,43 +274,43 @@ namespace Enki
 		asebaSocketMaps.erase(&proximitySensors.vm);
 		asebaSocketMaps.erase(&distanceSensors.vm);
 	}
-	
+
 	void AsebaMarxbot::controlStep(double dt)
 	{
 		//stepCounter++;
 		//std::cerr << stepCounter << std::endl;
 		/*
 			Values mapping
-			
+
 			motor:
 				estimated 3000 == 30 cm/s
-			
+
 			encoders:
 				16 tick per motor turn
 				134 reduction
 				6 cm wheel diameter
 		*/
-		
+
 		// set physical variables
 		leftSpeed = static_cast<double>(leftMotorVariables.speed) / 100;
 		rightSpeed = static_cast<double>(rightMotorVariables.speed) / 100;
-		
+
 		// do motion
 		DifferentialWheeled::controlStep(dt);
-		
+
 		// get physical variables
 		int odoLeft = static_cast<int>((leftOdometry * 16  * 134) / (2 * M_PI));
 		leftMotorVariables.odo[0] = odoLeft & 0xffff;
 		leftMotorVariables.odo[1] = odoLeft >> 16;
-		
+
 		int odoRight = static_cast<int>((rightOdometry * 16  * 134) / (2 * M_PI));
 		rightMotorVariables.odo[0] = odoRight & 0xffff;
 		rightMotorVariables.odo[1] = odoRight >> 16;
-		
+
 		for (size_t i = 0; i < 24; i++)
 			proximitySensorVariables.bumpers[i] = static_cast<int16_t>(getVirtualBumper(i));
 		std::fill(proximitySensorVariables.ground, proximitySensorVariables.ground + 12, 0);
-		
+
 		for (size_t i = 0; i < 180; i++)
 		{
 			if (rotatingDistanceSensor.zbuffer[i] > 32767)
@@ -318,10 +318,10 @@ namespace Enki
 			else
 				distanceSensorVariables.distances[i] = static_cast<int16_t>(rotatingDistanceSensor.zbuffer[i]);
 		}
-		
+
 		// do a network step
 		Hub::step();
-		
+
 		// disconnect old streams
 		for (size_t i = 0; i < toDisconnect.size(); ++i)
 		{
@@ -329,27 +329,27 @@ namespace Enki
 			closeStream(toDisconnect[i]);
 		}
 		toDisconnect.clear();
-		
+
 		// run each module
 		for (size_t i = 0; i < modules.size(); i++)
 		{
 			AsebaVMState* vm = &(modules[i]->vm);
-			
+
 			/* no queue for now
 			// process all incoming events as long as 
 			while (!AsebaVMIsExecutingThread(vm) && !events.empty())
 				AsebaProcessIncomingEvents(&(modules[i]->vm));
 			*/
-			
+
 			// run VM
 			AsebaVMRun(vm, 65535);
-			
+
 			// reschedule a periodic event if we are not in step by step
 			if (AsebaMaskIsClear(vm->flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm->flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 				AsebaVMSetupEvent(vm, ASEBA_EVENT_LOCAL_EVENTS_START);
 		}
 	}
-	
+
 	void AsebaMarxbot::connectionCreated(Dashel::Stream *stream)
 	{
 		std::string targetName = stream->getTargetName();
@@ -358,17 +358,17 @@ namespace Enki
 			// schedule current stream for disconnection
 			if (this->stream)
 				toDisconnect.push_back(this->stream);
-			
+
 			// set new stream as current stream
 			this->stream = stream;
 			qDebug() << this << " : New client connected.";
 		}
 	}
-	
+
 	void AsebaMarxbot::incomingData(Stream *stream)
 	{
 		Event event(stream);
-		
+
 		// push to other nodes
 		for (size_t i = 0; i < modules.size(); ++i)
 		{
@@ -377,7 +377,7 @@ namespace Enki
 			AsebaProcessIncomingEvents(&(module.vm));
 		}
 	}
-	
+
 	void AsebaMarxbot::connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
 		if (stream == this->stream)

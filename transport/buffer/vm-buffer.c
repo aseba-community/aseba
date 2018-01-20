@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -85,12 +85,12 @@ void AsebaSendMessage(AsebaVMState *vm, uint16_t type, const void *data, uint16_
 void AsebaSendMessageWords(AsebaVMState *vm, uint16_t type, const uint16_t* data, uint16_t count)
 {
 	uint16_t i;
-	
+
 	buffer_pos = 0;
 	buffer_add_uint16(type);
 	for (i = 0; i < count; i++)
 		buffer_add_uint16(data[i]);
-	
+
 	AsebaSendBuffer(vm, buffer, buffer_pos);
 }
 #endif
@@ -134,14 +134,14 @@ void AsebaSendDescription(AsebaVMState *vm)
 	const AsebaVariableDescription* namedVariables = vmDescription->variables;
 	const AsebaNativeFunctionDescription* const * nativeFunctionsDescription = AsebaGetNativeFunctionsDescriptions(vm);
 	const AsebaLocalEventDescription* localEvents = AsebaGetLocalEventsDescriptions(vm);
-	
+
 	uint16_t i = 0;
 	buffer_pos = 0;
-	
+
 	buffer_add_uint16(ASEBA_MESSAGE_DESCRIPTION);
 
 	buffer_add_string(vmDescription->name);
-	
+
 	buffer_add_uint16(ASEBA_PROTOCOL_VERSION);
 
 	buffer_add_uint16(vm->bytecodeSize);
@@ -152,58 +152,58 @@ void AsebaSendDescription(AsebaVMState *vm)
 	for (i = 0; namedVariables[i].size; i++)
 		;
 	buffer_add_uint16(i);
-	
+
 	// compute the number of local event functions
 	for (i = 0; localEvents[i].name; i++)
 		;
 	buffer_add_uint16(i);
-	
+
 	// compute the number of native functions
 	for (i = 0; nativeFunctionsDescription[i]; i++)
 		;
 	buffer_add_uint16(i);
-	
+
 	// send buffer
 	AsebaSendBuffer(vm, buffer, buffer_pos);
-	
+
 	// send named variables description
 	for (i = 0; namedVariables[i].name; i++)
 	{
 		buffer_pos = 0;
-		
+
 		buffer_add_uint16(ASEBA_MESSAGE_NAMED_VARIABLE_DESCRIPTION);
-		
+
 		buffer_add_uint16(namedVariables[i].size);
 		buffer_add_string(namedVariables[i].name);
-		
+
 		// send buffer
 		AsebaSendBuffer(vm, buffer, buffer_pos);
 	}
-	
+
 	// send local events description
 	for (i = 0; localEvents[i].name; i++)
 	{
 		buffer_pos = 0;
-		
+
 		buffer_add_uint16(ASEBA_MESSAGE_LOCAL_EVENT_DESCRIPTION);
-		
+
 		buffer_add_string(localEvents[i].name);
 		buffer_add_string(localEvents[i].doc);
-		
+
 		// send buffer
 		AsebaSendBuffer(vm, buffer, buffer_pos);
 	}
-	
+
 	// send native functions description
 	for (i = 0; nativeFunctionsDescription[i]; i++)
 	{
 		uint16_t j;
 
 		buffer_pos = 0;
-		
+
 		buffer_add_uint16(ASEBA_MESSAGE_NATIVE_FUNCTION_DESCRIPTION);
-		
-		
+
+
 		buffer_add_string(nativeFunctionsDescription[i]->name);
 		buffer_add_string(nativeFunctionsDescription[i]->doc);
 		for (j = 0; nativeFunctionsDescription[i]->arguments[j].size; j++)
@@ -214,7 +214,7 @@ void AsebaSendDescription(AsebaVMState *vm)
 			buffer_add_int16(nativeFunctionsDescription[i]->arguments[j].size);
 			buffer_add_string(nativeFunctionsDescription[i]->arguments[j].name);
 		}
-		
+
 		// send buffer
 		AsebaSendBuffer(vm, buffer, buffer_pos);
 	}
@@ -224,7 +224,7 @@ void AsebaProcessIncomingEvents(AsebaVMState *vm)
 {
 	uint16_t source;
 	const AsebaVMDescription *desc = AsebaGetVMDescription(vm);
-	
+
 	uint16_t amount = AsebaGetBuffer(vm, buffer, ASEBA_MAX_INNER_PACKET_SIZE, &source);
 
 	if (amount > 0)

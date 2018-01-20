@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -57,10 +57,10 @@ private:
 		int16_t user[1024];
 	} variables;
 	char mutableName[12];
-	
+
 	// stream for listening to incoming connections
 	Dashel::Stream* listenStream;
-	
+
 public:
 	// public because accessed from a glue function
 	uint16_t lastMessageSource;
@@ -75,7 +75,7 @@ public:
 #endif // ZEROCONF_SUPPORT
 
 public:
-	
+
 	AsebaNode()
 #ifdef ZEROCONF_SUPPORT
 		:zeroconf(*this)
@@ -83,26 +83,26 @@ public:
 	{
 		// setup variables
 		vm.nodeId = 1;
-		
+
 		bytecode.resize(512);
 		vm.bytecode = &bytecode[0];
 		vm.bytecodeSize = bytecode.size();
-		
+
 		stack.resize(64);
 		vm.stack = &stack[0];
 		vm.stackSize = stack.size();
-		
+
 		vm.variables = reinterpret_cast<int16_t *>(&variables);
 		vm.variablesSize = sizeof(variables) / sizeof(int16_t);
 	}
-	
+
 	Dashel::Stream* listen(const int port, const int deltaNodeId)
 	{
 		vm.nodeId = 1 + deltaNodeId;
 		strncpy(mutableName, "dummynode-0", 12);
 		mutableName[10] = '0' + deltaNodeId;
 		nodeDescription.name = mutableName;
-		
+
 		// connect network
 		try
 		{
@@ -149,7 +149,7 @@ public:
 		}
 	}
 #endif // ZEROCONF_SUPPORT
-	
+
 	virtual void connectionCreated(Dashel::Stream *stream)
 	{
 		std::string targetName = stream->getTargetName();
@@ -158,7 +158,7 @@ public:
 			// schedule current stream for disconnection
 			if (this->stream)
 				toDisconnect.push_back(this->stream);
-			
+
 			// set new stream as current stream
 			this->stream = stream;
 			std::cerr << this << " : New client connected." << std::endl;
@@ -168,7 +168,7 @@ public:
 #endif // ZEROCONF_SUPPORT
 		}
 	}
-	
+
 	virtual void connectionClosed(Dashel::Stream *stream, bool abnormal)
 	{
 #ifdef ZEROCONF_SUPPORT
@@ -177,7 +177,7 @@ public:
 		this->stream = nullptr;
 		// clear breakpoints
 		vm.breakpointsCount = 0;
-		
+
 		if (abnormal)
 			std::cerr << this << " : Client has disconnected unexpectedly." << std::endl;
 		else
@@ -187,7 +187,7 @@ public:
 		updateZeroconfStatus();
 #endif // ZEROCONF_SUPPORT
 	}
-	
+
 	virtual void incomingData(Dashel::Stream *stream)
 	{
 #ifdef ZEROCONF_SUPPORT
@@ -196,23 +196,23 @@ public:
 		// only process data for the current stream
 		if (stream != this->stream)
 			return;
-		
+
 		uint16_t temp;
 		uint16_t len;
-		
+
 		stream->read(&temp, 2);
 		len = bswap16(temp);
 		stream->read(&temp, 2);
 		lastMessageSource = bswap16(temp);
 		lastMessageData.resize(len+2);
 		stream->read(&lastMessageData[0], lastMessageData.size());
-		
+
 		AsebaProcessIncomingEvents(&vm);
-		
+
 		// run VM
 		AsebaVMRun(&vm, 1000);
 	}
-	
+
 	void run()
 	{
 		// wait a given time, return if stop was called
@@ -231,10 +231,10 @@ public:
 					// reschedule a periodic event if we are not in step by step
 					if (AsebaMaskIsClear(vm.flags, ASEBA_VM_STEP_BY_STEP_MASK) || AsebaMaskIsClear(vm.flags, ASEBA_VM_EVENT_ACTIVE_MASK))
 						AsebaVMSetupEvent(&vm, ASEBA_EVENT_LOCAL_EVENTS_START-0);
-					
+
 					// run VM
 					AsebaVMRun(&vm, 1000);
-					
+
 					// save current time for next iteration
 					Aseba::UnifiedTime currentTime;
 					timeout = 2*int(variables.timerPeriod) - int((currentTime - startTime).value);
@@ -247,7 +247,7 @@ public:
 			{
 				timeout = -1;
 			}
-			
+
 			// disconnect old streams
 			for (size_t i = 0; i < toDisconnect.size(); ++i)
 			{

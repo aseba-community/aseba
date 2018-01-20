@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -35,17 +35,17 @@
 namespace Aseba { namespace ThymioVPL
 {
 	using namespace std;
-	
+
 	static wstring toWstring(int val)
 	{
 		wstringstream streamVal;
 		streamVal << val;
-		
+
 		return streamVal.str();
 	}
-	
+
 	//////
-	
+
 	void Compiler::CodeGenerator::EventHandler::generateAdditionalCode()
 	{
 		if (isStateSet)
@@ -54,37 +54,37 @@ namespace Aseba { namespace ThymioVPL
 				L"\n\tcallsub display_state\n\n",
 			-1));
 	}
-	
+
 	void Compiler::CodeGenerator::ButtonEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent buttons\n", -1));
 	}
-	
+
 	void Compiler::CodeGenerator::ProxEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent prox\n", -1));
 	}
-	
+
 	void Compiler::CodeGenerator::TapEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent tap\n", -1));
 	}
-	
+
 	void Compiler::CodeGenerator::AccEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent acc\n", -1));
 	}
-	
+
 	void Compiler::CodeGenerator::ClapEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
 		code.prepend(EventHandler::PairCodeAndIndex(L"\nonevent mic\n", -1));
 	}
-	
+
 	void Compiler::CodeGenerator::TimeoutEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
@@ -93,7 +93,7 @@ namespace Aseba { namespace ThymioVPL
 			L"\ttimer.period[0] = 0\n",
 		-1));
 	}
-	
+
 	void Compiler::CodeGenerator::RemoteControlEventHandler::generateAdditionalCode()
 	{
 		EventHandler::generateAdditionalCode();
@@ -101,7 +101,7 @@ namespace Aseba { namespace ThymioVPL
 	};
 
 	//////
-	
+
 	//! Create a compiler ready to be used
 	Compiler::CodeGenerator::CodeGenerator() : 
 		advancedMode(false),
@@ -117,34 +117,34 @@ namespace Aseba { namespace ThymioVPL
 		eventHandlers["timeout"] = new TimeoutEventHandler();
 		eventHandlers["rc5"] = new RemoteControlEventHandler();
 	}
-	
+
 	Compiler::CodeGenerator::~CodeGenerator()
 	{
 		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
 			delete *it;
 	}
-	
+
 	//! reset the compiler to its initial state, for advanced or basic mode
 	void Compiler::CodeGenerator::reset(bool advanced) 
 	{
 		clearEventHandlers();
-		
+
 		generatedCode.clear();
 		setToCodeIdMap.clear();
-		
+
 		advancedMode = advanced;
 		useSound = false;
 		inWhenBlock = false;
 		inIfBlock = false;
 	}
-	
+
 	//! Initialize the map of events and their code
 	void Compiler::CodeGenerator::clearEventHandlers() 
 	{
 		for (EventHandlers::iterator it(eventHandlers.begin()); it != eventHandlers.end(); ++it)
 			(*it)->clear();
 	}
-	
+
 	//! Link all event handles together into their
 	void Compiler::CodeGenerator::link()
 	{
@@ -159,14 +159,14 @@ namespace Aseba { namespace ThymioVPL
 				eventHandler->generateAdditionalCode();
 			}
 		}
-		
+
 		// if no code, do not generate any initial code
 		if (!wasCode)
 			return;
-		
+
 		// generate initialisation code
 		generatedCode.push_back(generateInitialisationCode());
-		
+
 		// collect code from all handlers
 		map<unsigned, size_t> rowIdToCode;
 		int maxRow(0);
@@ -181,7 +181,7 @@ namespace Aseba { namespace ThymioVPL
 				maxRow = std::max(maxRow, codeAndIndex.second);
 			}
 		}
-		
+
 		// copy the collected set to the vector
 		setToCodeIdMap.resize(maxRow+1);
 		for (int i = 0; i <= maxRow; ++i)
@@ -193,7 +193,7 @@ namespace Aseba { namespace ThymioVPL
 				setToCodeIdMap[i] = -1;
 		}
 	}
-	
+
 	//! Add initialization code after all pairs have been parsed
 	wstring Compiler::CodeGenerator::generateInitialisationCode() const
 	{
@@ -262,7 +262,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::indentText() const
 	{
 		wstring text(L"\t");
@@ -272,7 +272,7 @@ namespace Aseba { namespace ThymioVPL
 			text += L"\t";
 		return text;
 	}
-	
+
 	//! Generate code for an event-actions set
 	void Compiler::CodeGenerator::visit(const EventActionsSet& eventActionsSet, bool debugLog)
 	{
@@ -283,20 +283,20 @@ namespace Aseba { namespace ThymioVPL
 			lookupEventName = "prox";
 		else
 			lookupEventName = eventName;
-		
+
 		// the second and third modes of buttons are rc
 		if ((eventName == "button") && (eventActionsSet.getEventBlock()->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW))
 			lookupEventName = "rc5";
-		
+
 		// the first mode of the acc event is just a tap
 		if ((eventName == "acc") && (eventActionsSet.getEventBlock()->getValue(0) == AccEventBlock::MODE_TAP))
 			lookupEventName = "tap";
-		
+
 		// get the corresponding event handler
 		EventHandlers::iterator eventIt(eventHandlers.find(lookupEventName));
 		assert(eventIt != eventHandlers.end());
 		EventHandler* eventHandler(*eventIt);
-		
+
 		// add a new entry
 		// if non-conditional code, put before any conditional code
 		size_t codeEntryIndex(eventHandler->code.size());
@@ -315,22 +315,22 @@ namespace Aseba { namespace ThymioVPL
 		}
 		eventHandler->code.insert(codeEntryIndex, EventHandler::PairCodeAndIndex(L"", eventActionsSet.getRow()));
 		wstring& currentCode(eventHandler->code[codeEntryIndex].first);
-		
+
 		// add event and actions details
 		visitEventAndStateFilter(eventActionsSet.getEventBlock(), eventActionsSet.getStateFilterBlock(), currentCode);
 		for (int i=0; i<eventActionsSet.actionBlocksCount(); ++i)
 			visitAction(eventActionsSet.getActionBlock(i), currentCode, eventHandler->isStateSet);
-		
+
 		// possibly add the debug event
 		visitExecFeedback(eventActionsSet, currentCode);
 		if (debugLog)
 			visitDebugLog(eventActionsSet, currentCode);
-		
+
 		// possibly close condition and add code
 		visitEndOfLine(currentCode);
 		currentCode.append(L"\n");
 	}
-	
+
 	//! Generate the debug log event for this set
 	void Compiler::CodeGenerator::visitExecFeedback(const EventActionsSet& eventActionsSet, wstring& currentCode)
 	{
@@ -338,20 +338,20 @@ namespace Aseba { namespace ThymioVPL
 		text += L"emit pair_run " + toWstring(eventActionsSet.getRow()) + L"\n";
 		currentCode.append(text);
 	}
-	
+
 	//! Generate the debug log event for this set
 	void Compiler::CodeGenerator::visitDebugLog(const EventActionsSet& eventActionsSet, wstring& currentCode)
 	{
 		wstring text(indentText());
 		text += L"_emit debug_log [";
-		
+
 		wstringstream ostr;
 		ostr << hex << showbase;
 		const QVector<uint16_t> compressedContent(eventActionsSet.getContentCompressed());
         copy(compressedContent.begin(), compressedContent.end(), ostream_iterator<uint16_t, wchar_t>(ostr, L", "));
 		text += ostr.str();
 		text.erase(text.size() - 2);
-		
+
 		text += L"]\n";
 		currentCode.append(text);
 	}
@@ -360,7 +360,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// generate event code
 		wstring text;
-		
+
 		// if block generates a test
 		if (block->isAnyValueSet())
 		{
@@ -369,14 +369,14 @@ namespace Aseba { namespace ThymioVPL
 			{
 				text += visitEventAccPre(block);
 			}
-			
+
 			// test code, special case for remote control
 			const bool isIf((block->getName() == "button") && (block->getValue(5) != ArrowButtonsEventBlock::MODE_ARROW));
 			if (isIf)
 				text += L"\tif ";
 			else
 				text += L"\twhen ";
-			
+
 			// event-specific code
 			if (block->getName() == "button")
 			{
@@ -399,15 +399,15 @@ namespace Aseba { namespace ThymioVPL
 				// internal compiler error
 				abort();
 			}
-			
+
 			if (isIf)
 				text += L" then\n ";
 			else
 				text += L" do\n";
-			
+
 			inWhenBlock = true;
 		}
-		
+
 		// if state filter does generate a test
 		if (stateFilterBlock && stateFilterBlock->isAnyValueSet())
 		{
@@ -436,13 +436,13 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 			text += L" then\n";
-			
+
 			inIfBlock = true;
 		}
-		
+
 		currentCode = text;
 	}
-	
+
 	//! End the generated code of a VPL line, close whens and ifs
 	void Compiler::CodeGenerator::visitEndOfLine(wstring& currentCode)
 	{
@@ -459,11 +459,11 @@ namespace Aseba { namespace ThymioVPL
 			inWhenBlock = false;
 		}
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitEventArrowButtons(const Block* block)
 	{
 		wstring text;
-		
+
 		const int mode(block->getValue(5));
 		if (mode == ArrowButtonsEventBlock::MODE_ARROW)
 		{
@@ -500,7 +500,7 @@ namespace Aseba { namespace ThymioVPL
 				{86, 16, 78},
 				{87, 13, unsigned(-1)}
 			};
-			
+
 			text += L"rc5.command == " + toWstring(mapping[value][0]);
 			if (mapping[value][1] != unsigned(-1))
 				text += L" or rc5.command == " + toWstring(mapping[value][1]);
@@ -518,10 +518,10 @@ namespace Aseba { namespace ThymioVPL
 		}
 		else
 			assert(false);
-		
+
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitEventProx(const Block* block)
 	{
 		wstring text;
@@ -559,7 +559,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitEventProxGround(const Block* block)
 	{
 		wstring text;
@@ -597,7 +597,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return text;
 	}
-	
+
 	//! Pretest, compute angle
 	wstring Compiler::CodeGenerator::visitEventAccPre(const Block* block)
 	{
@@ -608,7 +608,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			abort();
 	}
-	
+
 	//! Test, use computed angle
 	wstring Compiler::CodeGenerator::visitEventAcc(const Block* block)
 	{
@@ -619,11 +619,11 @@ namespace Aseba { namespace ThymioVPL
 			testValue = -block->getValue(1);
 		else
 			abort();
-		
+
 		const int middleValue(testValue * 16384 / AccEventBlock::resolution);
 		const int lowBound(middleValue - 8192 / AccEventBlock::resolution);
 		const int highBound(middleValue + 8192 / AccEventBlock::resolution);
-		
+
 		wstring text;
 		if (testValue != -AccEventBlock::resolution)
 			text += L"angle > " + toWstring(lowBound);
@@ -633,15 +633,15 @@ namespace Aseba { namespace ThymioVPL
 			text += L"angle < " + toWstring(highBound);
 		return text;
 	}
-	
+
 	//! Visit an action block, if 0 return directly
 	void Compiler::CodeGenerator::visitAction(const Block* block, wstring& currentCode, bool& isStateSet)
 	{
 		if (!block)
 			return;
-		
+
 		wstring text;
-		
+
 		if (block->getName() == "move")
 		{
 			text += visitActionMove(block);
@@ -671,10 +671,10 @@ namespace Aseba { namespace ThymioVPL
 			// internal compiler error
 			abort();
 		}
-		
+
 		currentCode.append(text);
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionMove(const Block* block)
 	{
 		wstring text;
@@ -689,7 +689,7 @@ namespace Aseba { namespace ThymioVPL
 		text += L"\n";
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionTopColor(const Block* block)
 	{
 		wstring text;
@@ -704,7 +704,7 @@ namespace Aseba { namespace ThymioVPL
 		text += L")\n";
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionBottomColor(const Block* block)
 	{
 		wstring text;
@@ -727,22 +727,22 @@ namespace Aseba { namespace ThymioVPL
 		text += L")\n";
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionSound(const Block* block)
 	{
 		static const int noteTable[6] = { 262, 311, 370, 440, 524, 0 };
 		static const int durationTable[3] = {-1, 7, 14};
-		
+
 		// find last non-silent note
 		unsigned noteCount(block->valuesCount());
 		assert(noteCount > 0);
 		while ((noteCount > 0) && ((block->getValue(noteCount-1) & 0xff) == 5))
 			--noteCount;
-		
+
 		// if there is no note, return
 		if (noteCount == 0)
 			return indentText() + L"# zero notes in sound block\n";
-		
+
 		// generate code for notes
 		wstring notesCopyText;
 		wstring durationsCopyText;
@@ -752,7 +752,7 @@ namespace Aseba { namespace ThymioVPL
 		{
 			const unsigned note(block->getValue(i) & 0xff);
 			const unsigned duration((block->getValue(i)>>8) & 0xff);
-			
+
 			if (note == 5 && i+1 < noteCount && (block->getValue(i+1) & 0xff) == 5)
 			{
 				// next note is silence, skip
@@ -770,10 +770,10 @@ namespace Aseba { namespace ThymioVPL
 				accumulatedDuration = 0;
 			}
 		}
-		
+
 		// enable sound
 		useSound = true;
-		
+
 		// prepare target string
 		wstring text;
 		const wstring indString(indentText());
@@ -799,10 +799,10 @@ namespace Aseba { namespace ThymioVPL
 		// start playing
 		text += indString;
 		text += L"call sound.freq(notes[0], durations[0])\n";
-		
+
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionTimer(const Block* block)
 	{
 		wstring text;
@@ -811,7 +811,7 @@ namespace Aseba { namespace ThymioVPL
 		text += L"timer.period[0] = "+ toWstring(block->getValue(0)) + L"\n";
 		return text;
 	}
-	
+
 	wstring Compiler::CodeGenerator::visitActionSetState(const Block* block, bool& isStateSet)
 	{
 		wstring text;

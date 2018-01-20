@@ -11,16 +11,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -46,13 +46,13 @@
 namespace Enki
 {
 	using namespace Aseba;
-	
+
 	const std::map<EnvironmentNotificationType, QColor> notificationLogTypeToColor = {
 		{ EnvironmentNotificationType::LOG_INFO, Qt::white },
 		{ EnvironmentNotificationType::LOG_WARNING, Qt::yellow },
 		{ EnvironmentNotificationType::LOG_ERROR, Qt::red }
 	};
-	
+
 	PlaygroundViewer::PlaygroundViewer(World* world, bool energyScoringSystemEnabled) : 
 		ViewerWidget(world),
 		font("Courier", 10),
@@ -62,17 +62,17 @@ namespace Enki
 	{
 		setMouseTracking(true);
 	}
-	
+
 	PlaygroundViewer::~PlaygroundViewer()
 	{
-		
+
 	}
-	
+
 	World* PlaygroundViewer::getWorld() const
 	{
 		return world;
 	}
-	
+
 	void PlaygroundViewer::notifyAsebaEnvironment(const EnvironmentNotificationType type, const std::string& description, const strings& arguments)
 	{
 		if (type == EnvironmentNotificationType::DISPLAY_INFO)
@@ -131,7 +131,7 @@ namespace Enki
 				qDebug() << "Unknown description for notifying FATAL_ERROR" << QString::fromStdString(description);
 		}
 	}
-	
+
 	void PlaygroundViewer::log(const QString& entry, const QColor& color)
 	{
 		logText[logPos] = entry;
@@ -139,17 +139,17 @@ namespace Enki
 		logTime[logPos] = Aseba::UnifiedTime();
 		logPos = (logPos+1) % LOG_HISTORY_COUNT;
 	}
-	
+
 	void PlaygroundViewer::log(const std::string& entry, const QColor& color)
 	{
 		log(QString::fromStdString(entry), color);
 	}
-	
+
 	void PlaygroundViewer::log(const char* entry, const QColor& color)
 	{
 		log(QString(entry), color);
 	}
-	
+
 	void PlaygroundViewer::processStarted()
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
@@ -157,7 +157,7 @@ namespace Enki
 		//log(tr("%0: Process started").arg((Q_PID_PRINT)process->pid()), Qt::white);
 		Q_UNUSED(process);
 	}
-	
+
 	void PlaygroundViewer::processError(QProcess::ProcessError error)
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
@@ -181,16 +181,16 @@ namespace Enki
 			default:
 				break;
 		}
-		
+
 	}
-	
+
 	void PlaygroundViewer::processReadyRead()
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
 		while (process->canReadLine())
 			log(tr("%0: %1").arg((Q_PID_PRINT)process->pid()).arg(process->readLine().constData()), Qt::yellow);
 	}
-	
+
 	void PlaygroundViewer::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 	{
 		QProcess* process(polymorphic_downcast<QProcess*>(sender()));
@@ -201,19 +201,19 @@ namespace Enki
 			log(tr("Process finished abnormally").arg((Q_PID_PRINT)process->pid()), Qt::red);*/
 		Q_UNUSED(process);
 	}
-	
+
 	void PlaygroundViewer::renderObjectsTypesHook()
 	{
 		managedObjectsAliases[&typeid(DashelAsebaFeedableEPuck)] = &typeid(EPuck);
 		managedObjectsAliases[&typeid(DashelAsebaThymio2)] = &typeid(Thymio2);
 	}
-	
+
 	void PlaygroundViewer::sceneCompletedHook()
 	{
 		// create a map with names and scores
 		//qglColor(QColor::fromRgbF(0, 0.38 ,0.61));
 		qglColor(Qt::black);
-		
+
 		// TODO: once we have ECS-enabled Enki, use modules for playground as well
 		if (energyScoringSystemEnabled)
 		{
@@ -233,12 +233,12 @@ namespace Enki
 					i++;
 				}
 			}
-			
+
 			renderText(16, height() * 7 / 8 - 40, scoreString, font);
-			
+
 			renderText(16, height() * 7 / 8 - 20, QString("E. in pool: %0 - total score: %1").arg(energyPool).arg(totalScore), font);
 		}
-		
+
 		// console background
 		glEnable(GL_BLEND);
 		qglColor(QColor(0,0,0,200));
@@ -253,7 +253,7 @@ namespace Enki
 			glVertex2f(-1,-0.75);
 		glEnd();
 		glDisable(GL_BLEND);
-		
+
 		// console text
 		for (unsigned i=0; i<LOG_HISTORY_COUNT; ++i)
 		{
@@ -265,7 +265,7 @@ namespace Enki
 			}
 		}
 	}
-	
+
 	void PlaygroundViewer::mouseMoveEvent(QMouseEvent * event)
 	{
 		ViewerWidget::mouseMoveEvent(event);
@@ -275,17 +275,17 @@ namespace Enki
 		else
 			QToolTip::showText(event->globalPos(), "");
 	}
-	
+
 	void PlaygroundViewer::timerEvent(QTimerEvent * event)
 	{
 		// if the object being moved is Aseba-enabled, make sure it processes network events
 		AbstractNodeGlue* asebaObject(dynamic_cast<AbstractNodeGlue*>(selectedObject));
 		if (asebaObject)
 			asebaObject->externalInputStep(double(timerPeriodMs)/1000.);
-		
+
 		ViewerWidget::timerEvent(event);
 	}
-	
+
 	//! Help button or F1 have been pressed, show dialog box
 	void PlaygroundViewer::helpActivated()
 	{

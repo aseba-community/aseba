@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -42,15 +42,15 @@ int open_port(char * file)
 {
 	struct termios newtio;
 	int fd;
-	
+
 	fd = open(file, O_RDWR);
 	if (fd < 0)
 		return fd;
-	
+
 	tcgetattr(fd, &oldtio);
-	
+
 	memset(&newtio, 0, sizeof(newtio));
-	
+
 	newtio.c_cflag |= CLOCAL;
 	newtio.c_cflag |= CREAD;
 	newtio.c_cflag |= CS8;
@@ -61,10 +61,10 @@ int open_port(char * file)
 	newtio.c_lflag = 0;
 	newtio.c_cc[VTIME] = 0;
 	newtio.c_cc[VMIN] = 1;
-	
+
 	tcflush(fd, TCIOFLUSH);
 	tcsetattr(fd,TCSANOW, &newtio);
-	
+
 	return fd;
 }
 
@@ -72,9 +72,9 @@ void close_port(int fd)
 {
 	if (fd < 0)
 		return;
-	
+
 	tcsetattr(fd,TCSANOW, &oldtio);
-	
+
 	close(fd);
 }
 
@@ -185,13 +185,13 @@ int main(int argc, char ** argv)
 	}
 
 	fd = open_port(argv[argc-1]);
-	
+
 	if (fd < 0)
 	{
 		fprintf(stderr, "Error opening serial port file %s\n", argv[argc-1]);
 		usage(argv[0]);
 	}
-	
+
 	count = write(fd, &settings, sizeof(settings));
 	if (count != sizeof(settings))
 	{
@@ -204,7 +204,7 @@ int main(int argc, char ** argv)
 		fprintf(stderr, "Error reading settings, read %d instead of %lu bytes\n", count, sizeof(settings)-1);
 		exit(3);
 	}
-	
+
 	printf("Got back:\n");
 	printf("\tNodeID: 0x%04x\n", settings.nodeid);
 	printf("\tPanID: 0x%04x\n", settings.panid);
@@ -212,6 +212,6 @@ int main(int argc, char ** argv)
 	printf("\ttxpower: %d\n",settings.txpower);
 	printf("\tVersion: %d\n",settings.version);
 	close_port(fd);
-	
+
 	return 0;
 }  

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -39,14 +39,14 @@ namespace Aseba
 		editor(editor)
 	{
 		setWindowTitle(tr("Aseba Studio - Search and Replace"));
-		
+
 		QLabel* label = new QLabel(tr("&Search for:"));
 		findLineEdit = new QLineEdit;
 		label->setBuddy(findLineEdit);
 		QHBoxLayout *entryLayout = new QHBoxLayout;
 		entryLayout->addWidget(label);
 		entryLayout->addWidget(findLineEdit);
-		
+
 		caseCheckBox = new QCheckBox(tr("&Case sensitive"));
 		wholeWordsCheckBox = new QCheckBox(tr("&Whole words"));
 		regularExpressionsCheckBox = new QCheckBox(tr("Re&gular expressions"));
@@ -54,7 +54,7 @@ namespace Aseba
 		optionsLayout->addWidget(caseCheckBox);
 		optionsLayout->addWidget(wholeWordsCheckBox);
 		optionsLayout->addWidget(regularExpressionsCheckBox);
-		
+
 		findNextButton = new QPushButton(tr("&Find Next"));
 		findNextButton->setDefault(true);
 		findPreviousButton = new QPushButton(tr("Find &Previous"));
@@ -63,10 +63,10 @@ namespace Aseba
 		buttonsLayout->addWidget(findNextButton);
 		buttonsLayout->addWidget(findPreviousButton);
 		buttonsLayout->addWidget(findFromTopButton);
-		
+
 		warningText = new QLabel;
 		warningText->setStyleSheet("color: darkred; font-weight: bold");
-		
+
 		replaceGroupBox = new QGroupBox(tr("&Replace"));
 		replaceGroupBox->setCheckable(true);
 		replaceGroupBox->setChecked(false);
@@ -87,16 +87,16 @@ namespace Aseba
 		replaceLayout->addLayout(entryLayout2);
 		replaceLayout->addLayout(buttonsLayout2);
 		replaceGroupBox->setLayout(replaceLayout);
-		
+
 		QVBoxLayout* layout = new QVBoxLayout;
 		layout->addLayout(entryLayout);
 		layout->addLayout(optionsLayout);
 		layout->addLayout(buttonsLayout);
 		layout->addWidget(warningText);
 		layout->addWidget(replaceGroupBox);
-		
+
 		setLayout(layout);
-		
+
 		connect(findNextButton, SIGNAL(clicked()), SLOT(findNext()));
 		connect(findPreviousButton, SIGNAL(clicked()), SLOT(findPrevious()));
 		connect(findFromTopButton, SIGNAL(clicked()), SLOT(findFromTop()));
@@ -104,39 +104,39 @@ namespace Aseba
 		connect(replaceFindPreviousButton, SIGNAL(clicked()), SLOT(replaceFindPrevious()));
 		connect(replaceAllButton, SIGNAL(clicked()), SLOT(replaceAll()));
 	}
-	
+
 	void FindDialog::setFindText(const QString& text)
 	{
 		findLineEdit->setText(text);
 	}
-	
+
 	void FindDialog::findNext()
 	{
 		find(editor->textCursor(), QTextDocument::FindFlag(0));
 	}
-	
+
 	void FindDialog::findPrevious()
 	{
 		find(editor->textCursor(), QTextDocument::FindBackward);
 	}
-	
+
 	void FindDialog::findFromTop()
 	{
 		find(QTextCursor(editor->document()), QTextDocument::FindFlag(0));
 	}
-	
+
 	void FindDialog::replaceFindNext()
 	{
 		replace();
 		find(editor->textCursor(), QTextDocument::FindFlag(0));
 	}
-	
+
 	void FindDialog::replaceFindPrevious()
 	{
 		replace();
 		find(editor->textCursor(), QTextDocument::FindBackward);
 	}
-	
+
 	void FindDialog::replaceAll()
 	{
 		QTextCursor c(editor->document());
@@ -146,16 +146,16 @@ namespace Aseba
 			c = editor->textCursor();
 		}
 	}
-	
+
 	bool FindDialog::find(const QTextCursor cc, const QTextDocument::FindFlag dir)
 	{
 		assert(editor);
-		
+
 		//if (cc.hasSelection())
-		
+
 		QTextDocument::FindFlags flags(dir);
 		QTextCursor nc;
-		
+
 		// search text
 		if (wholeWordsCheckBox->isChecked())
 			flags |= QTextDocument::FindWholeWords;
@@ -174,7 +174,7 @@ namespace Aseba
 				flags |= QTextDocument::FindCaseSensitively;
 			nc = editor->document()->find(findLineEdit->text(), cc ,flags);
 		}
-		
+
 		// do something with found text
 		if (nc.isNull())
 		{
@@ -192,7 +192,7 @@ namespace Aseba
 			return true;
 		}
 	}
-	
+
 	void FindDialog::replace()
 	{
 		QTextCursor cc(editor->textCursor());

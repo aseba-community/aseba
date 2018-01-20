@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -56,15 +56,15 @@ namespace Aseba { namespace ThymioVPL
 					"border: 4px solid black; height: 40px; margin: 0px; }"
 			);
 			s->setSliderPosition(0);
-			
+
 			QGraphicsProxyWidget *w = new QGraphicsProxyWidget(this);
 			w->setAcceptDrops(false);
 			w->setWidget(s);
 			w->resize(48, 226);
 			w->setPos(10+i*188, 15);
-			
+
 			sliders.push_back(s);
-			
+
 			connect(s, SIGNAL(valueChanged(int)), SLOT(valueChangeDetected()));
 			connect(s, SIGNAL(valueChanged(int)), SIGNAL(contentChanged()));
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
@@ -72,12 +72,12 @@ namespace Aseba { namespace ThymioVPL
 			connect(s, SIGNAL(sliderReleased()), SLOT(emitUndoCheckpointAndClearIfChanged()));
 			USAGE_LOG(logSignal(s,SIGNAL(sliderReleased()),i,this));
 		}
-		
+
 		thymioBody = new ThymioBody(this, -70);
 		thymioBody->setUp(false);
 		thymioBody->setPos(128,128);
 		thymioBody->setScale(0.2);
-		
+
 		timer = new QTimeLine(2000, this);
 		timer->setFrameRange(0, 150);
 		timer->setCurveShape(QTimeLine::LinearCurve);
@@ -88,16 +88,16 @@ namespace Aseba { namespace ThymioVPL
 	MoveActionBlock::~MoveActionBlock()
 	{
 	}
-	
+
 	void MoveActionBlock::frameChanged(int frame)
 	{
 		qreal pt[2];
 		for(int i=0; i<2; i++) 
 			pt[i] = (sliders[i]->value())*0.06*50; // [-30,30]
-		
+
 		const qreal step = frame/200.0;
 		const qreal angle = (pt[0]-pt[1])*3*step;
-		
+
 		if (fabs(pt[1]-pt[0]) < 10e-4)
 		{
 			thymioBody->setPos(QPointF(128,128-(pt[1]+pt[0])*1.2*step));
@@ -116,7 +116,7 @@ namespace Aseba { namespace ThymioVPL
 		timer->stop();
 		timer->start();
 	}
-	
+
 	int MoveActionBlock::getValue(unsigned i) const
 	{ 
 		if (int(i)<sliders.size()) 
@@ -129,7 +129,7 @@ namespace Aseba { namespace ThymioVPL
 		if(int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value/50);
 	}
-	
+
 	QVector<uint16_t> MoveActionBlock::getValuesCompressed() const
 	{
 		return QVector<uint16_t>(1, 
@@ -137,13 +137,13 @@ namespace Aseba { namespace ThymioVPL
 			 (sliders[1]->value()+10)
 		);
 	}
-	
+
 	// Color Action
 	ColorActionBlock::ColorActionBlock( QGraphicsItem *parent, bool top) :
 		BlockWithBody("action", top ? "colortop" : "colorbottom", top, parent)
 	{
 		const char *sliderColors[] = { "FF0000", "00FF00", "0000FF" };
-		
+
 		for(unsigned i=0; i<3; i++)
 		{
 			QSlider *s = new QSlider(Qt::Horizontal);
@@ -166,9 +166,9 @@ namespace Aseba { namespace ThymioVPL
 			w->setWidget(s);
 			w->resize(202, 48);
 			w->setPos(27, 60+i*64);
-			
+
 			sliders.push_back(s);
-			
+
 			connect(s, SIGNAL(valueChanged(int)), SLOT(valueChangeDetected()));
 			connect(s, SIGNAL(valueChanged(int)), SIGNAL(contentChanged()));
 			connect(s, SIGNAL(sliderPressed()), SLOT(clearChangedFlag()));
@@ -184,13 +184,13 @@ namespace Aseba { namespace ThymioVPL
 			return sliders[i]->value(); 
 		return -1;
 	}
-	
+
 	void ColorActionBlock::setValue(unsigned i, int value) 
 	{ 
 		if (int(i)<sliders.size()) 
 			sliders[i]->setSliderPosition(value);
 	}
-	
+
 	QVector<uint16_t> ColorActionBlock::getValuesCompressed() const
 	{
 		unsigned value(0);
@@ -202,12 +202,12 @@ namespace Aseba { namespace ThymioVPL
 		assert(value <= 65535);
 		return QVector<uint16_t>(1, value);
 	}
-	
+
 	void ColorActionBlock::valueChangeDetected()
 	{
 		update();
 	}
-	
+
 	void ColorActionBlock::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		bodyColor = QColor( sliders[0]->value()*5.46875+80, 
@@ -224,15 +224,15 @@ namespace Aseba { namespace ThymioVPL
 			painter->fillRect(myRect, gradient);
 		}
 	}
-	
+
 	TopColorActionBlock::TopColorActionBlock(QGraphicsItem *parent):
 		ColorActionBlock(parent, true)
 	{}
-	
+
 	BottomColorActionBlock::BottomColorActionBlock(QGraphicsItem *parent):
 		ColorActionBlock(parent, false)
 	{}
-	
+
 	// Sound Action
 	SoundActionBlock::SoundActionBlock(QGraphicsItem *parent) :
 		Block("action", "sound", parent),
@@ -244,18 +244,18 @@ namespace Aseba { namespace ThymioVPL
 		notes[3] = 2; durations[3] = 1;
 		notes[4] = 1; durations[4] = 1;
 		notes[5] = 2; durations[5] = 2;
-		
+
 		new QGraphicsSvgItem (":/images/notes.svgz", this);
 	}
-	
+
 	void SoundActionBlock::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Block::paint(painter, option, widget);
-		
+
 		painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		for (unsigned row = 0; row < 5; ++row)
 		{
-			
+
 			//painter->fillRect(17, 60 + row*37, 222, 37, QColor::fromHsv((5-row)*51, 100, 255));
 			painter->fillRect(17, 60 + row*37 + 2, 222, 33, Qt::lightGray);
 			for (unsigned col = 0; col < 6; ++col)
@@ -267,7 +267,7 @@ namespace Aseba { namespace ThymioVPL
 						painter->setPen(QPen(Qt::black, 4, Qt::SolidLine));
 						painter->setBrush(Qt::white);
 						painter->drawEllipse(17 + col*37 + 3, 60 + row*37 + 3, 31, 31);
-						
+
 					}
 					else
 					{
@@ -279,7 +279,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 		}
 	}
-	
+
 	void SoundActionBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (event->button() == Qt::LeftButton)
@@ -307,16 +307,16 @@ namespace Aseba { namespace ThymioVPL
 				}
 				else
 					setNote(noteIdx, noteVal);
-				
+
 				dragging = true;
 				setChangedFlag();
 				return;
 			}
 		}
-		
+
 		Block::mousePressEvent(event);
 	}
-	
+
 	void SoundActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -330,7 +330,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseMoveEvent(event);
 	}
-	
+
 	void SoundActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -341,7 +341,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseReleaseEvent(event);
 	}
-	
+
 	void SoundActionBlock::idxAndValFromPos(const QPointF& pos, bool* ok, unsigned& noteIdx, unsigned& noteVal)
 	{
 		if (QRectF(17,60,220,185).contains(pos))
@@ -355,7 +355,7 @@ namespace Aseba { namespace ThymioVPL
 			if (ok) *ok = false;
 		}
 	}
-	
+
 	void SoundActionBlock::setNote(unsigned noteIdx, unsigned noteVal)
 	{
 		unsigned& note(notes[noteIdx]);
@@ -367,7 +367,7 @@ namespace Aseba { namespace ThymioVPL
 			emit contentChanged();
 		}
 	}
-	
+
 	void SoundActionBlock::setDuration(unsigned noteIdx, unsigned durationVal)
 	{
 		unsigned& duration(durations[noteIdx]);
@@ -379,14 +379,14 @@ namespace Aseba { namespace ThymioVPL
 			emit contentChanged();
 		}
 	}
-	
+
 	int SoundActionBlock::getValue(unsigned i) const
 	{ 
 		if (i<6) 
 			return notes[i] | (durations[i] << 8); 
 		return -1;
 	}
-	
+
 	void SoundActionBlock::setValue(unsigned i, int value) 
 	{ 
 		if (i<6)
@@ -397,7 +397,7 @@ namespace Aseba { namespace ThymioVPL
 			emit contentChanged();
 		}
 	}
-	
+
 	QVector<uint16_t> SoundActionBlock::getValuesCompressed() const
 	{
 		unsigned compressedNotes = 0;
@@ -411,7 +411,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return (QVector<uint16_t>() << compressedNotes << compressedDurations);
 	}
-	
+
 	// TimerActionBlock
 	TimerActionBlock::TimerActionBlock(QGraphicsItem *parent) :
 		Block("action", "timer", parent),
@@ -419,28 +419,28 @@ namespace Aseba { namespace ThymioVPL
 		duration(1.0)
 	{
 		new QGraphicsSvgItem (":/images/timer.svgz", this);
-		
+
 		timer = new QTimeLine(duration, this);
 		timer->setFrameRange(0, duration/40);
 		timer->setCurveShape(QTimeLine::LinearCurve);
 		timer->setLoopCount(1);
 		connect(timer, SIGNAL(frameChanged(int)), SLOT(frameChanged(int)));
 	}
-	
+
 	void TimerActionBlock::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-		
+
 		Block::paint(painter, option, widget);
-		
+
 		painter->setBrush(Qt::white);
 		painter->drawEllipse(128-72, 136-72, 72*2, 72*2);
-		
+
 		const float angle(float(duration) * 2.f * M_PI / 4000.f);
 		painter->setBrush(Qt::darkBlue);
 		painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -angle*16*360/(2*M_PI));
-		
+
 		const float leftDuration(duration-float(timer->currentFrame())*40.f);
 		if (timer->state() == QTimeLine::Running)
 		{
@@ -448,9 +448,9 @@ namespace Aseba { namespace ThymioVPL
 			painter->setBrush(Qt::red);
 			painter->drawPie(QRectF(128-50, 136-50, 100, 100), 16*90, -leftAngle*16*360/(2*M_PI));
 		}
-		
+
 		painter->setPen(QPen(Qt::black, 10, Qt::SolidLine, Qt::RoundCap));
-		
+
 		// drawing handle
 		{
 			static const QPointF points[5] = {
@@ -471,15 +471,15 @@ namespace Aseba { namespace ThymioVPL
 			painter->restore();
 		}
 		//painter->drawLine(128, 136, 128+sinf(angle)*50, 136-cosf(angle)*50);
-		
-		
+
+
 	}
-	
+
 	void TimerActionBlock::frameChanged(int frame)
 	{
 		update();
 	}
-	
+
 	void TimerActionBlock::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		bool ok;
@@ -493,7 +493,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mousePressEvent(event);
 	}
-	
+
 	void TimerActionBlock::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -506,7 +506,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseMoveEvent(event);
 	}
-	
+
 	void TimerActionBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (dragging)
@@ -518,7 +518,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			Block::mouseReleaseEvent(event);
 	}
-	
+
 	unsigned TimerActionBlock::durationFromPos(const QPointF& pos, bool* ok) const
 	{
 		const double TIMER_RESOLUTION = 4;
@@ -532,32 +532,32 @@ namespace Aseba { namespace ThymioVPL
 		if (ok) *ok = false;
 		return 0;
 	}
-	
+
 	int TimerActionBlock::getValue(unsigned i) const
 	{ 
 		return duration;
 	}
-	
+
 	void TimerActionBlock::setValue(unsigned i, int value) 
 	{ 
 		setDuration(value);
 	}
-	
+
 	QVector<uint16_t> TimerActionBlock::getValuesCompressed() const
 	{
 		return QVector<uint16_t>(1, duration);
 	}
-	
+
 	void TimerActionBlock::setDuration(unsigned duration)
 	{
 		if (duration != this->duration)
 		{
 			this->duration = duration;
-			
+
 			update();
 			emit contentChanged();
 			setChangedFlag();
-			
+
 			timer->stop();
 			timer->setDuration(duration);
 			timer->setFrameRange(0, duration/40);
@@ -570,5 +570,5 @@ namespace Aseba { namespace ThymioVPL
 		StateFilterBlock("action", "setstate", parent)
 	{
 	}
-	
+
 } } // namespace ThymioVPL / namespace Aseba

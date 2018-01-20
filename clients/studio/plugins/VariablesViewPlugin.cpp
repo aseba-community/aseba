@@ -15,7 +15,7 @@ namespace Aseba
 		valuesRanges(new QComboBox)
 	{
 		QVBoxLayout* layout = new QVBoxLayout(this);
-	
+
 		layout->addWidget(new QLabel(tr("Please choose your variables")));
 		layout->addWidget(new QLabel(tr("red component")));
 		layout->addWidget(redVariable);
@@ -25,15 +25,15 @@ namespace Aseba
 		layout->addWidget(blueVariable);
 		layout->addWidget(new QLabel(tr("range of values")));
 		layout->addWidget(valuesRanges);
-		
+
 		QPushButton* okButton = new QPushButton(QIcon(":/images/ok.png"), tr("Ok"));
 		connect(okButton, SIGNAL(clicked(bool)), SLOT(accept()));
 		layout->addWidget(okButton);
-		
+
 		valuesRanges->addItem(tr("auto range"));
 		valuesRanges->addItem(tr("8 bits range (0–255)"));
 		valuesRanges->addItem(tr("percent range (0–100)"));
-		
+
 		const QList<TargetVariablesModel::Variable>& variables(variablesModel->getVariables());
 		for (int i = 0; i < variables.size(); ++i)
 		{
@@ -41,7 +41,7 @@ namespace Aseba
 			greenVariable->addItem(variables[i].name);
 			blueVariable->addItem(variables[i].name);
 		}
-		
+
 		const int redIndex(redVariable->findText("cam.red"));
 		if (redIndex != -1)
 			redVariable->setCurrentIndex(redIndex);
@@ -51,10 +51,10 @@ namespace Aseba
 		const int blueIndex(redVariable->findText("cam.blue"));
 		if (blueIndex != -1)
 			blueVariable->setCurrentIndex(blueIndex);
-		
+
 		setWindowTitle(tr("Linear Camera View Plugin"));
 	}
-	
+
 	//! Construct the plugin, taking ownership of an interface to a development environment
 	LinearCameraViewPlugin::LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de) :
 		VariableListener(_de->getVariablesModel()),
@@ -78,12 +78,12 @@ namespace Aseba
 		connect(this, SIGNAL(dialogBoxResult(bool)), checkbox, SLOT(setChecked(bool)));
 		return checkbox;
 	}
-	
+
 	void LinearCameraViewPlugin::closeAsSoonAsPossible()
 	{
 		close();
 	}
-	
+
 	void LinearCameraViewPlugin::setEnabled(bool enabled)
 	{
 		if (enabled)
@@ -91,12 +91,12 @@ namespace Aseba
 		else
 			close();
 	}
-	
+
 	void LinearCameraViewPlugin::enablePlugin()
 	{
 		// unsubscribe to existing variables, if any
 		disablePlugin();
-		
+
 		{
 			LinearCameraViewVariablesDialog linearCameraViewVariablesDialog(variablesModel);
 			if (linearCameraViewVariablesDialog.exec() != QDialog::Accepted)
@@ -104,18 +104,18 @@ namespace Aseba
 				emit dialogBoxResult(false);
 				return;
 			}
-			
+
 			redName = linearCameraViewVariablesDialog.redVariable->currentText();
 			greenName = linearCameraViewVariablesDialog.greenVariable->currentText();
 			blueName = linearCameraViewVariablesDialog.blueVariable->currentText();
 			valuesRange = (ValuesRange)linearCameraViewVariablesDialog.valuesRanges->currentIndex();
 		}
-		
+
 		bool ok = true;
 		ok &= subscribeToVariableOfInterest(redName);
 		ok &= subscribeToVariableOfInterest(greenName);
 		ok &= subscribeToVariableOfInterest(blueName);
-		
+
 		if (!ok)
 		{
 			QMessageBox::warning(this, tr("Cannot initialize linear camera view plugin"), tr("One or more variable not found in %1, %2, or %3.").arg(redName).arg(greenName).arg(blueName));
@@ -123,18 +123,18 @@ namespace Aseba
 			emit dialogBoxResult(false);
 			return;
 		}
-		
+
 		redPos = de->getVariablesModel()->getVariablePos(redName);
 		greenPos = de->getVariablesModel()->getVariablePos(greenName);
 		bluePos = de->getVariablesModel()->getVariablePos(blueName);
 		redSize = de->getVariablesModel()->getVariableSize(redName);
 		greenSize = de->getVariablesModel()->getVariableSize(greenName);
 		blueSize = de->getVariablesModel()->getVariableSize(blueName);
-		
+
 		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
 		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
 		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
-		
+
 		if (!timerId)
 		{
 			if (de->getProductId() == ASEBA_PID_EPUCK)
@@ -142,10 +142,10 @@ namespace Aseba
 			else
 				timerId = startTimer(100);
 		}
-		
+
 		show();
 	}
-	
+
 	void LinearCameraViewPlugin::disablePlugin()
 	{
 		// unsubscribe to existing variables, if any
@@ -156,20 +156,20 @@ namespace Aseba
 			timerId = 0;
 		}
 	}
-	
+
 	void LinearCameraViewPlugin::timerEvent ( QTimerEvent * event )
 	{
 		de->getTarget()->getVariables(de->getNodeId(), redPos, redSize);
 		de->getTarget()->getVariables(de->getNodeId(), greenPos, greenSize);
 		de->getTarget()->getVariables(de->getNodeId(), bluePos, blueSize);
 	}
-	
+
 	void LinearCameraViewPlugin::closeEvent ( QCloseEvent * event )
 	{
 		disablePlugin();
 		emit dialogBoxResult(false);
 	}
-	
+
 	void LinearCameraViewPlugin::variableValueUpdated(const QString& name, const VariablesDataVector& values)
 	{
 		if (name == redName)
@@ -187,14 +187,14 @@ namespace Aseba
 			blue = values;
 			componentsReceived |= 1 << 2;
 		}
-		
+
 		const int width = qMin(red.size(), qMin(green.size(), blue.size()));
 		if ((componentsReceived == 0x7) && width)
 		{
 			componentsReceived = 0;
 			QPixmap pixmap(width, 1);
 			QPainter painter(&pixmap);
-			
+
 			int min = std::numeric_limits<int>::max();
 			int max = std::numeric_limits<int>::min();
 			switch (valuesRange)
@@ -213,26 +213,26 @@ namespace Aseba
 					}
 				}
 				break;
-				
+
 				case VALUES_RANGE_8BITS:
 				{
 					min = 0;
 					max = 255;
 				}
 				break;
-				
+
 				case VALUES_RANGE_PERCENT:
 				{
 					min = 0;
 					max = 100;
 				}
 				break;
-				
+
 				default:
 				assert(false);
 				break;
 			}
-			
+
 			for (int i = 0; i < width; i++)
 			{
 				int range = max - min;
@@ -243,7 +243,7 @@ namespace Aseba
 				int b = ((blue[i] - min) * 255) / range;
 				painter.fillRect(i, 0, 1, 1, QColor(r, g, b));
 			}
-			
+
 			image->setPixmap(pixmap);
 		}
 	}

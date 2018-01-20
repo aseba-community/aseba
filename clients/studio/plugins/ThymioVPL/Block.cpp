@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -55,10 +55,10 @@ namespace Aseba { namespace ThymioVPL
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-		
+
 		drawBody(painter, 0, yShift, up, bodyColor);
 	}
-	
+
 	void Block::ThymioBody::drawBody(QPainter * painter, int xShift, int yShift, bool up, const QColor& bodyColor)
 	{
 		// button shape
@@ -66,7 +66,7 @@ namespace Aseba { namespace ThymioVPL
 		painter->setBrush(bodyColor);
 		painter->drawChord(-124+xShift, -118+yShift, 248, 144, 0, 2880);
 		painter->drawRoundedRect(-124+xShift, -52+yShift, 248, 176, 5, 5);
-		
+
 		if(!up) 
 		{
 			painter->setBrush(Qt::black);
@@ -74,7 +74,7 @@ namespace Aseba { namespace ThymioVPL
 			painter->drawRect(110+xShift, 30+yShift, 18, 80);
 		}
 	}
-	
+
 	//! Factory for buttons
 	Block* Block::createBlock(const QString& name, bool advanced, QGraphicsItem *parent)
 	{
@@ -107,7 +107,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			return 0;
 	}
-	
+
 	Block::Block(const QString& type, const QString& name, QGraphicsItem *parent) : 
 		QGraphicsObject(parent),
 		type(type),
@@ -123,7 +123,7 @@ namespace Aseba { namespace ThymioVPL
 	{
 		// doing nothing
 	}
-	
+
 	//! Return the name of the block translated in the local language
 	QString Block::getTranslatedName() const
 	{
@@ -156,7 +156,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			return "unknown block name";
 	}
-	
+
 	//! Return a 4-bit unsigned integer encoding the name
 	unsigned Block::getNameAsUInt4() const
 	{
@@ -190,7 +190,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			throw std::runtime_error("unknown name");
 	}
-	
+
 	bool Block::isAnyValueSet() const
 	{
 		for (unsigned i=0; i<valuesCount(); ++i)
@@ -200,61 +200,61 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return false;
 	}
-	
+
 	void Block::resetValues()
 	{
 		for (unsigned i=0; i<valuesCount(); ++i)
 			setValue(i, 0);
 	}
-	
+
 	QMimeData* Block::mimeData() const
 	{
 		// create a DOM document and serialize the content of this block in it
 		QDomDocument document("block");
 		document.appendChild(serialize(document));
-		
+
 		// create a MIME data for this block
 		QMimeData *mime = new QMimeData;
 		mime->setData("Block", document.toByteArray());
-		
+
 		return mime;
 	}
-	
+
 	QDomElement Block::serialize(QDomDocument& document) const
 	{
 		// create element
 		QDomElement element = document.createElement("block");
-		
+
 		// populate attributes from this block's informations
 		element.setAttribute("name", getName());
 		element.setAttribute("type", getType());
 		for (unsigned i=0; i<valuesCount(); ++i)
 			element.setAttribute(QString("value%0").arg(i), getValue(i));
-		
+
 		return element;
 	}
-	
+
 	Block* Block::deserialize(const QDomElement& element, bool advanced)
 	{
 		// create a block
 		Block *block(createBlock(element.attribute("name"), advanced));
 		if (!block)
 			return 0;
-		
+
 		// set that block's informations from element's attributes
 		for (unsigned i=0; i<block->valuesCount(); ++i)
 			block->setValue(i, element.attribute(QString("value%0").arg(i), QString("%0").arg(block->getValue(i))).toInt());
-		
+
 		return block;
 	}
-	
+
 	Block* Block::deserialize(const QByteArray& data, bool advanced)
 	{
 		QDomDocument document;
 		document.setContent(data);
 		return deserialize(document.documentElement(), advanced);
 	}
-	
+
 	QString Block::deserializeType(const QByteArray& data)
 	{
 		QDomDocument document;
@@ -262,7 +262,7 @@ namespace Aseba { namespace ThymioVPL
 		const QDomElement element(document.documentElement());
 		return element.attribute("type");
 	}
-	
+
 	QString Block::deserializeName(const QByteArray& data)
 	{
 		QDomDocument document;
@@ -270,17 +270,17 @@ namespace Aseba { namespace ThymioVPL
 		const QDomElement element(document.documentElement());
 		return element.attribute("name");
 	}
-	
+
 	void Block::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Q_UNUSED(option);
 		Q_UNUSED(widget);
-		
+
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Style::blockCurrentColor(type));
 		painter->drawRoundedRect(0, 0, 256, 256, 5, 5);
 	}
-	
+
 	QImage Block::image(qreal factor)
 	{
 		const QRectF br(boundingRect());
@@ -292,14 +292,14 @@ namespace Aseba { namespace ThymioVPL
 		painter.translate(-br.topLeft());
 		render(painter);
 		painter.end();
-		
+
 		return img;
 	}
-	
+
 	QImage Block::translucidImage(qreal factor)
 	{
 		QImage img(image(factor));
-		
+
 		// Set transparent block FIXME: test ugly, and should test whether QX11Extras module has been found rather than the platform
 		#ifdef Q_WS_X11
 		if (!QX11Info::isCompositingManagerRunning())
@@ -322,10 +322,10 @@ namespace Aseba { namespace ThymioVPL
 				}
 			}
 		}
-		
+
 		return img;
 	}
-	
+
 	//! Manual rendering of this block and its children, do not use a scene
 	void Block::render(QPainter& painter)
 	{
@@ -334,7 +334,7 @@ namespace Aseba { namespace ThymioVPL
 		paint(&painter, &opt, 0);
 		renderChildItems(painter, this, opt);
 	}
-	
+
 	//! Manual rendering of this block and its children, do not use a scene, for child items
 	void Block::renderChildItems(QPainter& painter, QGraphicsItem* item, QStyleOptionGraphicsItem& opt)
 	{
@@ -357,17 +357,17 @@ namespace Aseba { namespace ThymioVPL
 			painter.restore();
 		}
 	}
-	
+
 	void Block::clearChangedFlag()
 	{
 		changed = false;
 	}
-	
+
 	void Block::setChangedFlag()
 	{
 		changed = true;
 	}
-	
+
 	void Block::emitUndoCheckpointAndClearIfChanged()
 	{
 		if (changed)
@@ -380,20 +380,20 @@ namespace Aseba { namespace ThymioVPL
 		#ifndef ANDROID
 		if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton)).length() < QApplication::startDragDistance()) 
 			return;
-		
+
 		Q_ASSERT(scene());
 		Q_ASSERT(scene()->views().size() > 0);
 		ResizingView* view(polymorphic_downcast<ResizingView*>(scene()->views()[0]));
 		const QRectF sceneRect(mapRectToScene(boundingRect()));
 		const QRect viewRect(view->mapFromScene(sceneRect).boundingRect());
 		const QPoint hotspot(view->mapFromScene(event->scenePos()) - viewRect.topLeft());
-		
+
 		const bool isCopy((event->modifiers() & Qt::ControlModifier) || (name == "statefilter"));
 		QDrag *drag = new QDrag(event->widget());
 		drag->setMimeData(mimeData());
 		drag->setHotSpot(hotspot);
 		drag->setPixmap(QPixmap::fromImage(translucidImage(view->getScale())));
-		
+
 		beingDragged = true;
 		keepAfterDrop = false;
 		USAGE_LOG(logBlockMouseMove(this->name, this->type, event));
@@ -412,7 +412,7 @@ namespace Aseba { namespace ThymioVPL
 		beingDragged = false;
 		#endif // ANDROID
 	}
-	
+
 	void Block::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		EventActionsSet* parentSet(dynamic_cast<EventActionsSet*>(parentItem()));
@@ -422,38 +422,38 @@ namespace Aseba { namespace ThymioVPL
 		}
 		QGraphicsItem::mousePressEvent(event);
 	}
-	
+
 	/////
-	
+
 	BlockWithNoValues::BlockWithNoValues(const QString& type, const QString& name, QGraphicsItem *parent):
 		Block(type, name, parent)
 	{}
-	
-	
+
+
 	BlockWithBody::BlockWithBody(const QString& type, const QString& name, bool up, QGraphicsItem *parent) :
 		Block(type, name, parent),
 		up(up),
 		bodyColor(Qt::white)
 	{
 	}
-	
+
 	void BlockWithBody::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		Block::paint(painter, option, widget);
 		ThymioBody::drawBody(painter, 128, 128, up, bodyColor);
 	}
-	
-	
+
+
 	BlockWithButtons::BlockWithButtons(const QString& type, const QString& name, bool up, QGraphicsItem *parent) :
 		BlockWithBody(type, name, up, parent)
 	{
 	}
-	
+
 	unsigned BlockWithButtons::valuesCount() const
 	{
 		return buttons.size();
 	}
-	
+
 	int BlockWithButtons::getValue(unsigned i) const
 	{
 		if (i < (unsigned)buttons.size())
@@ -467,7 +467,7 @@ namespace Aseba { namespace ThymioVPL
 			buttons.at(i)->setValue(value);
 		emit contentChanged();
 	}
-	
+
 	QVector<uint16_t> BlockWithButtons::getValuesCompressed() const
 	{
 		unsigned value(0);
@@ -479,8 +479,8 @@ namespace Aseba { namespace ThymioVPL
 		assert(value <= 65535);
 		return QVector<uint16_t>(1, value);
 	}
-	
-	
+
+
 	BlockWithButtonsAndRange::BlockWithButtonsAndRange(const QString& type, const QString& name, bool up, const PixelToValModel pixelToValModel, int lowerBound, int upperBound, int defaultLow, int defaultHigh, const QColor& lowColor, const QColor& highColor, bool advanced, QGraphicsItem *parent) :
 		BlockWithButtons(type, name, up, parent),
 		pixelToValModel(pixelToValModel),
@@ -498,12 +498,12 @@ namespace Aseba { namespace ThymioVPL
 		showRangeControl(advanced)
 	{
 	}
-	
+
 	void BlockWithButtonsAndRange::paint (QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 	{
 		// paint parent
 		BlockWithButtons::paint(painter, option, widget);
-		
+
 		if (showRangeControl)
 		{
 			// draw selectors
@@ -513,7 +513,7 @@ namespace Aseba { namespace ThymioVPL
 			const int h(96);
 			const int lowPos(valToPixel(low));
 			const int highPos(valToPixel(high));
-			
+
 			// compute what we should show
 			bool isAnyClose(false);
 			bool isAnyFar(false);
@@ -525,7 +525,7 @@ namespace Aseba { namespace ThymioVPL
 				isAnyFar = isAnyFar || value == 2;
 				isAnyRange = isAnyRange || value == 3;
 			}
-			
+
 			// background
 			painter->setPen(QPen(Style::unusedButtonStrokeColor, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::NoBrush);
@@ -554,7 +554,7 @@ namespace Aseba { namespace ThymioVPL
 				painter->fillRect(x+highPos,y+24,lowPos-highPos,48,QBrush(linearGrad));
 				painter->drawRect(x+highPos,y+24,lowPos-highPos,48);
 			}
-			
+
 			// cursors
 			painter->setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
 			painter->setBrush(Qt::white);
@@ -572,7 +572,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 		}
 	}
-	
+
 	void BlockWithButtonsAndRange::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (!showRangeControl)
@@ -585,7 +585,7 @@ namespace Aseba { namespace ThymioVPL
 		if (lastPressedIn)
 			mouseMoveEvent(event);
 	}
-	
+
 	void BlockWithButtonsAndRange::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 	{
 		if (!showRangeControl || !lastPressedIn)
@@ -593,7 +593,7 @@ namespace Aseba { namespace ThymioVPL
 			BlockWithButtons::mouseMoveEvent(event);
 			return;
 		}
-		
+
 		const QRectF& r(rangeRect());
 		QPointF pos(event->pos());
 		if (!((event->buttons() & Qt::LeftButton) && r.contains(pos)))
@@ -613,7 +613,7 @@ namespace Aseba { namespace ThymioVPL
 			}
 			return;
 		}
-		
+
 		pos -= r.topLeft();
 		if (pos.y() >= 48)
 		{
@@ -630,20 +630,20 @@ namespace Aseba { namespace ThymioVPL
 		update();
 		emit contentChanged();
 	}
-	
+
 	void BlockWithButtonsAndRange::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		BlockWithButtons::mouseReleaseEvent(event);
-		
+
 		USAGE_LOG(logBlockMouseRelease(this->name, this->type, event));
 		emit undoCheckpoint();
 	}
-	
+
 	unsigned BlockWithButtonsAndRange::valuesCount() const
 	{
 		return BlockWithButtons::valuesCount() + 2;
 	}
-	
+
 	int BlockWithButtonsAndRange::getValue(unsigned i) const
 	{
 		const unsigned buttonsCount(buttons.size());
@@ -674,7 +674,7 @@ namespace Aseba { namespace ThymioVPL
 		}
 		updateIndicationLEDsOpacity();
 	}
-	
+
 	QVector<uint16_t> BlockWithButtonsAndRange::getValuesCompressed() const
 	{
 		QVector<uint16_t> values(BlockWithButtons::getValuesCompressed());
@@ -682,7 +682,7 @@ namespace Aseba { namespace ThymioVPL
 		values.append(high);
 		return values;
 	}
-	
+
 	bool BlockWithButtonsAndRange::isAnyValueSet() const
 	{
 		for (unsigned i=0; i<BlockWithButtons::valuesCount(); ++i)
@@ -692,19 +692,19 @@ namespace Aseba { namespace ThymioVPL
 		}
 		return false;
 	}
-	
+
 	bool BlockWithButtonsAndRange::isAnyAdvancedFeature() const
 	{
 		bool isButtonAdvanced(false);
-		
+
 		// check whether any button is in advanced mode
 		if (buttonsCountSimple >= 0)
 			for (int i=0; i<buttons.size(); ++i)
 				isButtonAdvanced = isButtonAdvanced || (buttons[i]->getValue() >= buttonsCountSimple);
-		
+
 		return (low != defaultLow) || (high != defaultHigh) || isButtonAdvanced;
 	}
-	
+
 	void BlockWithButtonsAndRange::setAdvanced(bool advanced)
 	{
 		if (!advanced)
@@ -726,12 +726,12 @@ namespace Aseba { namespace ThymioVPL
 		showRangeControl = advanced;
 		emit contentChanged();
 	}
-	
+
 	QRectF BlockWithButtonsAndRange::rangeRect() const
 	{
 		return QRectF(32,100,192,96);
 	}
-	
+
 	float BlockWithButtonsAndRange::pixelToVal(float pixel) const
 	{
 		// pixel to relative
@@ -768,7 +768,7 @@ namespace Aseba { namespace ThymioVPL
 		v = round(v / precision) * precision;
 		return std::min(std::max(lowerBound, v), lowerBound + range);
 	}
-	
+
 	float BlockWithButtonsAndRange::valToPixel(float val) const
 	{
 		val = std::min(std::max((float)lowerBound, val), (float)upperBound);
@@ -778,7 +778,7 @@ namespace Aseba { namespace ThymioVPL
 		else
 			return 23+width*(sqrt((val-lowerBound)/float(range)));
 	}
-	
+
 	//! Create a point with a gradient representing a LED on the robot
 	QGraphicsItem* BlockWithButtonsAndRange::createIndicationLED(int x, int y)
 	{
@@ -790,14 +790,14 @@ namespace Aseba { namespace ThymioVPL
 		ledIndication->setPen(Qt::NoPen);
 		return ledIndication;
 	}
-	
+
 	//! For every button, update the indication LED accordingly
 	void BlockWithButtonsAndRange::updateIndicationLEDsOpacity(void)
 	{
 		// we need to have one LED per button for this function to work
 		if (indicationLEDs.size() != buttons.size())
 			return;
-		
+
 		for (int i=0; i<indicationLEDs.size(); ++i)
 		{
 			switch (buttons[i]->getValue())
@@ -810,9 +810,9 @@ namespace Aseba { namespace ThymioVPL
 			}
 		}
 	}
-	
+
 	// State Filter Action
-	
+
 	StateFilterBlock::StateFilterBlock(const QString& type, const QString& name, QGraphicsItem *parent) : 
 		BlockWithButtons(type, name, true, parent)
 	{

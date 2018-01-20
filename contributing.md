@@ -102,6 +102,7 @@ Header files have included guards of the form `__FILE_NAME_H` for a file named `
 
 Code should be indented by tabs.
 A tab should be equivalent to 4 spaces.
+Empty lines should not have any whitespace.
 
 ### Class and struct naming
 

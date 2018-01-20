@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -75,7 +75,7 @@ int16_t aseba_atan2(int16_t y, int16_t x)
 		else if (x < 0)
 			return -32768;
 	}
-	
+
 	{
 		int16_t res;
 		int16_t ax = abs(x);
@@ -92,9 +92,9 @@ int16_t aseba_atan2(int16_t y, int16_t x)
 			q1 = __builtin_divmodud(ay, ax, &rem1);
 			q2 = __builtin_divud(((unsigned long) rem1) << 16, ax);
 			int32_t value = (q1 << 16) | q2;
-			
+
 			int16_t fb1;
-			
+
 			// find first bit at one
 			// ASM optimisation for 16bits PIC
 			// Find first bit from left (MSB) on 32 bits word
@@ -123,16 +123,16 @@ int16_t aseba_atan2(int16_t y, int16_t x)
 					int16_t delta = subprecision_index & 0x1f;
 					res = __builtin_divsd(__builtin_mulss(aseba_atan_table[index*8 + bin], 32 - delta) + __builtin_mulss(aseba_atan_table[index*8 + bin + 1], delta),32);
 				}
-				
+
 #else		
 			int32_t value = (((int32_t)ay << 16)/(int32_t)(ax));
 			int16_t fb1 = 0;
-			
+
 			int16_t fb1_counter;
 			for (fb1_counter = 0; fb1_counter < 32; fb1_counter++)
 				if ((value >> (int32_t)fb1_counter) != 0)
 					fb1 = fb1_counter;
-						
+
 			{
 				// we only keep 4 bits of precision below comma as atan(x) is like x near 0
 				int16_t index = fb1 - 12;
@@ -156,7 +156,7 @@ int16_t aseba_atan2(int16_t y, int16_t x)
 					res = 32768 - res;
 			}
 		}
-		
+
 		if (y > 0)
 			return res;
 		else
@@ -203,13 +203,13 @@ int16_t aseba_sin(int16_t angle)
 			return 32767;
 		invert = 0;
 	}
-	
+
 	index = lookupAngle >> 7;
 	subIndex = lookupAngle & 0x7f;
-	
+
 	{
 		int16_t result = (int16_t)(((int32_t)aseba_sin_table[index] * (int32_t)(128-subIndex) + (int32_t)aseba_sin_table[index+1] * (int32_t)(subIndex)) >> 7);
-		
+
 		if (invert)
 			return -result;
 		else
@@ -229,10 +229,10 @@ int16_t aseba_sqrt(int16_t num)
 	int16_t op = num;
 	int16_t res = 0;
 	int16_t one = 1 << 14;
-	
+
 	while(one > op)
 		one >>= 2;
-		
+
 	while(one != 0) 
 	{
 		if (op >= res + one) 
@@ -290,12 +290,12 @@ void AsebaNative_veccopy(AsebaVMState *vm)
 	// variable pos
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
-	
+
 	for (i = 0; i < length; i++)
 	{
 		vm->variables[dest++] = vm->variables[src++];
@@ -319,12 +319,12 @@ void AsebaNative_vecfill(AsebaVMState *vm)
 	// variable pos
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t value = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
-	
+
 	for (i = 0; i < length; i++)
 	{
 		vm->variables[dest++] = vm->variables[value];
@@ -349,10 +349,10 @@ void AsebaNative_vecaddscalar(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t scalar = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	const int16_t scalarValue = vm->variables[scalar];
 	uint16_t i;
 	for (i = 0; i < length; i++)
@@ -380,10 +380,10 @@ void AsebaNative_vecadd(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -410,10 +410,10 @@ void AsebaNative_vecsub(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -440,10 +440,10 @@ void AsebaNative_vecmul(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -470,16 +470,16 @@ void AsebaNative_vecdiv(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
 		int32_t dividend = (int32_t)vm->variables[src1++];
 		int32_t divisor = (int32_t)vm->variables[src2++];
-		
+
 		if (divisor != 0)
 		{
 			vm->variables[dest++] = (int16_t)(dividend / divisor);
@@ -512,10 +512,10 @@ void AsebaNative_vecmin(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -545,10 +545,10 @@ void AsebaNative_vecmax(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -578,10 +578,10 @@ void AsebaNative_vecclamp(AsebaVMState *vm)
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t low = AsebaNativePopArg(vm);
 	uint16_t high = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -613,12 +613,12 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	uint16_t src1 = AsebaNativePopArg(vm);
 	uint16_t src2 = AsebaNativePopArg(vm);
 	int16_t shift = vm->variables[AsebaNativePopArg(vm)];
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
 	int32_t res = 0;
 	uint16_t i;
-	
+
 	if(shift > 32) {
 		vm->variables[dest] = 0;
 		return;
@@ -626,7 +626,7 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 
 #ifdef DSP_AVAILABLE
 	length--;
-	
+
 	CORCONbits.US = 0; // Signed mode
 	CORCON |= 0b11110001; // 40 bits mode, saturation enable, integer mode.
 	// Do NOT save the accumulator values, so do NOT USE THIS FUNCTION IN INTERRUPT ! 	
@@ -643,15 +643,15 @@ void AsebaNative_vecdot(AsebaVMState *vm)
 	: /* No output */
 	: [loop_cnt] "r" (length), [ptr1] "x" (&vm->variables[src1]), [ptr2] "r" (&vm->variables[src2])
 	: "cc", "w4", "w5" );
-	
+
 	if(shift > 16) {
 		shift -= 16;
 		asm __volatile__ ("sftac	A, #16\r\n" : /* No output */ : /* No input */ : "cc");
 	}
-	
+
 	// Shift and get the output
 	asm __volatile__ ("sftac A, %[sft]\r\n" : /* No output */ : [sft] "r" (shift) : "cc");
-	
+
 	vm->variables[dest] = ACCAL; // Get the Accumulator low word
 #elif defined(__C30__)
 	for (i= 0; i < length; i++)
@@ -689,20 +689,20 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 	uint16_t min = AsebaNativePopArg(vm);
 	uint16_t max = AsebaNativePopArg(vm);
 	uint16_t mean = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
 	int16_t val;
 	int32_t acc;
 	uint16_t i;
-	
+
 	if (length)
 	{
 		val = vm->variables[src++];
 		acc = val;
 		vm->variables[min] = val;
 		vm->variables[max] = val;
-		
+
 		for (i = 1; i < length; i++)
 		{
 			val = vm->variables[src++];
@@ -712,7 +712,7 @@ void AsebaNative_vecstat(AsebaVMState *vm)
 				vm->variables[max] = val;
 			acc += (int32_t)val;
 		}
-		
+
 		vm->variables[mean] = (int16_t)(acc / (int32_t)length);
 	}
 }
@@ -737,14 +737,14 @@ void AsebaNative_vecargbounds(AsebaVMState *vm)
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t argmin = AsebaNativePopArg(vm);
 	uint16_t argmax = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
 	int16_t min = 32767;
 	int16_t max = -32768;
 	int16_t val;
 	uint16_t i;
-	
+
 	if (length)
 	{
 		for (i = 0; i < length; i++)
@@ -781,10 +781,10 @@ void AsebaNative_vecsort(AsebaVMState *vm)
 {
 	// variable pos
 	uint16_t src = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	aseba_comb_sort(&vm->variables[src], length);
 }
 
@@ -806,10 +806,10 @@ void AsebaNative_mathmuldiv(AsebaVMState *vm)
 	uint16_t aIndex = AsebaNativePopArg(vm);
 	uint16_t bIndex = AsebaNativePopArg(vm);
 	uint16_t cIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -848,10 +848,10 @@ void AsebaNative_mathatan2(AsebaVMState *vm)
 	uint16_t destIndex = AsebaNativePopArg(vm);
 	int16_t yIndex = AsebaNativePopArg(vm);
 	int16_t xIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -878,10 +878,10 @@ void AsebaNative_mathsin(AsebaVMState *vm)
 	// variable pos
 	uint16_t destIndex = AsebaNativePopArg(vm);
 	int16_t xIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -906,10 +906,10 @@ void AsebaNative_mathcos(AsebaVMState *vm)
 	// variable pos
 	uint16_t destIndex = AsebaNativePopArg(vm);
 	int16_t xIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -935,18 +935,18 @@ void AsebaNative_mathrot2(AsebaVMState *vm)
 	uint16_t vectOutIndex = AsebaNativePopArg(vm);
 	uint16_t vecInIndex = AsebaNativePopArg(vm);
 	uint16_t angleIndex = AsebaNativePopArg(vm);
-	
+
 	// variables
 	int16_t x = vm->variables[vecInIndex];
 	int16_t y = vm->variables[vecInIndex+1];
 	int16_t a = vm->variables[angleIndex];
-	
+
 	int16_t cos_a = aseba_cos(a);
 	int16_t sin_a = aseba_sin(a);
-	
+
 	int16_t xp = (int16_t)(((int32_t)cos_a * (int32_t)x - (int32_t)sin_a * (int32_t)y) >> (int32_t)15);
 	int16_t yp = (int16_t)(((int32_t)cos_a * (int32_t)y + (int32_t)sin_a * (int32_t)x) >> (int32_t)15);
-	
+
 	vm->variables[vectOutIndex] = xp;
 	vm->variables[vectOutIndex+1] = yp;
 }
@@ -968,10 +968,10 @@ void AsebaNative_mathsqrt(AsebaVMState *vm)
 	// variable pos
 	uint16_t destIndex = AsebaNativePopArg(vm);
 	int16_t xIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -997,11 +997,11 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm); // output value index
 	uint16_t src = AsebaNativePopArg(vm); // input vector index
 	uint16_t length = AsebaNativePopArg(vm); // length threshold index
-	
+
 	// variable size
 	uint16_t inputLength = AsebaNativePopArg(vm);
 	int16_t minLength = vm->variables[length]; // length threshold 
-	
+
 	// work variables
 	uint16_t nzFirstZero;
 	int16_t index;
@@ -1009,7 +1009,7 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
 	int16_t bestSeqLength;
 	int16_t bestSeqIndex;
 	int16_t seqLength;
-	
+
 	// search for a zero, then non-zero
 	uint16_t nzFirstIndex = 0;
 	while (vm->variables[src + nzFirstIndex] != 0)
@@ -1042,11 +1042,11 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
 			return;
 		}
 	}
-	
+
 	index = 0;
 	bestSeqLength = 0;
 	bestSeqIndex = 0;
-	
+
 	while (1)
 	{
 		// scan non-zero sequence
@@ -1066,7 +1066,7 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
 		}
 		if (index >= inputLength)
 			break;
-		
+
 		// scan zero sequence
 		while (vm->variables[src + (nzFirstIndex + index) % inputLength] == 0)
 		{
@@ -1075,7 +1075,7 @@ void AsebaNative_vecnonzerosequence(AsebaVMState *vm)
 				goto doubleBreak;
 		}
 	}
-	
+
 doubleBreak:
 	if (bestSeqLength < minLength)
 	{
@@ -1117,10 +1117,10 @@ void AsebaNative_rand(AsebaVMState *vm)
 {
 	// variable pos
 	uint16_t destIndex = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	uint16_t length = AsebaNativePopArg(vm);
-	
+
 	uint16_t i;
 	for (i = 0; i < length; i++)
 	{
@@ -1189,7 +1189,7 @@ void AsebaNative_deqsize(AsebaVMState *vm)
 	// variable pos
 	uint16_t deque = AsebaNativePopArg(vm);
 	uint16_t size = AsebaNativePopArg(vm);
-	
+
 	// variable size
 	(void)/* uint16_t deque_length = */ AsebaNativePopArg(vm);
 
@@ -1234,19 +1234,19 @@ void AsebaNative_deqget(AsebaVMState *vm)
 	uint16_t dest = AsebaNativePopArg(vm);
 	uint16_t index = AsebaNativePopArg(vm);
 	uint16_t index_val = vm->variables[index];
-	
+
 	// variable size
 	uint16_t deque_length = AsebaNativePopArg(vm);
 	uint16_t dest_length = AsebaNativePopArg(vm);
-	
+
 	// Check for parameter range exception
 	if (vm->variables[index] < 0 || vm->variables[index] > deque_length - 2 - 1)
 		return deque_throw_exception(vm);
-	
+
 	// Do it
 	_AsebaNative_deqget(vm, dest, deque, index_val, dest_length, deque_length);
 }
-	
+
 const AsebaNativeFunctionDescription AsebaNativeDescription_deqget =
 {
 	"deque.get",
@@ -1266,7 +1266,7 @@ void AsebaNative_deqset(AsebaVMState *vm)
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t index = AsebaNativePopArg(vm);
 	uint16_t index_val = vm->variables[index];
-	
+
 	// variable size
 	uint16_t deque_length = AsebaNativePopArg(vm);
 	uint16_t src_length = AsebaNativePopArg(vm);
@@ -1275,17 +1275,17 @@ void AsebaNative_deqset(AsebaVMState *vm)
 	uint16_t dq_size = vm->variables[deque];
 	uint16_t dq_start = vm->variables[deque + 1];
 	uint16_t dq_capacity = deque_length - 2;
-	
+
 	// Check for deque size and parameter range exception
 	if (vm->variables[index] < 0 || vm->variables[index] > deque_length - 2 - 1
 		|| src_length > dq_size - index_val)
 	{
 		return deque_throw_exception(vm);
 	}
-	
+
 	// Copy elements into deque
 	uint16_t i;
-	
+
 	for (i = 0; i < src_length; i++)
 	{
 		vm->variables[deque + 2 + ((dq_start + index_val + i) % dq_capacity)] = vm->variables[src++];
@@ -1303,14 +1303,14 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_deqset =
 		{ 0, 0 }
 	}
 };
-	
+
 static void _AsebaNative_deqinsert(AsebaVMState *vm, uint16_t deque, uint16_t src, uint16_t index_val, uint16_t deque_length, uint16_t src_length)
 {
 	// infer deque parameters
 	uint16_t dq_size = vm->variables[deque];
 	uint16_t dq_start = vm->variables[deque + 1];
 	uint16_t dq_capacity = deque_length - 2;
-	
+
 	// Check for deque size exception
 	if (src_length > dq_capacity - dq_size)
 		return deque_throw_exception(vm);
@@ -1347,15 +1347,15 @@ void AsebaNative_deqinsert(AsebaVMState *vm)
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t index = AsebaNativePopArg(vm);
 	uint16_t index_val = vm->variables[index];
-	
+
 	// variable size
 	uint16_t deque_length = AsebaNativePopArg(vm);
 	uint16_t src_length = AsebaNativePopArg(vm);
-	
+
 	// Check for parameter range exception
 	if (vm->variables[index] < 0 || index_val > deque_length - 2 - 1)
 		return deque_throw_exception(vm);
-	
+
 	// Do it
 	_AsebaNative_deqinsert(vm, deque, src, index_val, deque_length, src_length);
 }
@@ -1371,14 +1371,14 @@ const AsebaNativeFunctionDescription AsebaNativeDescription_deqinsert =
 		{ 0, 0 }
 	}
 };
-	
+
 static void _AsebaNative_deqerase(AsebaVMState *vm, uint16_t deque, uint16_t index_val, uint16_t len_val, uint16_t deque_length)
 {
 	// infer deque parameters
 	uint16_t dq_size = vm->variables[deque];
 	uint16_t dq_start = vm->variables[deque + 1];
 	uint16_t dq_capacity = deque_length - 2;
-	
+
 	// Check for deque size exception
 	if (len_val > dq_size - index_val)
 		return deque_throw_exception(vm);
@@ -1412,14 +1412,14 @@ void AsebaNative_deqerase(AsebaVMState *vm)
 	uint16_t len = AsebaNativePopArg(vm);
 	uint16_t index_val = vm->variables[index];
 	uint16_t len_val = vm->variables[len];
-	
+
 	// variable size
 	uint16_t deque_length = AsebaNativePopArg(vm);
-	
+
 	// Check for parameter range exception
 	if (vm->variables[index] < 0 || index_val > deque_length - 2 - 1)
 		return deque_throw_exception(vm);
-	
+
 	// Do it
 	_AsebaNative_deqerase(vm, deque, index_val, len_val, deque_length);
 }
@@ -1467,9 +1467,9 @@ void AsebaNative_deqpushback(AsebaVMState *vm)
 	uint16_t src = AsebaNativePopArg(vm);
 	uint16_t deque_length = AsebaNativePopArg(vm);
 	uint16_t src_length = AsebaNativePopArg(vm);
-    
+
 	uint16_t index_val = vm->variables[deque]; // length of deque is index value
-	
+
 	// Now call insert with proper arguments
 	// Low-level function will check capacity and raise exception if necessary
 	_AsebaNative_deqinsert(vm, deque, src, index_val, deque_length, src_length);
@@ -1520,7 +1520,7 @@ void AsebaNative_deqpopback(AsebaVMState *vm)
 	uint16_t dest_length = AsebaNativePopArg(vm);
 
     uint16_t index_val = vm->variables[deque]; // length of deque is index value, from which tuple length will be subtracted
-	
+
 	// Now call insert and erase with proper arguments
 	// Low-level function will check capacity and raise exception if necessary
 	_AsebaNative_deqget(vm, dest, deque, index_val - dest_length, dest_length, deque_length);

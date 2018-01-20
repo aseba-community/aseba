@@ -56,21 +56,21 @@ struct TestNodesManager: NodesManager
 struct TestSimulatorEnvironment: SimulatorEnvironment
 {
 	World& world;
-	
+
 	TestSimulatorEnvironment(World& world): world(world) {}
-	
+
 	virtual void notify(const EnvironmentNotificationType type, const string& description, const strings& arguments) override
 	{
 		cerr << "N " << description;
 		copy(arguments.begin(), arguments.end(), ostream_iterator<string>(cerr, " "));
 		cerr << endl;
 	}
-	
+
 	virtual string getSDFilePath(const string& robotName, unsigned fileNumber) const override
 	{
 		return string("SD_FILE_") + to_string(fileNumber) + ".DAT";
 	}
-	
+
 	virtual World* getWorld() const override
 	{
 		return &world;
@@ -85,13 +85,13 @@ int main()
 	// create world, robot and nodes manager
 	World world(40, 20);
 	simulatorEnvironment.reset(new TestSimulatorEnvironment(world));
-	
+
 	DirectAsebaThymio2* thymio(new DirectAsebaThymio2("thymio2_0", 1));
 	thymio->pos = {10, 10};
 	world.addObject(thymio);
-	
+
 	TestNodesManager testNodesManager(thymio);
-	
+
 	cout << "\n* Discovering robot\n" << endl;
 
 	// list the nodes and step, the robot should send its description to the nodes manager
@@ -128,7 +128,7 @@ int main()
 		cerr << "nodes manager did not return a target description for \"thymio-II\"" << endl;
 		return 3;
 	}
-	
+
 	// we define a lambda to load and run a program
 	auto loadAndRun = [&](const wchar_t program[])
 	{
@@ -156,9 +156,9 @@ int main()
 		// then run the code...
 		thymio->inQueue.emplace(new Run(nodeId));
 	};
-	
+
 	cout << "\n* Testing movement\n" << endl;
-	
+
 	// let the robot move until it sees an obstacle
 	loadAndRun(
 		L"onevent prox\n"
@@ -187,9 +187,9 @@ int main()
 		cerr << "Robot is still moving after 100 time steps, delta: " << deltaPos.x << ", " << deltaPos.y << endl;
 		return 5;
 	}
-	
+
 	cout << "\n* Testing SD card\n" << endl;
-	
+
 	// write some data
 	loadAndRun(
 		L"var result\n"
@@ -197,14 +197,14 @@ int main()
 		L"call sd.write([1,2,3,4], result)\n"
 	);
 	step();
-	
+
 	// check result
 	if (thymio->variables.freeSpace[0] != 4)
 	{
 		cerr << "Result of sd.write is " << thymio->variables.freeSpace[0] << " instead of 4" << endl;
 		return 6;
 	}
-	
+
 	// load back the data and compare
 	loadAndRun(
 		L"var data[8]\n"
@@ -215,7 +215,7 @@ int main()
 		L"call sd.read(data[4:7], result)\n"
 	);
 	step();
-	
+
 	// check result
 	auto expected = {1, 2, 3, 4, 1, 2, 3, 4};
 	if (!equal(expected.begin(), expected.end(), &thymio->variables.freeSpace[0]))

@@ -4,16 +4,16 @@
 		Stephane Magnenat <stephane at magnenat dot net>
 		(http://stephane.magnenat.net)
 		and other contributors, see authors.txt for details
-	
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, version 3 of the License.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -54,18 +54,18 @@ namespace Aseba { namespace ThymioVPL
 	class Scene;
 	class BlockButton;
 	class ResizingView;
-	
+
 	/** \addtogroup studio */
 	/*@{*/
-	
+
 	class ThymioVisualProgramming : public QWidget, public NodeToolInterface
 	{
 		Q_OBJECT
-	
+
 	public:
 		ThymioVisualProgramming(DevelopmentEnvironmentInterface *_de, bool showCloseButton = true, bool debugLog = false, bool execFeedback = false);
 		~ThymioVisualProgramming();
-		
+
 		virtual QWidget* createMenuEntry();
 		virtual void closeAsSoonAsPossible();
 
@@ -74,26 +74,26 @@ namespace Aseba { namespace ThymioVPL
 		virtual QDomDocument transformDomToVersion1(const QDomDocument& content0);
 		virtual QDomDocument saveToDom() const;
 		virtual void codeChangedInEditor();
-		
+
 		bool isModified() const;
 		qreal getViewScale() const;
-		
+
 	signals:
 		void modifiedStatusChanged(bool modified);
 		void compilationOutcome(bool success);
-		
+
 	protected slots:
 		void showErrorLine();
 		bool closeFile();
-		
+
 	private slots:
 		void openHelp();
 		void saveSnapshot() const;
 		void showVPLModal();
-		
+
 		void addEvent();
 		void addAction();
-		
+
 		void newFile();
 		void openFile();
 		bool save();
@@ -108,40 +108,40 @@ namespace Aseba { namespace ThymioVPL
 		void processCompilationResult();
 		void processHighlightChange();
 		void userEvent(unsigned id, const VariablesDataVector& data);
-		
+
 	private:
 		void clearUndo();
 		void toggleAdvancedMode(bool advanced, bool force=false, bool ignoreSceneCheck=false);
 		void clearSceneWithoutRecompilation();
 		void showAtSavedPosition();
 		void setupGlobalEvents();
-		
+
 	public:
 		const bool debugLog;
 		const bool execFeedback;
-		
+
 	protected:
 		friend class Aseba::ThymioVPL::BlockButton;
 		friend class Aseba::ThymioVPL::Scene;
-		
+
 		std::unique_ptr<DevelopmentEnvironmentInterface> de;
 		ResizingView *view;
 		Scene *scene;
 		bool loading; //!< true during load, to prevent recursion of changes triggered by VPL itself
-		
+
 		QStack<QString> undoStack; //!< keep string version of QDomDocument
 		int undoPos; //!< current position of undo in the stack, -1 if invalid
-		
+
 		// Event & Action buttons
 		QList<BlockButton *> eventButtons;
 		QList<BlockButton *> actionButtons;
 		QLabel *eventsLabel;
 		QLabel *actionsLabel;
-	
+
 		QLabel *compilationResult;
 		QLabel *compilationResultImage;
 		QPushButton *showCompilationError;
-		
+
 		//QSlider *zoomSlider;
 
 		QToolBar *toolBar;
@@ -166,7 +166,7 @@ namespace Aseba { namespace ThymioVPL
 		QSpacerItem *spacer4;
 		QSpacerItem *spacer5;
 		QSpacerItem *spacer6;
-		
+
 		// run button animation
 		QVector<QPixmap> runAnimFrames;
 		int runAnimFrame;
@@ -178,11 +178,11 @@ namespace Aseba { namespace ThymioVPL
 		QVBoxLayout *sceneLayout;
 		QHBoxLayout *compilationResultLayout;
 		QVBoxLayout *actionsLayout;
-		
+
 	protected:
 		friend class Aseba::ThymioVPLStandalone;
 		friend struct Aseba::ThymioVPLStandaloneInterface;
-		
+
 		QPixmap drawColorScheme(const QColor& eventColor, const QColor& stateColor, const QColor& actionColor);
 		void saveGeometryIfVisible();
 		bool preDiscardWarningDialog(bool keepCode);
@@ -190,7 +190,7 @@ namespace Aseba { namespace ThymioVPL
 		void setColors(QComboBox *comboBox);
 		void updateBlockButtonImages();
 		void closeEvent(QCloseEvent * event);
-		
+
 		#ifndef Q_OS_WIN
 		void regenerateRunButtonAnimation(const QSize& iconSize);
 		#endif // Q_OS_WIN
