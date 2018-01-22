@@ -5,12 +5,6 @@ This page describes the programming capabilities of Thymio. It lists
 the different variables and functions and indicates to which elements
 of the robot they refer.
 
-Standard library
-----------------
-
-The Thymio comes with the Aseba `standard library of native functions,
-documented on its own page <aseba-std-natives.rst>`__.
-
 Buttons
 -------
 
