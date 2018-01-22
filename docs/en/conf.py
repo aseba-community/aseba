@@ -85,6 +85,14 @@ todo_include_todos = False
 #
 html_theme = 'sphinx_rtd_theme'
 
+# Use a style similar to the Linux Kernel documentation. as
+# it is more usable than the default RTD theme
+html_context = {
+    'css_files': [
+        '_static/theme_overrides.css',
+    ],
+}
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
