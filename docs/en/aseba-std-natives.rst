@@ -120,7 +120,7 @@ Native functions standard library
 Since a scalar is considered to be an array of size one, you can use
 these functions on scalars:
 
-.. code-block::
+::
 
     var theta = 16384
     var cos_theta
