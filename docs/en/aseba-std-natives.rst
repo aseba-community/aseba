@@ -1,3 +1,5 @@
+.. _aseba_natives:
+
 Native functions standard library
 =================================
 
