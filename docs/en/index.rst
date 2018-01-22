@@ -7,7 +7,7 @@ Welcome to Aseba's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    aseba-language
