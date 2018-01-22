@@ -650,4 +650,4 @@ What to read next?
 
 You might be interested to read:
 
--  `Description of the native functions standard library <std-natives.rst>`__
+-  `Description of the native functions standard library <aseba-std-natives.rst>`__

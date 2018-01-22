@@ -1,5 +1,5 @@
-Programming Interface
-=====================
+Thymio Programming Interface
+============================
 
 This page describes the programming capabilities of Thymio. It lists
 the different variables and functions and indicates to which elements
@@ -201,7 +201,7 @@ is pressed. When the centre button is pressed, all four LEDs light up.
    ``led 1`` corresponding to the front LED, then clockwise numbering.
 
 The LED of the RC receiver
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This red LED is located close to the remote-control (infrared) receiver.
 
@@ -256,10 +256,10 @@ motor commands from the variables ``motor.left.pwm`` and
 ``motor.right.pwm``.
 
 Sound
-=====
+-----
 
 Sound-intensity detection
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | The Thymio can detect when the ambient sound is above a given
   intensity and emit an event.
@@ -269,7 +269,7 @@ Sound-intensity detection
   ``mic.threshold``, then the event ``mic`` is generated.
 
 Playing and recording sounds
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can play synthetic or system sounds. Moreover, if you have installed
 a `micro-SD <http://en.wikipedia.org/wiki/MicroSD#microSD>`__ card
@@ -281,7 +281,7 @@ Aseba, it fires the event ``sound.finished``. It does not fire an event
 if playing is interrupted or if a new sound is played.
 
 Synthetic sound
----------------
+~~~~~~~~~~~~~~~
 
 The native function ``sound.freq`` plays a frequency, specified in Hz,
 for a certain duration, specified in 1/60 s. Specifying a 0 duration
@@ -289,7 +289,7 @@ plays the sound continuously and specifying a -1 duration stops the
 sound.
 
 Changing the primary wave
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Synthetic sound generation works by re-sampling a primary wave. By
 default, it is a triangular wave, but you can define your own wave using
@@ -301,7 +301,7 @@ the frequency of 7812.5/142 = ~55 Hz. Playing a sound of a higher
 frequency skips samples in the array.
 
 Recording
----------
+~~~~~~~~~
 
 You can record sounds using the ``sound.record`` native function. This
 function takes as parameter a record number from 0 to 32767. Files are
@@ -310,7 +310,7 @@ parameter passed to the ``sound.record`` function. To stop a recording,
 call the ``sound.record`` function with the value of -1.
 
 Replaying
----------
+~~~~~~~~~
 
 You can replay a recorded sound using the ``sound.replay`` native
 function. This function takes as parameter a record number from 0 to
@@ -319,7 +319,7 @@ the parameter passed to the ``sound.replay`` function. To stop a replay,
 call the ``sound.replay`` function with the value of -1.
 
 Duration (from firmware version 11)
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can retrieve the duration of a recorded sound using the
 ``sound.duration(x,duration)`` native function. Its first parameter,
@@ -328,7 +328,7 @@ from the SD card. The result in 1/10 of seconds is put in the variable
 ``duration`` as second parameter.
 
 Creating sound on your computer
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can create sounds for Thymio using your computer. An efficient way
 to do so is to use the `Audacity <http://audacity.sourceforge.net/>`__
@@ -356,7 +356,7 @@ video <http://www.youtube.com/watch?v=aWtPvnLYMps>`__ on how to do the
 above.
 
 Play
-----
+~~~~
 
 You can play a user-defined sound using the ``sound.play`` native
 function, which takes a record number from 0 to 32767 as parameter. The
@@ -366,7 +366,7 @@ stop playing a sound, call the ``sound.play`` function with the value
 -1.
 
 System sound
-------------
+~~~~~~~~~~~~
 
 
 You can play a system sound using the ``sound.system`` native function,
@@ -378,7 +378,7 @@ be named ``Sx.wav`` where ``x`` is the parameter passed to the
 ``sound.system`` function with the value -1.
 
 System sound library
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The following sounds are available:
 
@@ -406,7 +406,7 @@ The following sounds are available:
 
 
 Remote control
-==============
+--------------
 
 Thymio contains a receiver for infrared remote controls compatible with
 the `RC5 <http://en.wikipedia.org/wiki/RC-5>`__ protocol. When Thymio
@@ -415,7 +415,7 @@ variables ``rc5.address`` and ``rc5.command`` are updated.
 
 
 Read and write data from the SD card
-====================================
+------------------------------------
 
 If an SD card is present, the variable ``sd.present`` is set to 1
 (otherwise 0), and Thymio can read and write data to files. Only a
@@ -449,7 +449,7 @@ values.
 power-off the robot before removing the SD card.**
 
 Loading a program from the SD card
-==================================
+----------------------------------
 
 Thymio can load a program from the SD card. When it boots, Thymio loads
 the file ``vmcode.abo`` from the SD card if present.
@@ -463,7 +463,7 @@ the .abo format. Don't forget to call it ``vmcode.abo`` if you want your
 Thymio to read it when it starts.
 
 Table of local events
-=====================
+---------------------
 
 +-----------------------+-----------------------------------------------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------------+
 | event                 | description                                               | frequency (Hz)           | result                                                                                                                  |
