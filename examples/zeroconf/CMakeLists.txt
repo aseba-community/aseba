@@ -1,5 +1,3 @@
-# assuming DNSSD_FOUND
-
 add_executable(asebatargetadvertise
 	targetadvertise.cpp
 )

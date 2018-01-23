@@ -13,19 +13,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(CMakeModules/ParseVersion.cmake)
 include(CMakeModules/cpp_features.cmake)
 include(CMakeModules/workarounds.cmake)
-
 include(CMakeModules/aseba_conf.cmake)
 
 # testing and defines
 enable_testing()
-add_definitions(-DASEBA_ASSERT)
 
+
+## FIX ME
 # Dashel
 find_package(dashel REQUIRED)
 include_directories(${dashel_INCLUDE_DIRS})
-
 # Enki
 find_package(enki)
+
+
 
 # Qt and Qwt
 find_package(Qt5 5.6 COMPONENTS Core Gui Widgets Network Help Concurrent Xml Svg X11Extras OPTIONAL_COMPONENTS Test Multimedia)
@@ -37,15 +38,8 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 # Zeroconf
-find_package(DNSSD)
-if (DNSSD_FOUND)
-	if(AVAHI_COMMON_LIBRARIES)
-		add_definitions(-DDNSSD_AVAHI)
-	endif(AVAHI_COMMON_LIBRARIES)
-	include_directories(${DNSSD_INCLUDE_DIRS})
-	find_package(Threads REQUIRED)
-	add_definitions(-DZEROCONF_SUPPORT)
-endif()
+include(CMakeModules/zeroconf.cmake)
+
 
 # Aseba itself
 set(LIB_INSTALL_DIR lib CACHE FILEPATH "Where to install libraries")
@@ -60,20 +54,7 @@ add_subdirectory(transport)
 
 # define the core libraries variable, to be used by all Aseba programs
 set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
-if (DNSSD_FOUND)
-	if (AVAHI_COMMON_LIBRARIES)
-		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${AVAHI_CLIENT_LIBRARIES} ${AVAHI_COMMON_LIBRARIES} ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-	else()
-		set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${DNSSD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-		if (WIN32)
-			set(ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES} -lws2_32)
-		endif()
-	endif()
-	set(ASEBA_ZEROCONF_LIBRARIES asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
-	if (Qt5Core_FOUND)
-		set(ASEBA_ZEROCONFQT_LIBRARIES asebazeroconfqt asebazeroconf ${ASEBA_ZEROCONF_ADDITIONAL_LIBRARIES})
-	endif()
-endif()
+
 
 # Target and client specific libraries
 add_subdirectory(vm)
