@@ -17,6 +17,6 @@ include_directories(${aseba_INCLUDE_DIR})
 # Different types of examples
 add_subdirectory(clients)
 add_subdirectory(switches)
-if (DNSSD_FOUND)
+if (HAS_ZEROCONF_SUPPORT)
 	add_subdirectory(zeroconf)
 endif()

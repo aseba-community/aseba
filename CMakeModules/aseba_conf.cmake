@@ -1,5 +1,5 @@
 add_library(aseba_conf INTERFACE)
-target_link_libraries(aseba_conf cpp_features)
+target_link_libraries(aseba_conf INTERFACE cpp_features)
 
 target_compile_definitions(aseba_conf INTERFACE -DASEBA_ASSERT)
 
