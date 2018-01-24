@@ -55,10 +55,10 @@ set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
 add_subdirectory(aseba)
 
 # Examples for developers
-#add_subdirectory(examples)
+add_subdirectory(examples)
 
 # Unit tests
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 # User entries
 if (UNIX)
