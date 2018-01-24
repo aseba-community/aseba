@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include "../../common/types.h"
+#include "common/types.h"
 
 /**
 	\defgroup can Transport layer over CAN bus

@@ -29,8 +29,8 @@
 #include <set>
 #include <memory>
 #include <dashel/dashel.h>
-#include "../../common/msg/msg.h"
-#include "../../compiler/compiler.h"
+#include "common/msg/msg.h"
+#include "compiler/compiler.h"
 
 
 namespace Aseba

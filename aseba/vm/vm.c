@@ -18,8 +18,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../common/consts.h"
-#include "../common/types.h"
+#include "common/consts.h"
+#include "common/types.h"
 #include "vm.h"
 #include <string.h>
 

@@ -21,9 +21,9 @@
 #ifndef __PLAYGROUND_ASEBA_GLUE_H
 #define __PLAYGROUND_ASEBA_GLUE_H
 
-#include "../../common/types.h"
-#include "../../common/consts.h"
-#include "../../vm/natives.h"
+#include "common/types.h"
+#include "common/consts.h"
+#include "vm/natives.h"
 #include <valarray>
 #include <vector>
 #include <map>

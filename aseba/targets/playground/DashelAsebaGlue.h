@@ -26,7 +26,7 @@
 #include <dashel/dashel.h>
 
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-qt.h"
+#include "common/zeroconf/zeroconf-qt.h"
 #endif // ZEROCONF_SUPPORT
 
 // Implementation of the connection using Dashel

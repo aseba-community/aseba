@@ -23,8 +23,8 @@
 
 #include "Plugin.h"
 #include "DashelTarget.h"
-#include "../../common/utils/utils.h"
-#include "../../common/productids.h"
+#include "common/utils/utils.h"
+#include "common/productids.h"
 #include "NamedValuesVectorModel.h"
 
 // plugins

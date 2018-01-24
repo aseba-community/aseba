@@ -22,8 +22,8 @@
 #include "Thymio2-natives.h"
 #include "../../Parameters.h"
 #include "../../EnkiGlue.h"
-#include "../../../../common/productids.h"
-#include "../../../../common/utils/utils.h"
+#include "common/productids.h"
+#include "common/utils/utils.h"
 
 namespace Enki
 {

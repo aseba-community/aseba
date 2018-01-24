@@ -22,7 +22,7 @@
 #define __PLAYGROUND_THYMIO2_H
 
 #include "../../AsebaGlue.h"
-#include "../../../../common/utils/utils.h"
+#include "common/utils/utils.h"
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/thymio2/Thymio2.h>
 #include <fstream>

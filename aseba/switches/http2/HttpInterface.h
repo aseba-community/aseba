@@ -26,8 +26,8 @@
 #include <map>
 #include <set>
 #include <dashel/dashel.h>
-#include "../../common/msg/NodesManager.h"
-#include "../../common/utils/utils.h"
+#include "common/msg/NodesManager.h"
+#include "common/utils/utils.h"
 
 #include "AeslProgram.h"
 #include "HttpDashelTarget.h"

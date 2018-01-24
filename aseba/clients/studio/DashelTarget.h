@@ -22,8 +22,8 @@
 #define TCPTARGET_H
 
 #include "Target.h"
-#include "../../common/consts.h"
-#include "../../common/msg/NodesManager.h"
+#include "common/consts.h"
+#include "common/msg/NodesManager.h"
 #include <QString>
 #include <QDialog>
 #include <QQueue>
@@ -37,7 +37,7 @@
 #include <map>
 #include <dashel/dashel.h>
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-qt.h"
+#include "common/zeroconf/zeroconf-qt.h"
 #endif // ZEROCONF_SUPPORT
 
 class QPushButton;

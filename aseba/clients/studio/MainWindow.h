@@ -44,7 +44,7 @@
 #include "CustomWidgets.h"
 #include "ModelAggregator.h"
 
-#include "../../compiler/compiler.h"
+#include "compiler/compiler.h"
 #include <fstream>
 #include <sstream>
 #include <vector>

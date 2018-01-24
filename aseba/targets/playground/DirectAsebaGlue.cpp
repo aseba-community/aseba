@@ -20,8 +20,8 @@
 
 #include "DirectAsebaGlue.h"
 #include "EnkiGlue.h"
-#include "../../common/utils/FormatableString.h"
-#include "../../transport/buffer/vm-buffer.h"
+#include "common/utils/FormatableString.h"
+#include "transport/buffer/vm-buffer.h"
 
 namespace Aseba
 {

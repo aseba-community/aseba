@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-#include "../../common/types.h"
-#include "../../vm/vm.h"
-#include "../../vm/natives.h"
+#include "common/types.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
 
 /**
 	\defgroup transport-buffer Helper for transport layers using buffers

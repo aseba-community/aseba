@@ -43,8 +43,8 @@
 
 #include "Scene.h"
 #include "Buttons.h"
-#include "../../../../common/msg/msg.h"
-#include "../../../../compiler/compiler.h"
+#include "common/msg/msg.h"
+#include "compiler/compiler.h"
 #include <UsageProfile.pb.h>
 #include "LogSignalMapper.h"
 

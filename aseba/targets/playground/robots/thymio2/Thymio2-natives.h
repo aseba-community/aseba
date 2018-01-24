@@ -21,8 +21,8 @@
 #ifndef __PLAYGROUND_THYMIO2_NATIVES_H
 #define __PLAYGROUND_THYMIO2_NATIVES_H
 
-#include "../../../../vm/vm.h"
-#include "../../../../vm/natives.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
 
 // sound
 

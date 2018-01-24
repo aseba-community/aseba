@@ -25,8 +25,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../../vm/natives.h"
-#include "../../common/productids.h"
+#include "vm/natives.h"
+#include "common/productids.h"
 
 #define SIMPLIFIED_EPUCK
 

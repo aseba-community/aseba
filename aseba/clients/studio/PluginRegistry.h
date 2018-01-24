@@ -28,7 +28,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <set>
-#include "../../compiler/compiler.h"
+#include "compiler/compiler.h"
 
 namespace Aseba
 {

@@ -21,8 +21,8 @@
 #include "ThymioVPLStandalone.h"
 #include "AeslEditor.h"
 #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
-#include "../../common/consts.h"
-#include "../../common/productids.h"
+#include "common/consts.h"
+#include "common/productids.h"
 #include "translations/CompilerTranslator.h"
 #include <QMessageBox>
 #include <QVBoxLayout>

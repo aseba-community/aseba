@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include "../common/types.h"
+#include "common/types.h"
 #include "vm.h"
 
 #ifdef _MSC_VER

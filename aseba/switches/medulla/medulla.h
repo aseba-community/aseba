@@ -30,9 +30,9 @@
 #include <QDBusMessage>
 #include <QMetaType>
 #include <QList>
-#include "../../common/msg/msg.h"
-#include "../../common/msg/NodesManager.h"
-#include "../../compiler/compiler.h"
+#include "common/msg/msg.h"
+#include "common/msg/NodesManager.h"
+#include "compiler/compiler.h"
 
 typedef QList<qint16> Values;
 

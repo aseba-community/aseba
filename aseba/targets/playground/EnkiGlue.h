@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 #include <enki/PhysicalEngine.h>
-#include "../../vm/vm.h"
-#include "../../common/utils/utils.h"
+#include "vm/vm.h"
+#include "common/utils/utils.h"
 
 namespace Enki
 {

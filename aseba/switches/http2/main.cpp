@@ -24,10 +24,10 @@
 #include <memory>
 
 #include "HttpInterface.h"
-#include "../../common/consts.h"
-#include "../../common/types.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/types.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 //! Show usage
 void dumpHelp(std::ostream &stream, const char *programName)

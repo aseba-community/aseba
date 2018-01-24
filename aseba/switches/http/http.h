@@ -25,11 +25,11 @@
 #include <list>
 #include <queue>
 #include <dashel/dashel.h>
-#include "../../common/msg/msg.h"
-#include "../../common/msg/NodesManager.h"
-#include "../../compiler/compiler.h"
+#include "common/msg/msg.h"
+#include "common/msg/NodesManager.h"
+#include "compiler/compiler.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
 #endif // ZEROCONF_SUPPORT
 
 #if defined(_WIN32) && defined(__MINGW32__)

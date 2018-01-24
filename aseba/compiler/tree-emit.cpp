@@ -19,7 +19,7 @@
 */
 
 #include "tree.h"
-#include "../common/utils/utils.h"
+#include "common/utils/utils.h"
 #include <cassert>
 #include <cstdlib>
 #include <algorithm>

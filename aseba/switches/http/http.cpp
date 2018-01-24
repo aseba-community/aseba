@@ -83,11 +83,11 @@
 #include <vector>
 #include <iterator>
 #include "http.h"
-#include "../../common/consts.h"
-#include "../../common/types.h"
-#include "../../common/productids.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/types.h"
+#include "common/productids.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 #if defined(_WIN32) && defined(__MINGW32__)
 /* This is a workaround for MinGW32, see libxml/xmlexports.h */

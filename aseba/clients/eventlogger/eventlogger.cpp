@@ -1,7 +1,7 @@
 #include <dashel/dashel.h>
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 #include <cmath>
 #include <QtGui>
 #include <QApplication>

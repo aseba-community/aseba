@@ -19,8 +19,8 @@
 */
 
 #include <iostream>
-#include "../../common/consts.h"
-#include "../../common/utils/utils.h"
+#include "common/consts.h"
+#include "common/utils/utils.h"
 #include "AeslProgram.h"
 
 using Aseba::Http::AeslProgram;

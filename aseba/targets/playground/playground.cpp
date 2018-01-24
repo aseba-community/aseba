@@ -25,7 +25,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../../common/utils/FormatableString.h"
+#include "common/utils/FormatableString.h"
 #include "DashelAsebaGlue.h"
 #include "Door.h"
 #include "PlaygroundViewer.h"
@@ -46,7 +46,7 @@
 #endif // HAVE_DBUS
 
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-qt.h"
+#include "common/zeroconf/zeroconf-qt.h"
 #endif // ZEROCONF_SUPPORT
 
 namespace Enki

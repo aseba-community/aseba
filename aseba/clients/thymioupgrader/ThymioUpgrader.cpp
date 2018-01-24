@@ -21,10 +21,10 @@
 #include <memory>
 #include <iostream>
 
-#include "../../common/consts.h"
-#include "../../common/msg/msg.h"
-#include "../../common/utils/HexFile.h"
-#include "../../common/utils/utils.h"
+#include "common/consts.h"
+#include "common/msg/msg.h"
+#include "common/utils/HexFile.h"
+#include "common/utils/utils.h"
 
 #include "ThymioUpgrader.h"
 

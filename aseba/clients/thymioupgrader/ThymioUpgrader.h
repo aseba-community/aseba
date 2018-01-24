@@ -6,7 +6,7 @@
 #include <QFutureWatcher>
 #include <QTemporaryFile>
 #include <dashel/dashel.h>
-#include "../../common/utils/BootloaderInterface.h"
+#include "common/utils/BootloaderInterface.h"
 
 class QVBoxLayout;
 class QHBoxLayout;

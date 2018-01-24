@@ -19,8 +19,8 @@
 */
 
 #include "vm-buffer.h"
-#include "../../common/consts.h"
-#include "../../common/types.h"
+#include "common/consts.h"
+#include "common/types.h"
 #include <string.h>
 #include <assert.h>
 

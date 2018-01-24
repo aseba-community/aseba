@@ -20,7 +20,7 @@
 
 #include "AeslEditor.h"
 #include "CustomWidgets.h"
-#include "../../common/utils/utils.h"
+#include "common/utils/utils.h"
 #include <QtWidgets>
 #include <QtGlobal>
 
