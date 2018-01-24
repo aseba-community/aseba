@@ -11,10 +11,10 @@ For more information, see: http://aseba.wikidot.com
 ## Supported platforms
 
 The following platforms are supported:
-- Linux ([compilation instructions](compile.Linux.md))
-- macOS ([compilation instructions](compile.macOS.md))
-- Windows ([compilation instructions](compile.Windows.md))
-- embedded systems ([see the dependency list](compile.deps.md))
+- Linux ([compilation instructions](docs/compile.Linux.md))
+- macOS ([compilation instructions](docs/compile.macOS.md))
+- Windows ([compilation instructions](docs/compile.Windows.md))
+- embedded systems ([see the dependency list](docs/compile.deps.md))
 
 ## Use Aseba
 
