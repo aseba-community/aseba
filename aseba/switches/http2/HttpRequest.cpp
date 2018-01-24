@@ -21,7 +21,7 @@
 #include <iostream>
 #include "HttpRequest.h"
 #include "HttpResponse.h"
-#include "../../common/utils/utils.h"
+#include "common/utils/utils.h"
 
 using Aseba::Http::DashelHttpRequest;
 using Aseba::Http::DashelHttpResponse;

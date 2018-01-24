@@ -20,8 +20,8 @@
 
 #include "compiler.h"
 #include "tree.h"
-#include "../common/utils/FormatableString.h"
-#include "../common/utils/utils.h"
+#include "common/utils/FormatableString.h"
+#include "common/utils/utils.h"
 #include <memory>
 #include <valarray>
 #include <iostream>

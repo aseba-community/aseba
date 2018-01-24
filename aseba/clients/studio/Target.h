@@ -23,8 +23,8 @@
 
 #include <QObject>
 #include <valarray>
-#include "../../compiler/compiler.h"
-#include "../../common/msg/msg.h"
+#include "compiler/compiler.h"
+#include "common/msg/msg.h"
 
 namespace Aseba
 {

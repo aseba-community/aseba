@@ -19,8 +19,8 @@
 */
 
 #include "DashelTarget.h"
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
 #include <algorithm>
 #include <iostream>
 #include <ostream>

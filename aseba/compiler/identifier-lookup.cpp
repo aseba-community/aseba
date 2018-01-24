@@ -20,8 +20,8 @@
 
 #include "compiler.h"
 #include "tree.h"
-#include "../common/consts.h"
-#include "../common/utils/FormatableString.h"
+#include "common/consts.h"
+#include "common/utils/FormatableString.h"
 #include <cassert>
 #include <cstdlib>
 #include <sstream>

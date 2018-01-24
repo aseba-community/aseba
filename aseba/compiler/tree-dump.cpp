@@ -19,7 +19,7 @@
 */
 
 #include "tree.h"
-#include "../common/utils/FormatableString.h"
+#include "common/utils/FormatableString.h"
 #include <ostream>
 
 namespace Aseba

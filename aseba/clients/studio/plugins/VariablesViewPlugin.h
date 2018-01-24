@@ -5,7 +5,7 @@
 #include <QDialog>
 #include "../Plugin.h"
 #include "../TargetModels.h"
-#include "../../../compiler/compiler.h"
+#include "compiler/compiler.h"
 
 class QLabel;
 class QComboBox;

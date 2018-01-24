@@ -28,10 +28,10 @@
 #include "FindDialog.h"
 #include "ModelAggregator.h"
 #include "translations/CompilerTranslator.h"
-#include "../../common/consts.h"
-#include "../../common/productids.h"
-#include "../../common/utils/utils.h"
-#include "../../common/about/AboutDialog.h"
+#include "common/consts.h"
+#include "common/productids.h"
+#include "common/utils/utils.h"
+#include "common/about/AboutDialog.h"
 #include <QtGui>
 #include <QtWidgets>
 #include <QtXml>

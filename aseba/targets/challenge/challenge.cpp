@@ -29,11 +29,11 @@
 #define ASEBA_ASSERT
 #endif
 
-#include "../../vm/vm.h"
-#include "../../vm/natives.h"
-#include "../../common/productids.h"
-#include "../../common/consts.h"
-#include "../../transport/buffer/vm-buffer.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
+#include "common/productids.h"
+#include "common/consts.h"
+#include "transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <enki/PhysicalEngine.h>
 #include <enki/robots/e-puck/EPuck.h>

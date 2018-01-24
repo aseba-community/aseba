@@ -22,7 +22,7 @@
 
 #include <utility>
 #include "zeroconf.h"
-#include "../../common/utils/FormatableString.h"
+#include "common/utils/FormatableString.h"
 
 using namespace std;
 

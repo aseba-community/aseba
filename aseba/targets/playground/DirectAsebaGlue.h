@@ -23,8 +23,8 @@
 
 #include <memory>
 #include <queue>
-#include "../../common/msg/msg.h"
-#include "../../transport/buffer/vm-buffer.h"
+#include "common/msg/msg.h"
+#include "transport/buffer/vm-buffer.h"
 #include "AsebaGlue.h"
 
 // Implementation of the connection using direct connection

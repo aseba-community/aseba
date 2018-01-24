@@ -24,7 +24,7 @@
 #include "Plugin.h"
 #include "DashelTarget.h"
 #include "MainWindow.h"
-#include "../../common/productids.h"
+#include "common/productids.h"
 #include "NamedValuesVectorModel.h"
 
 // plugins

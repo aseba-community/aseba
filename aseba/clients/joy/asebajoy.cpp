@@ -1,6 +1,6 @@
 #include <dashel/dashel.h>
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
 #include <SDL.h>
 #include <cmath>
 #include <cassert>

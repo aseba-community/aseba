@@ -31,7 +31,7 @@
 #include <QTime>
 
 #include "MainWindow.h"
-#include "../../common/types.h"
+#include "common/types.h"
 
 class QwtPlot;
 class QDoubleSpinBox;

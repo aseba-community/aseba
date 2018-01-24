@@ -28,10 +28,10 @@
 #include <vector>
 #include <iterator>
 #include "medulla.h"
-#include "../../common/consts.h"
-#include "../../common/types.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/types.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 #include <QDBusMetaType>
 #include <QtXml>
 #include <QtDebug>

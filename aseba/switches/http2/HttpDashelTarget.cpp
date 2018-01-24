@@ -20,8 +20,8 @@
 
 #include <iostream>
 #include <sstream>
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
 #include "HttpDashelTarget.h"
 #include "HttpRequest.h"
 #include "HttpInterface.h"

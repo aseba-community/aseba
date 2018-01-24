@@ -19,10 +19,10 @@
 */
 
 #include <dashel/dashel.h>
-#include "../../common/consts.h"
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 #include <time.h>
 #include <iostream>
 #include <iomanip>

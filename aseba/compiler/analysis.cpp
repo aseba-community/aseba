@@ -19,7 +19,7 @@
 */
 
 #include "compiler.h"
-#include "../common/consts.h"
+#include "common/consts.h"
 #include <cassert>
 #include <iostream>
 

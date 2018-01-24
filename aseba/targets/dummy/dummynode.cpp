@@ -22,16 +22,16 @@
 #define ASEBA_ASSERT
 #endif
 
-#include "../../vm/vm.h"
-#include "../../vm/natives.h"
-#include "../../common/productids.h"
-#include "../../common/consts.h"
-#include "../../common/utils/utils.h"
-#include "../../common/utils/FormatableString.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
+#include "common/productids.h"
+#include "common/consts.h"
+#include "common/utils/utils.h"
+#include "common/utils/FormatableString.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
 #endif // ZEROCONF_SUPPORT
-#include "../../transport/buffer/vm-buffer.h"
+#include "transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
 #include <iostream>
 #include <sstream>

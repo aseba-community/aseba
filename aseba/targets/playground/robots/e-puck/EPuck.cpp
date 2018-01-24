@@ -21,8 +21,8 @@
 #include "EPuck.h"
 #include "../../Parameters.h"
 #include "../../EnkiGlue.h"
-#include "../../../../common/productids.h"
-#include "../../../../common/utils/utils.h"
+#include "common/productids.h"
+#include "common/utils/utils.h"
 
 // Native functions
 

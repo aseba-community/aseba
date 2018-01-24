@@ -29,7 +29,7 @@
 #define __PLAYGROUND_VIEWER_H
 
 #include "EnkiGlue.h"
-#include "../../common/utils/utils.h"
+#include "common/utils/utils.h"
 #include <viewer/Viewer.h>
 #include <QProcess>
 

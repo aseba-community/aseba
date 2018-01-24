@@ -27,15 +27,15 @@
 #include <vector>
 #include <iterator>
 #include "switch.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
-#include "../../common/consts.h"
-#include "../../common/utils/utils.h"
-#include "../../common/utils/FormatableString.h"
-#include "../../common/msg/msg.h"
-#include "../../common/msg/endian.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/utils/utils.h"
+#include "common/utils/FormatableString.h"
+#include "common/msg/msg.h"
+#include "common/msg/endian.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
-#include "../../common/productids.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
+#include "common/productids.h"
 #endif // ZEROCONF_SUPPORT
 
 #ifdef ZEROCONF_SUPPORT

@@ -41,7 +41,7 @@
 #include "Scene.h"
 #include "ThymioVisualProgramming.h"
 #include "Style.h"
-#include "../../../../common/utils/utils.h"
+#include "common/utils/utils.h"
 #include "UsageLogger.h"
 
 namespace Aseba { namespace ThymioVPL

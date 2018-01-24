@@ -49,7 +49,7 @@
 #include "Style.h"
 #include "ResizingView.h"
 #include "UsageLogger.h"
-#include "../../../../common/utils/utils.h"
+#include "common/utils/utils.h"
 
 namespace Aseba { namespace ThymioVPL
 {

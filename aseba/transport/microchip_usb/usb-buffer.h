@@ -21,8 +21,8 @@
 #ifndef _USB_BUFFER_H_
 #define _USB_BUFFER_H_
 
-#include "../../vm/vm.h"
-#include "../../common/types.h"
+#include "vm/vm.h"
+#include "common/types.h"
 
 /**
 	\defgroup usb Transport layer over USB serial

@@ -23,9 +23,9 @@
 
 #include <dashel/dashel.h>
 #include <map>
-#include "../../common/types.h"
+#include "common/types.h"
 #ifdef ZEROCONF_SUPPORT
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
 #endif // ZEROCONF_SUPPORT
 
 namespace Aseba

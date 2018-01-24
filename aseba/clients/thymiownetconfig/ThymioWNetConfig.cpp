@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-#include "../../common/consts.h"
+#include "common/consts.h"
 
 #include "ThymioWNetConfig.h"
 

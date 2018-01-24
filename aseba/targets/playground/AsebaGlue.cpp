@@ -29,8 +29,8 @@
 #include <cstring>
 #include "AsebaGlue.h"
 #include "EnkiGlue.h"
-#include "../../vm/vm.h"
-#include "../../common/utils/FormatableString.h"
+#include "vm/vm.h"
+#include "common/utils/FormatableString.h"
 
 namespace Aseba
 {

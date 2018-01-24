@@ -33,7 +33,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 
-#include "../../compiler/compiler.h"
+#include "compiler/compiler.h"
 
 namespace Aseba { namespace Http
 {

@@ -19,7 +19,7 @@
 */
 
 #include "compiler.h"
-#include "../common/utils/FormatableString.h"
+#include "common/utils/FormatableString.h"
 #include <cstdlib>
 #include <sstream>
 #include <ostream>

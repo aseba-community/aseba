@@ -1,7 +1,7 @@
 #ifndef _TRANSLATOR_H
 #define _TRANSLATOR_H
 
-#include "../../../compiler/errors_code.h"
+#include "compiler/errors_code.h"
 #include <QtCore>
 #include <string>
 

@@ -29,8 +29,8 @@
 #include "PlaygroundViewer.h"
 #include "Parameters.h"
 #include "Robots.h"
-#include "../../common/utils/utils.h"
-#include "../../common/about/AboutDialog.h"
+#include "common/utils/utils.h"
+#include "common/about/AboutDialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QMouseEvent>

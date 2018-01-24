@@ -22,7 +22,7 @@
 	This file was originally created by Philippe Rétornaz
 */
 
-#include "../../common/consts.h"
+#include "common/consts.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

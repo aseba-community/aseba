@@ -22,8 +22,8 @@
 #define __TREE_H
 
 #include "compiler.h"
-#include "../common/consts.h"
-#include "../common/utils/FormatableString.h"
+#include "common/consts.h"
+#include "common/utils/FormatableString.h"
 #include <vector>
 #include <string>
 #include <ostream>

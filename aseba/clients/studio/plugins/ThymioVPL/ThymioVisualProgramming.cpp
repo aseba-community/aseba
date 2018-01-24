@@ -52,8 +52,8 @@
 #include "UsageLogger.h"
 
 #include "../../TargetModels.h"
-#include "../../../../common/utils/utils.h"
-#include "../../../../common/about/AboutDialog.h"
+#include "common/utils/utils.h"
+#include "common/about/AboutDialog.h"
 
 
 // for backtrace

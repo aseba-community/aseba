@@ -21,9 +21,9 @@
 #include "compiler.h"
 #include "tree.h"
 #include "errors_code.h"
-#include "../common/consts.h"
-#include "../common/utils/utils.h"
-#include "../common/utils/FormatableString.h"
+#include "common/consts.h"
+#include "common/utils/utils.h"
+#include "common/utils/FormatableString.h"
 #include <cassert>
 #include <cstdlib>
 #include <sstream>

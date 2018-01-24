@@ -31,7 +31,7 @@
 #include <stdexcept>
 #include "MainWindow.h"
 #include "HelpViewer.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 
 using namespace std;
 

@@ -19,13 +19,13 @@
 */
 
 #include <dashel/dashel.h>
-#include "../../common/consts.h"
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
-#include "../../common/utils/HexFile.h"
-#include "../../common/utils/FormatableString.h"
-#include "../../common/utils/BootloaderInterface.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "common/consts.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
+#include "common/utils/HexFile.h"
+#include "common/utils/FormatableString.h"
+#include "common/utils/BootloaderInterface.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 #include <iostream>
 #include <fstream>
 #include <vector>

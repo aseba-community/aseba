@@ -40,7 +40,7 @@ Possible issues:
 #include <iostream>
 #include <stdexcept>
 #include "DashelTarget.h"
-#include "../../transport/dashel_plugins/dashel-plugins.h"
+#include "transport/dashel_plugins/dashel-plugins.h"
 #include "ThymioVPLStandalone.h"
 #include "plugins/ThymioVPL/UsageLogger.h"
 

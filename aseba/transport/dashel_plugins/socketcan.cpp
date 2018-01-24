@@ -38,7 +38,7 @@
 #include <dashel/dashel.h>
 #include <dashel/dashel-posix.h>
 
-#include "../../common/consts.h"
+#include "common/consts.h"
 
 #ifndef AF_CAN
 #define AF_CAN		29
