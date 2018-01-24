@@ -11,7 +11,7 @@ if (AVAHI_COMMON_LIBRARIES)
 endif ()
 
 set_target_properties(asebazeroconf PROPERTIES VERSION ${LIB_VERSION_STRING})
-target_link_libraries(asebazeroconf aseba_conf zeroconf)
+target_link_libraries(asebazeroconf PUBLIC asebacommon zeroconf)
 
 
 install(TARGETS asebazeroconf
@@ -31,10 +31,11 @@ install(FILES ${ASEBAZEROCONF_HDR}
 
 # Zeroconf with Qt
 if (Qt5Core_FOUND)
+	set(CMAKE_AUTOMOC ON)
 	add_library(asebazeroconfqt zeroconf-qt.cpp)
 	set_target_properties(asebazeroconfqt PROPERTIES VERSION ${LIB_VERSION_STRING})
 	target_include_directories(asebazeroconfqt PUBLIC ${DNSSD_INCLUDE_DIRS})
-	qt5_use_modules(asebazeroconfqt Core Network)
+	target_link_libraries(asebazeroconfqt PUBLIC asebazeroconf Qt5::Core Qt5::Network)
 
 
 	install(TARGETS asebazeroconfqt

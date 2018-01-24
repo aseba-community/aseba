@@ -23,5 +23,6 @@ endif ()
 
 if (UNIX)
 	add_executable(thymiownetconfig-cli thymiownetconfig-cli.c)
+	target_link_libraries(thymiownetconfig-cli aseba_conf)
 	install(TARGETS thymiownetconfig-cli RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 endif (UNIX)

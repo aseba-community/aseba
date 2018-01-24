@@ -6,6 +6,7 @@ set (ASEBAVM_SRC
 	natives.c
 )
 add_library(asebavm ${ASEBAVM_SRC})
+target_link_libraries(asebavm aseba_conf)
 set_target_properties(asebavm PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 

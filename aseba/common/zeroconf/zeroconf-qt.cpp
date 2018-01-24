@@ -74,7 +74,6 @@ namespace Aseba
 	{
 		emit zeroconfRegisterCompleted(target);
 	}
-
 	//! Emit signal when update completed.
 	//! If you override this method you take responsibility for emitting signals as you see fit.
 	void QtZeroconf::updateCompleted(const Aseba::Zeroconf::TargetInformation & target)

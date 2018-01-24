@@ -17,6 +17,9 @@ if (ENKI_FOUND)
 	set_target_properties(asebasim PROPERTIES VERSION ${LIB_VERSION_STRING}
 											SOVERSION ${LIB_VERSION_MAJOR})
 
+
+	target_link_libraries(asebasim PUBLIC aseba_conf)
+
 	install(TARGETS asebasim
 			LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 			ARCHIVE DESTINATION ${LIB_INSTALL_DIR}

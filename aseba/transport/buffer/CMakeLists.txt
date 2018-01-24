@@ -10,6 +10,8 @@ install(TARGETS asebavmbuffer
                 ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
 
+target_link_libraries(asebavmbuffer aseba_conf)
+
 set (ASEBATRANSPORT_HDR_BUFFER
 	vm-buffer.h
 )
