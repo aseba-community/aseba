@@ -16,13 +16,14 @@ if (LIBXML2_FOUND)
 	
 	add_executable(asebahttp ${http_SRCS} ${http_MOCS})
 	
-	target_link_libraries(asebahttp asebacompiler asebacommon ${LIBXML2_LIBRARIES} asebazeroconf ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebahttp asebacompiler asebacommon ${LIBXML2_LIBRARIES} asebazeroconf asebacommon aseba_conf)
 
 	install(TARGETS asebahttp RUNTIME
 		DESTINATION bin
 	)
 
 	add_library(asebahttphub ${http_SRCS})
+	target_link_libraries(asebahttphub aseba_conf)
 	set_target_properties(asebahttphub PROPERTIES VERSION ${LIB_VERSION_STRING} 
 						    SOVERSION ${LIB_VERSION_MAJOR})
 

@@ -2,7 +2,7 @@ add_executable(asebaswitch
 	switch.cpp
 )
 
-target_link_libraries(asebaswitch asebazeroconf ${ASEBA_CORE_LIBRARIES})
+target_link_libraries(asebaswitch asebazeroconf asebacommon)
 
 install(TARGETS asebaswitch RUNTIME
 	DESTINATION bin

@@ -45,5 +45,6 @@ if (Qt5Core_FOUND)
 		DESTINATION include/aseba/common/zeroconf
 	)
 endif ()
+add_feature_info(QT_ZEROCONF Qt5Core_FOUND "Qt Zeroconf library ( depend on QtCore )")
 
 

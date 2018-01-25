@@ -1,4 +1,4 @@
-set (ASEBACOMMON_SRC
+add_library(asebacommon
 	utils/FormatableString.cpp
 	utils/utils.cpp
 	utils/HexFile.cpp
@@ -7,10 +7,10 @@ set (ASEBACOMMON_SRC
 	msg/NodesManager.cpp
 	msg/TargetDescription.cpp
 )
-
-add_library(asebacommon ${ASEBACOMMON_SRC})
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING})
-target_link_libraries(asebacommon PUBLIC aseba_conf)
+target_link_libraries(asebacommon PUBLIC aseba_conf asebadashelplugins)
+
+target_link_libraries(aseba_conf)
 
 install(TARGETS asebacommon 
 	LIBRARY DESTINATION ${LIB_INSTALL_DIR} 

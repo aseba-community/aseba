@@ -9,15 +9,15 @@ add_library(asebavmdummycallbacks STATIC
 # shared lib, it must be a dependency so that it can be used to resolve refs 
 # in asebavmdummycallbacks.
 if (BUILD_SHARED_LIBS)
-	target_link_libraries(asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebavmdummycallbacks asebacommon)
 else (BUILD_SHARED_LIBS)
-	target_link_libraries(asebavmdummycallbacks asebavm ${ASEBA_CORE_LIBRARIES})
+	target_link_libraries(asebavmdummycallbacks asebavm asebacommon)
 endif (BUILD_SHARED_LIBS)
 
 add_executable(asebatest
 	asebatest.cpp
 )
-target_link_libraries(asebatest asebacompiler asebavm asebavmdummycallbacks ${ASEBA_CORE_LIBRARIES})
+target_link_libraries(asebatest asebacompiler asebavm asebavmdummycallbacks asebacommon)
 
 # the following tests should succeed
 add_test(basic-arithmetic ${EXECUTABLE_OUTPUT_PATH}/asebatest --memcmp ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.dump ${CMAKE_CURRENT_SOURCE_DIR}/data/basic-arithmetic.txt)

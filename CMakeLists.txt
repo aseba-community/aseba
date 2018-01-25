@@ -7,6 +7,7 @@ project(aseba)
 
 # ensure a minimal version of CMake
 cmake_minimum_required(VERSION 3.5)
+include(FeatureSummary)
 
 # additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
@@ -22,9 +23,10 @@ enable_testing()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+find_package(Threads REQUIRED)
 
 # Qt and Qwt
-find_package(Qt5 5.6 COMPONENTS Core Gui Widgets Network Help Concurrent Xml Svg X11Extras OPTIONAL_COMPONENTS Test Multimedia)
+find_package(Qt5 5.6 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg X11Extras Test)
 
 find_package(Qwt)
 
@@ -44,9 +46,6 @@ set(LIB_VERSION_PATCH 0)
 set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 
 
-# define the core libraries variable, to be used by all Aseba programs
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon dashel)
-
 add_subdirectory(aseba)
 
 # Examples for developers
@@ -59,3 +58,18 @@ add_subdirectory(tests)
 if (UNIX)
 	add_subdirectory(menu)
 endif()
+
+
+feature_summary( WHAT PACKAGES_FOUND PACKAGES_NOT_FOUND ENABLED_FEATURES DISABLED_FEATURES)
+
+
+
+
+
+
+
+
+
+
+
+
