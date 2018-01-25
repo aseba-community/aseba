@@ -39,6 +39,7 @@ if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 endif (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 
 add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
+target_link_libraries(asebaqtplugins aseba_conf)
 
 qt5_use_modules(asebaqtplugins Widgets Xml Svg)
 if (Qt5X11Extras_FOUND)

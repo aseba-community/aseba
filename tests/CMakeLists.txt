@@ -24,7 +24,7 @@ add_subdirectory(simulator)
 #		# Support compilers like GCC 5 that don't have C++11 support enabled by default.
 #		target_compile_definitions(test-asebahttp PRIVATE -DCATCH_CONFIG_NO_CPP11)
 #	endif ()
-#	target_link_libraries(test-asebahttp asebahttphub asebacompiler ${LIBXML2_LIBRARIES} ${ASEBA_CORE_LIBRARIES})
+#	target_link_libraries(test-asebahttp asebahttphub asebacompiler ${LIBXML2_LIBRARIES} asebacommon)
 #	configure_file(testdata-HttpRequest.txt ${CMAKE_CURRENT_BINARY_DIR}/testdata-HttpRequest.txt COPYONLY)
 #	configure_file(http-valgrind-macosx.supp ${CMAKE_CURRENT_BINARY_DIR}/http-valgrind-macosx.supp COPYONLY)
 #	# test HTTP requests and JSON parsing

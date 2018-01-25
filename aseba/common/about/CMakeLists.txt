@@ -25,3 +25,4 @@ if (Qt5Svg_FOUND)
 		ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
 	)
 endif ()
+add_feature_info(ABOUT_QT QT_USE_QTSVG "About Windows")
