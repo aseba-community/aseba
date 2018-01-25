@@ -14,17 +14,11 @@ include(CMakeModules/ParseVersion.cmake)
 include(CMakeModules/cpp_features.cmake)
 include(CMakeModules/workarounds.cmake)
 include(CMakeModules/aseba_conf.cmake)
+include(CMakeModules/dashel.cmake)
+include(CMakeModules/enki.cmake)
 
 # testing and defines
 enable_testing()
-
-
-## FIX ME
-# Dashel
-find_package(dashel REQUIRED)
-include_directories(${dashel_INCLUDE_DIRS})
-# Enki
-find_package(enki)
 
 
 
@@ -50,7 +44,7 @@ set(LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_P
 
 
 # define the core libraries variable, to be used by all Aseba programs
-set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon ${dashel_LIBRARIES})
+set(ASEBA_CORE_LIBRARIES asebadashelplugins asebacommon dashel)
 
 add_subdirectory(aseba)
 

@@ -6,7 +6,7 @@ add_library(asebazeroconf
 	zeroconf-dashelhub.cpp
 )
 set_target_properties(asebazeroconf PROPERTIES VERSION ${LIB_VERSION_STRING})
-target_link_libraries(asebazeroconf PUBLIC asebacommon zeroconf)
+target_link_libraries(asebazeroconf PUBLIC asebacommon zeroconf dashel)
 
 
 install(TARGETS asebazeroconf
