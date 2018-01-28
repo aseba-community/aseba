@@ -5,7 +5,7 @@ Copyright (C) 2007--2017 the authors, a complete list can be fetched from the gi
 
 The following people have created significant portions of Aseba:
 
-*	[Stéphane Magnenat](http://stephane.magnenat.net) <stephane at magnenat dot net> [1] [2] [3] [4]
+*	[Stéphane Magnenat](http://stephane.magnenat.net) <stephane at magnenat dot net> [1] 2007–2010, 2015–2016; [2] 2010–2014; [3] 2010, 2016; [4] 2016–2017; [6] 2018-; independant: 2014–2015
 	project leader, original idea, architecture, core programmer all areas
 	contributed to: all
 
@@ -62,7 +62,7 @@ The following people have provided additional contributions:
 	bug reporting and fixing
 	contributed to: core, studio
 
-*	Corentin Jabot <corentin dot jabot at gmail dot com>
+*	Corentin Jabot <corentin dot jabot at gmail dot com> [3]
 	bug fixing and coding contributions
 	contributed to: core
 
@@ -144,6 +144,8 @@ In addition, the following institutions have supported the development:
 [4]: Game Technology Center, ETH Zurich (http://www.gtc.inf.ethz.ch/)
 
 [5]: Inria, France (https://www.inria.fr/en/)
+
+[6]: Enlightware LLC (http://enlightware.ch)
 
 # Other contributions
 
