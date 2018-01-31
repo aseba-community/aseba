@@ -56,9 +56,9 @@ As a general guideline, in order for a pull request to be accepted, it:
 1. **Must** be mergeable in the *master* branch
 2. **Must** compile and pass all unit tests
 3. **Must not** introduce regressions (unit tests or user testing)
+6. **Must** succeed in Aseba's continuous integration
 4. **Should** contain a single, understandable improvement
 5. **Should not** require more that 30 minutes of review by the maintainers
-6. **Should** succeed in Aseba's continuous integration
 7. **Should** have a clean commit history, from which individual commits may be cherry-picked
 
 These guidelines help us focus our efforts. If we close a pull request summarily for one of these reasons, you can always ask to reopen it if changes have been made. You may find it necessary to break up a large pull request into more manageable pieces.
