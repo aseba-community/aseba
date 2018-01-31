@@ -131,15 +131,18 @@ these functions on scalars:
     var cos_theta
     call math.cos(cos_theta, theta)
 
-Native functions for double-ended queues
-----------------------------------------
+Double-ended queues
+-------------------
 
-The `Deque` native library provides functions for `https:`en.wikipedia.org/wiki/Double-ended_queue <double-ended queue>`__ operations in an object-oriented style on specially-formatted arrays.
+The `Deque` native library provides functions for `double-ended queue <https://en.wikipedia.org/wiki/Double-ended_queue>`_ operations in an object-oriented style on specially-formatted arrays.
 The array for a `deque` object must be of size :math:`$2 + m \cdot k\,\,$` where :math:`$k$` is the size of the tuples [2]_ in the deque, and :math:`$m$` is the maximum number of tuples to be stored.
 
 An `index` :math:`$i$` into a deque is between two elements: the integer :math:`$i$` counts the number of elements to the left of the index.
 
-:code:`deque.size(Q,n)` : Set :math:`$n$` to the number of elements in deque :math:`$Q$`. If :math:`$n=0$` then :math:`$Q$` is empty. Note that :math:`$n$` must be divided by the tuple size to obtain the number of tuples in :math:`$Q$`.
+:code:`deque.size(Q,n)`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Set :math:`$n$` to the number of elements in deque :math:`$Q$`. If :math:`$n=0$` then :math:`$Q$` is empty. Note that :math:`$n$` must be divided by the tuple size to obtain the number of tuples in :math:`$Q$`.
 
 :code:`deque.push_front(Q,A)`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
