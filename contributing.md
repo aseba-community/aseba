@@ -8,6 +8,8 @@ If not, please [open a new issue](https://github.com/aseba-community/aseba/issue
 
 To contact the Aseba team, please open an issue with your question. Referring to a person through an [@mention](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown) in an issue is better than sending a direct e-mail, because it allows another team member to answer the question, and it allows another user with the same question to discover it in the [closed issues](https://github.com/aseba-community/aseba/issues?q=is%3Aissue+is%3Aclosed).
 
+If implementing your suggestion will require help from other developers, or will have a substantial impact on Aseba, or will require a large investment of your own, it is important to discuss it with the team as early as possible. 
+
 If you are a developer and have found a bug, please consider contributing a test. The most helpful way to do this is to submit a pull request with a new test in the [`tests`](https://github.com/aseba-community/aseba/tree/master/tests) directory.
 
 If you want to help us translating Aseba or its documentation, please read the [localization guide](localization.md).
