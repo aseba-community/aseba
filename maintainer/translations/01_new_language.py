@@ -36,7 +36,10 @@ studio_qrc_compiler_tag = re.compile(r"<!-- insert compiler translation here")
 sync_compiler_py_tag = re.compile(r"# insert translation here")
 updatedoc_tag = sync_compiler_py_tag
 challenge_qrc_tag = studio_qrc_tag
-
+playground_qrc_tag = studio_qrc_tag
+thymioupgrader_qrc_tag = studio_qrc_tag
+thymiownetconfig_qrc_tag = studio_qrc_tag
+qtabout_qrc_tag = studio_qrc_tag
 
 def insert_before_tag(input_file, output_file, tag_re, inserted_text):
     with open(input_file) as in_file:
@@ -97,6 +100,22 @@ os.chdir(challenge_path)
 # lupdate / lrelease asebachallenge_x.{ts,qm}
 translation_tools.do_lupdate_lrelease("asebachallenge", code, challenge_cpp)
 
+os.chdir(playground_path)
+# lupdate / lrelease asebaplayground_x.{ts,qm}
+translation_tools.do_lupdate_lrelease("asebaplayground", code, playground_path)
+
+os.chdir(thymioupgrader_path)
+# lupdate / lrelease thymioupgrader_x.{ts,qm}
+translation_tools.do_lupdate_lrelease("thymioupgrader", code, thymioupgrader_path)
+
+os.chdir(thymiownetconfig_path)
+# lupdate / lrelease thymiownetconfig_x.{ts,qm}
+translation_tools.do_lupdate_lrelease("thymiownetconfig", code, thymiownetconfig_path)
+
+os.chdir(qtabout_path)
+# lupdate / lrelease qtabout_x.{ts,qm}
+translation_tools.do_lupdate_lrelease("qtabout", code, qtabout_path)
+
 
 print "Modifying source files...\n"
 
@@ -140,6 +159,47 @@ os.remove(challenge_qrc)
 shutil.move(tmp_file, challenge_qrc)
 translation_tools.do_git_add(challenge_qrc)
 print "Done\n"
+
+# We have to update asebaplayground.qrc
+print "Updating asebaplayground.qrc..."
+os.chdir(playground_path)
+tmp_file = "asebaplayground.qrc.tmp"
+insert_before_tag(playground_qrc, tmp_file, playground_qrc_tag, """\t<file>asebaplayground_{}.qm</file>\n""".format(code))
+os.remove(playground_qrc)
+shutil.move(tmp_file, playground_qrc)
+translation_tools.do_git_add(playground_qrc)
+print "Done\n"
+
+# We have to update thymioupgrader.qrc
+print "Updating thymioupgrader.qrc..."
+os.chdir(thymioupgrader_path)
+tmp_file = "thymioupgrader.qrc.tmp"
+insert_before_tag(thymioupgrader_qrc, tmp_file, thymioupgrader_qrc_tag, """\t<file>thymioupgrader_{}.qm</file>\n""".format(code))
+os.remove(thymioupgrader_qrc)
+shutil.move(tmp_file, thymioupgrader_qrc)
+translation_tools.do_git_add(thymioupgrader_qrc)
+print "Done\n"
+
+# We have to update thymiownetconfig.qrc
+print "Updating thymiownetconfig.qrc..."
+os.chdir(thymiownetconfig_path)
+tmp_file = "thymiownetconfig.qrc.tmp"
+insert_before_tag(thymiownetconfig_qrc, tmp_file, thymiownetconfig_qrc_tag, """\t<file>thymiownetconfig_{}.qm</file>\n""".format(code))
+os.remove(thymiownetconfig_qrc)
+shutil.move(tmp_file, thymiownetconfig_qrc)
+translation_tools.do_git_add(thymiownetconfig_qrc)
+print "Done\n"
+
+# We have to update asebaqtabout.qrc
+print "Updating asebaqtabout.qrc..."
+os.chdir(qtabout_path)
+tmp_file = "asebaqtabout.qrc.tmp"
+insert_before_tag(qtabout_qrc, tmp_file, qtabout_qrc_tag, """\t<file>qtabout_{}.qm</file>\n""".format(code))
+os.remove(qtabout_qrc)
+shutil.move(tmp_file, qtabout_qrc)
+translation_tools.do_git_add(qtabout_qrc)
+print "Done\n"
+
 
 # Update updatedoc.py, if asked by the user
 if wikidot_url:
