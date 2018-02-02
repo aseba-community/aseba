@@ -10,7 +10,7 @@ To contact the Aseba team, please open an issue with your question. Referring to
 
 If implementing your suggestion will require help from other developers, or will have a substantial impact on Aseba, or will require a large investment of your own, it is important to discuss it with the team as early as possible. 
 
-If you are a developer and have found a bug, please consider contributing a test. The most helpful way to do this is to submit a pull request with a new test in the [`tests`](https://github.com/aseba-community/aseba/tree/master/tests) directory.
+If you are a developer and have found a bug, please consider [contributing a test](#testing). The most helpful way to do this is to submit a pull request with a new test in the [`tests`](https://github.com/aseba-community/aseba/tree/master/tests) directory.
 
 If you want to help us translating Aseba or its documentation, please read the [localization guide](localization.md).
 
@@ -66,6 +66,19 @@ As a general guideline, in order for a pull request to be accepted, it:
 These guidelines help us focus our efforts. If we close a pull request summarily for one of these reasons, you can always ask to reopen it if changes have been made. You may find it necessary to break up a large pull request into more manageable pieces.
 
 A special case are "work in progress" pull requests, which are created for discussion and are not intended to be merged. The title for such pull requests must start with "**WIP:**". This prefix will be removed when the pull request finally meets the guidelines and is ready for consideration.
+
+### Testing
+
+Aseba runs on many architectures and the source code contains many unit tests and end-to-end tests to rapidly detect errors in new services and regressions. Continuous integration will evaluate these tests for every new branch and pull request. You may run the tests yourself using `ctest`.
+
+It is good practice to define an acceptance test whenever you propose a new feature in Aseba. Tests should be added in the [`tests`](tests/) directory and declared in the appropriate `CMakeLists.txt` file.
+
+If you would like to propose a test *before* an implementation is proposed, please tell CMake either to disable the test, or explicitly that the test will fail. For example, in `CMakeLists.txt`:
+```
+add_test(testUnimplementedFeature ${EXECUTABLE_OUTPUT_PATH}/testUnimplementedFeature)
+set_tests_properties(testUnimplementedFeature PROPERTIES WILL_FAIL true)
+```
+This also applies if you discover a bug, and can propose a test before the fix is found.
 
 ## Release process
 
