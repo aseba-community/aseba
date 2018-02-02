@@ -69,7 +69,7 @@ A special case are "work in progress" pull requests, which are created for discu
 
 ### Testing
 
-Aseba runs on many architectures and the source code contains many unit tests and end-to-end tests to rapidly detect errors in new services and regressions. Continuous integration will evaluate these tests for every new branch and pull request. You may run the tests yourself using `ctest`.
+Aseba runs on many architectures and the source code contains many unit tests and end-to-end tests to rapidly detect errors in new services as well as regressions. Continuous integration will evaluate these tests for every new branch and pull request. You may run the tests yourself using `ctest`.
 
 It is good practice to define an acceptance test whenever you propose a new feature in Aseba. Tests should be added in the [`tests`](tests/) directory and declared in the appropriate `CMakeLists.txt` file.
 
