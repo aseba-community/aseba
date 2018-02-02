@@ -8,6 +8,7 @@
 	<file>thymiownetconfig_ja.qm</file>
 	<file>thymiownetconfig_zh.qm</file>
 	<file>thymiownetconfig_el.qm</file>
+	<file>thymiownetconfig_tr.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 </qresource>
 </RCC>
