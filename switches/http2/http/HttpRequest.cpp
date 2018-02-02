@@ -21,7 +21,7 @@
 #include <iostream>
 #include <cctype>
 #include <algorithm>
-#include <string> 
+#include <string>
 #include "../../../common/utils/utils.h"
 #include "../../../common/utils/FormatableString.h"
 #include "HttpRequest.h"
@@ -32,7 +32,7 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	void readRequestLine(Stream* stream, HttpMethod& method, string& uri, HttpProtocol& protocol, strings& tokenizedUri)
 	{
 		const string requestLine(readLine(stream));
@@ -51,7 +51,7 @@ namespace Aseba
 		{
 			throw HttpRequest::Error(FormatableString("Unsupported method %0").arg(e.what()), HttpStatus::METHOD_NOT_ALLOWED);
 		}
-		
+
 		// read the URI
 		uri = parts[1];
 		// Also allow %2F as URL part delimiter (see Scratch v430)
@@ -66,7 +66,7 @@ namespace Aseba
 		{
 			tokenizedUri.erase(tokenizedUri.begin(), tokenizedUri.begin() + 1);
 		}
-		
+
 		// read the protocol
 		try
 		{
@@ -77,14 +77,15 @@ namespace Aseba
 			throw HttpRequest::Error(FormatableString("Unsupported HTTP protocol version %0").arg(e.what()), HttpStatus::HTTP_VERSION_NOT_SUPPORTED);
 		}
 	}
-	
+
 	void readHeaders(Stream* stream, HttpRequest::Headers& headers)
 	{
 		while (true)
 		{
 			const string headerLine(trim(readLine(stream)));
 
-			if (headerLine.empty()) { // header section ends with empty line
+			if (headerLine.empty())
+			{ // header section ends with empty line
 				break;
 			}
 
@@ -106,18 +107,18 @@ namespace Aseba
 	{
 		// if this function is called, there must be content to read
 		auto contentLengthIt(headers.find("content-length"));
-		assert (contentLengthIt != headers.end());
+		assert(contentLengthIt != headers.end());
 		const size_t contentLength(atoi(contentLengthIt->second.c_str()));
 		if (contentLength > HttpRequest::CONTENT_BYTES_LIMIT)
 			throw HttpRequest::Error(FormatableString("Request content length is %0 which exceeds limit %1").arg(contentLength).arg(HttpRequest::CONTENT_BYTES_LIMIT), HttpStatus::BAD_REQUEST);
-			
+
 		if (contentLength > 0)
 		{
 			content.resize(contentLength);
 			stream->read(&content[0], contentLength);
 		}
 	}
-	
+
 	//! Receive the HTTP request and parse its headers and content.
 	HttpRequest HttpRequest::receive(Dashel::Stream* stream)
 	{
@@ -126,14 +127,14 @@ namespace Aseba
 		strings tokenizedUri;
 		HttpProtocol protocol;
 		readRequestLine(stream, method, uri, protocol, tokenizedUri);
-		
+
 		Headers headers;
 		readHeaders(stream, headers);
-		
+
 		vector<uint8_t> content;
 		if (headers.find("content-length") != headers.end())
 			readContent(stream, headers, content);
-		
+
 		HttpRequest request = {
 			method,
 			uri,
@@ -142,10 +143,10 @@ namespace Aseba
 			headers,
 			content
 		};
-		
+
 		LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", received " << toString(method) << " " << uri << " with " << content.size() << " byte(s) payload" << endl;
 		LOG_DUMP << "HTTP | On stream " << stream->getTargetName() << ": " << json(request) << endl;
-		
+
 		return request;
 	}
 
@@ -166,7 +167,7 @@ namespace Aseba
 			{ "content", serializedContent }
 		};
 	}
-	
+
 	//! Return a header or an empty string if not present
 	std::string HttpRequest::getHeader(const std::string& header) const
 	{

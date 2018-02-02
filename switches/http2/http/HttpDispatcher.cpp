@@ -32,20 +32,20 @@ namespace Aseba
 	using namespace std;
 	using namespace std::placeholders;
 	using namespace Dashel;
-			
-	#define RQ_MAP_GET_FIELD(itName, mapName, fieldName) \
-		const auto itName(mapName.find(#fieldName)); \
-		if (itName == mapName.end()) \
-		{ \
-			HttpResponse::fromPlainString("Cannot find field " #fieldName " in request content", HttpStatus::BAD_REQUEST).send(stream); \
-			return; \
-		}
-	
-	
-	HttpDispatcher::HttpDispatcher():
+
+#define RQ_MAP_GET_FIELD(itName, mapName, fieldName)                                                                                \
+	const auto itName(mapName.find(#fieldName));                                                                                    \
+	if (itName == mapName.end())                                                                                                    \
+	{                                                                                                                               \
+		HttpResponse::fromPlainString("Cannot find field " #fieldName " in request content", HttpStatus::BAD_REQUEST).send(stream); \
+		return;                                                                                                                     \
+	}
+
+
+	HttpDispatcher::HttpDispatcher() :
 		serverPort(3000),
 		// Models shared by endpoints
-		definitions( R"#json#(
+		definitions(R"#json#(
 			{
 				"breakpoint-pc" : {
 					"type" : "integer"
@@ -529,7 +529,7 @@ namespace Aseba
 					},
 					"type" : "object"
 				}
-			})#json#"_json )
+			})#json#"_json)
 	{
 		// register all handlers
 		REGISTER_HANDLER(optionsHandler, OPTIONS, {});
@@ -540,24 +540,24 @@ namespace Aseba
 		registerEventsHandlers();
 		registerNodesHandlers();
 		registerDebugsHandlers();
-		
+
 		// TODO: at some point, call a registerStreamsHandlers();
-		
+
 		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events" });
 		REGISTER_HANDLER(getStreamsEventsHandler, GET, { "streams", "events", "{name}" });
 	}
-	
+
 	string HttpDispatcher::name() const
 	{
 		return "HTTP Dispatcher";
 	}
-	
-	void HttpDispatcher::dumpArgumentsDescription(ostream &stream) const
+
+	void HttpDispatcher::dumpArgumentsDescription(ostream& stream) const
 	{
 		stream << "  HTTP module, provides access to the network from a web application\n";
 		stream << "    -w, --http      : listens to incoming HTTP connections on this port (default: 3000)\n";
 	}
-	
+
 	ArgumentDescriptions HttpDispatcher::describeArguments() const
 	{
 		return {
@@ -565,7 +565,7 @@ namespace Aseba
 			{ "--http", 1 }
 		};
 	}
-	
+
 	void HttpDispatcher::processArguments(Switch* asebaSwitch, const Arguments& arguments)
 	{
 		strings args;
@@ -584,18 +584,17 @@ namespace Aseba
 			LOG_ERROR << "HTTP | Error trying to open server stream " << oss.str() << ": " << e.what() << endl;
 		}
 	}
-	
+
 	//! Take ownership of the stream if it was created by our server stream
-	bool HttpDispatcher::connectionCreated(Switch* asebaSwitch, Dashel::Stream * stream)
+	bool HttpDispatcher::connectionCreated(Switch* asebaSwitch, Dashel::Stream* stream)
 	{
-		if (stream->getTarget().isSet("connectionPort") &&
-			stoi(stream->getTargetParameter("connectionPort")) == serverPort)
+		if (stream->getTarget().isSet("connectionPort") && stoi(stream->getTargetParameter("connectionPort")) == serverPort)
 			return true;
 		return false;
 	}
-	
+
 	//! Receive request and dispatch to the relevant handler, which will have to answer by itself or add the stream to an SSE set
-	void HttpDispatcher::incomingData(Switch* asebaSwitch, Dashel::Stream * stream)
+	void HttpDispatcher::incomingData(Switch* asebaSwitch, Dashel::Stream* stream)
 	{
 		try // for DashelException
 		{
@@ -603,14 +602,14 @@ namespace Aseba
 			{
 				// receive request
 				HttpRequest request(HttpRequest::receive(stream));
-				
+
 				// check handler map for given method
 				const auto uriHandlerMapIt(handlers.find(request.method));
 				if (uriHandlerMapIt != handlers.end())
 				{
 					const auto& uriHandlerMap(uriHandlerMapIt->second);
 					// look for a handler to dispatch
-					for (const auto& uriHandlerKV: uriHandlerMap)
+					for (const auto& uriHandlerKV : uriHandlerMap)
 					{
 						const strings& uri(uriHandlerKV.first);
 						// length must match
@@ -623,10 +622,10 @@ namespace Aseba
 							const string& folder(uri[i]);
 							const string& requestedFolder(request.tokenizedUri[i]);
 							const size_t l(folder.length());
-							if (l > 2 && folder[0] == '{' && folder[l-1] == '}')
+							if (l > 2 && folder[0] == '{' && folder[l - 1] == '}')
 							{
 								// template to fill
-								filledPathTemplates[folder.substr(1, l-2)] = requestedFolder;
+								filledPathTemplates[folder.substr(1, l - 2)] = requestedFolder;
 							}
 							else if (folder != requestedFolder)
 							{
@@ -641,22 +640,20 @@ namespace Aseba
 							try
 							{
 								// create context and deserialize JSON content, if any
-								HandlerContext context({
-									asebaSwitch,
+								HandlerContext context({ asebaSwitch,
 									stream,
 									request,
 									filledPathTemplates,
-									(request.content.size() > 0 && request.getHeader("Content-Type") == "application/json") ? parse(request.content) : json()
-								});
-								
+									(request.content.size() > 0 && request.getHeader("Content-Type") == "application/json") ? parse(request.content) : json() });
+
 								const json& doc(uriHandlerKV.second.second);
-								
+
 								// if specified, check that the handler can consume the provided Content-Type
 								auto consumesIt(doc.find("consumes"));
 								if (consumesIt != doc.end())
 								{
 									bool found(false);
-									for (const string& consumedType: *consumesIt)
+									for (const string& consumedType : *consumesIt)
 									{
 										const string contentType(request.getHeader("Content-Type"));
 										if (contentType.substr(0, contentType.find(';')) == consumedType)
@@ -668,12 +665,12 @@ namespace Aseba
 										return;
 									}
 								}
-								
+
 								// if request content is JSON, validate
 								auto parametersIt(doc.find("parameters"));
 								if (parametersIt != doc.end())
 								{
-									for (const auto& parameter: *parametersIt)
+									for (const auto& parameter : *parametersIt)
 									{
 										const auto nameIt(parameter.find("name"));
 										const auto inIt(parameter.find("in"));
@@ -691,18 +688,18 @@ namespace Aseba
 												HttpResponse::fromPlainString(string("Expected application/json as Content-Type, received: ") + contentType, HttpStatus::BAD_REQUEST).send(stream);
 												return;
 											}
-											
+
 											// make a copy of the schema and resolve the references
 											json schema(parameter.at("schema"));
 											resolveReferences(schema);
 											cerr << schema.dump() << endl;
-											
+
 											// validate body
 											try
 											{
 												validate(schema, context.parsedContent);
 											}
-											catch(const InvalidJsonSchema& e)
+											catch (const InvalidJsonSchema& e)
 											{
 												HttpResponse::fromPlainString(string("Invalid JSON in query: ") + e.what(), HttpStatus::BAD_REQUEST).send(stream);
 												return;
@@ -710,7 +707,7 @@ namespace Aseba
 										}
 									}
 								}
-								
+
 								//LOG_VERBOSE << "HTTP | On stream " << stream->getTargetName() << ", dispatching " << toString(request.method) << " " << request.uri << " to handler" << endl;
 								// dispatch
 								uriHandlerKV.second.first(context);
@@ -723,10 +720,10 @@ namespace Aseba
 						}
 					}
 				}
-				
+
 				// no matching method or URI found, not found
 				HttpResponse::fromPlainString(FormatableString("No handler found for %0 %1").arg(toString(request.method)).arg(request.uri), HttpStatus::NOT_FOUND).send(stream);
-				
+
 				// TODO; add timeout for closing unused connections for a while
 				// FIXME: what about protocols incompatibilities?
 			}
@@ -743,11 +740,11 @@ namespace Aseba
 			LOG_ERROR << "HTTP | Error while processing stream " << stream << " of target " << stream->getTargetName() << ": " << e.what() << endl;
 		}
 	}
-	
-	void HttpDispatcher::connectionClosed(Switch* asebaSwitch, Dashel::Stream * stream)
+
+	void HttpDispatcher::connectionClosed(Switch* asebaSwitch, Dashel::Stream* stream)
 	{
 		// Remove the SSE associated to this stream if any
-		auto eventStreamIt(eventStreams.begin()); 
+		auto eventStreamIt(eventStreams.begin());
 		while (eventStreamIt != eventStreams.end())
 		{
 			if (eventStreamIt->second == stream)
@@ -766,11 +763,11 @@ namespace Aseba
 				++pendingReadIt;
 		}
 	}
-	
+
 	void HttpDispatcher::processMessage(Switch* asebaSwitch, const Message& message)
 	{
 		// handle answers for pending variable read requests
-		const Variables *variables = dynamic_cast<const Variables *>(&message);
+		const Variables* variables = dynamic_cast<const Variables*>(&message);
 		if (variables)
 		{
 			auto pendingReadsIt(pendingReads.find({ message.source, variables->start }));
@@ -782,12 +779,12 @@ namespace Aseba
 			}
 			return;
 		}
-		
+
 		// consider user messages for forwarding to SSE
 		const UserMessage* userMessage(dynamic_cast<const UserMessage*>(&message));
 		if (!userMessage)
 			return;
-		
+
 		// find name and build event
 		string eventName;
 		if (userMessage->type >= asebaSwitch->commonDefinitions.events.size())
@@ -797,56 +794,56 @@ namespace Aseba
 		string sseEventEvent = "event: " + eventName + "\r\n\r\n";
 		string sseEventData("data: [");
 		unsigned i(0);
-		for (auto v: userMessage->data)
+		for (auto v : userMessage->data)
 		{
 			if (i++ > 0)
 				sseEventData += ", ";
 			sseEventData += to_string(v);
 		}
 		sseEventData += "]\r\n\r\n";
-			
+
 		// send all messages with the name of the event to the general events SSEs
 		auto generalEventsRange(eventStreams.equal_range(""));
 		for (auto generalEventIt = generalEventsRange.first; generalEventIt != generalEventsRange.second; ++generalEventIt)
 		{
-			Stream *stream(generalEventIt->second);
+			Stream* stream(generalEventIt->second);
 			stream->write(sseEventEvent.c_str(), sseEventEvent.length());
 			stream->write(sseEventData.c_str(), sseEventData.length());
 			stream->flush();
 		}
-		
+
 		// send message to the registered event with the right name
 		auto specificEventsRange(eventStreams.equal_range(eventName));
 		for (auto specificEventIt = specificEventsRange.first; specificEventIt != specificEventsRange.second; ++specificEventIt)
 		{
-			Stream *stream(specificEventIt->second);
+			Stream* stream(specificEventIt->second);
 			stream->write(sseEventData.c_str(), sseEventData.length());
 			stream->flush();
 		}
 	}
-	
+
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath)
 	{
 		// Since opId wasn't supplied by apidocs, construct an opId from the method and the URI Template path elements.
 		// For example, endpoint GET /nodes/{node}/variables has default opId GET-nodes-node-variables.
-		auto opPath{uriPath}; // copy path elements so can remove braces
-		for (auto & element: opPath)
-			element.erase(std::remove_if(element.begin(), element.end(), [](char c){ return c=='}'||c=='{'; }), element.end());
-		handlers[method][uriPath] = { handler, json{ {"operationId", toString(method) + "-" + join(opPath,"-")} }};
+		auto opPath{ uriPath }; // copy path elements so can remove braces
+		for (auto& element : opPath)
+			element.erase(std::remove_if(element.begin(), element.end(), [](char c) { return c == '}' || c == '{'; }), element.end());
+		handlers[method][uriPath] = { handler, json{ { "operationId", toString(method) + "-" + join(opPath, "-") } } };
 	}
-	
+
 	void HttpDispatcher::registerHandler(const Handler& handler, const HttpMethod& method, const strings& uriPath, const json& apidoc)
 	{
 		handlers[method][uriPath] = { handler, apidoc };
 	}
-	
+
 	//! Resolve the $ref field in JSON objects
 	void HttpDispatcher::resolveReferences(json& object) const
 	{
 		// if not an object, return
 		if (!object.is_object())
 			return;
-		
+
 		// import the content from referred element
 		auto refIt(object.find("$ref"));
 		if (refIt != object.end())
@@ -855,24 +852,24 @@ namespace Aseba
 			const string ref(refIt->get<string>());
 			const string defPath("#/definitions/");
 			const size_t defPathLength(defPath.length());
-			assert (ref.compare(0, defPathLength, "#/definitions/") == 0);
+			assert(ref.compare(0, defPathLength, "#/definitions/") == 0);
 			const string defKey(ref.substr(defPathLength));
 			auto refSubstIt(definitions.find(defKey));
-			assert (refSubstIt != definitions.end());
+			assert(refSubstIt != definitions.end());
 			auto refSubst(*refSubstIt);
 			// import referred content
 			for (json::iterator it = refSubst.begin(); it != refSubst.end(); ++it)
 				object[it.key()] = it.value();
 		}
-		
+
 		// remove the "$ref" entry
 		object.erase("$ref");
-		
+
 		// further resolve the references
 		for (json::iterator it = object.begin(); it != object.end(); ++it)
 			resolveReferences(it.value());
 	}
-	
+
 	//! Return a node from the request, or produce an error and return null if the node is not found
 	HttpDispatcher::NodeEntry HttpDispatcher::findNode(HandlerContext& context) const
 	{
@@ -881,7 +878,7 @@ namespace Aseba
 		try
 		{
 			const unsigned nodeId(stoul(templateIt->second));
-		
+
 			// retrieve node
 			const auto nodeIt(context.asebaSwitch->nodes.find(nodeId));
 			if (nodeIt == context.asebaSwitch->nodes.end())
@@ -897,39 +894,39 @@ namespace Aseba
 			return NodeEntry(0, nullptr);
 		}
 	}
-	
+
 	// handlers
 
 	void HttpDispatcher::optionsHandler(HandlerContext& context)
 	{
-		HttpResponse response{HttpResponse::fromJSON(buildApiDocs())};
+		HttpResponse response{ HttpResponse::fromJSON(buildApiDocs()) };
 		response.headers.emplace("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
 		response.headers.emplace("Access-Control-Allow-Headers", "Content-Type");
 		response.send(context.stream);
 	}
-	
+
 	void HttpDispatcher::getTestHandler(HandlerContext& context)
 	{
 		HttpResponse::fromHTMLString("{ content: \"hello world\" }").send(context.stream);
 	}
-	
+
 	void HttpDispatcher::getApiDocs(HandlerContext& context)
 	{
-		json response{buildApiDocs()};
+		json response{ buildApiDocs() };
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
 	json HttpDispatcher::buildApiDocs()
 	{
 		json documentation = R"({"swagger":"2.0","schemes":["http"],"host":"localhost:3000","info":{"version":"1","title":"Aseba","description":"REST API for Aseba"},"parameters":{"trait:serverSentEventStream:todo":{"name":"todo","in":"query","required":false,"type":"integer"}},"responses":{"trait:serverSentEventStream:200":{"description":"stream of server-sent events","schema":{"type":"string"}}}})"_json;
-		for (const auto& handlerMapKV: handlers)
+		for (const auto& handlerMapKV : handlers)
 		{
-			for (const auto& handlerKV: handlerMapKV.second)
+			for (const auto& handlerKV : handlerMapKV.second)
 			{
 				if (handlerKV.first.size() == 0)
 					break;
 
-				auto uri = "/" + join(handlerKV.first,"/");
+				auto uri = "/" + join(handlerKV.first, "/");
 
 				// method key must be lower case for OAS 2.0
 				auto method = toString(handlerMapKV.first);
@@ -943,5 +940,5 @@ namespace Aseba
 		documentation["definitions"] = definitions;
 		return documentation;
 	}
-	
+
 } // namespace Aseba

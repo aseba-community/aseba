@@ -42,7 +42,7 @@ using namespace Aseba;
 typedef Switch::Modules Modules;
 
 //! Show version
-void dumpVersion(std::ostream &stream, const char *programName)
+void dumpVersion(std::ostream& stream, const char* programName)
 {
 	// TODO: add copyright
 	stream << "Aseba version " << ASEBA_VERSION << "\n";
@@ -52,50 +52,50 @@ void dumpVersion(std::ostream &stream, const char *programName)
 }
 
 //! Show usage
-void dumpHelp(ostream &stream, const char *programName, const Switch* asebaSwitch, const Modules& modules)
+void dumpHelp(ostream& stream, const char* programName, const Switch* asebaSwitch, const Modules& modules)
 {
 	stream << "Usage: " << programName << " [options] [additional target]*\n";
 	stream << "Aseba Switch, connects Aseba networks together and with HTTP.\n\n";
 	stream << "Valid command-line options:\n";
 	stream << "  General\n";
- 	stream << "    -h, --help      : shows this help, and exit\n";
- 	stream << "    -V, --version   : shows the version number, and exit\n";
+	stream << "    -h, --help      : shows this help, and exit\n";
+	stream << "    -V, --version   : shows the version number, and exit\n";
 	asebaSwitch->dumpArgumentsDescription(stream);
-	for (auto const& module: modules)
+	for (auto const& module : modules)
 		module->dumpArgumentsDescription(stream);
 	stream << "\nAdditional targets are any valid Dashel targets.\n\n";
 	dumpVersion(stream, programName);
 }
 
 // Main
-int main(int argc, const char *argv[])
+int main(int argc, const char* argv[])
 {
 	// initialize Dashel plugins
 	Dashel::initPlugins();
-	
+
 	// create switch
 	unique_ptr<Switch> asebaSwitch(new Switch());
-	
+
 	// create modules
 	asebaSwitch->registerModule(new HttpDispatcher());
-	
+
 	// parse command line
 	Arguments arguments;
 	int argCounter = 1;
 	while (argCounter < argc)
 	{
-		const char *arg(argv[argCounter++]);
-		
+		const char* arg(argv[argCounter++]);
+
 		// show help/version and quit
 		if ((strcmp(arg, "-h") == 0) || (strcmp(arg, "--help") == 0))
 			dumpHelp(cout, argv[0], asebaSwitch.get(), asebaSwitch->getModules()), exit(0);
-		if((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
+		if ((strcmp(arg, "-V") == 0) || (strcmp(arg, "--version") == 0))
 			dumpVersion(cout, argv[0]), exit(0);
 		// find whether the switch knows this argument
 		if (asebaSwitch->describeArguments().parse(arg, argc, argv, argCounter, arguments))
 			goto argFound;
 		// find whether a module knows this argument
-		for (auto const& module: asebaSwitch->getModules())
+		for (auto const& module : asebaSwitch->getModules())
 			if (module->describeArguments().parse(arg, argc, argv, argCounter, arguments))
 				goto argFound;
 		// all given arguments must be handled, otherwise it is an error
@@ -107,15 +107,15 @@ int main(int argc, const char *argv[])
 		}
 		// register command line Aseba target
 		asebaSwitch->addAsebaTarget(arg);
-		
-		argFound: ;
+
+	argFound:;
 	}
-	
+
 	// set Switch and module arguments
 	asebaSwitch->processArguments(arguments);
-	for (auto const& module: asebaSwitch->getModules())
+	for (auto const& module : asebaSwitch->getModules())
 		module->processArguments(asebaSwitch.get(), arguments);
-	
+
 	// run switch, catch Dashel exceptions
 	try
 	{
@@ -124,7 +124,7 @@ int main(int argc, const char *argv[])
 	catch (const Dashel::DashelException& e)
 	{
 		LOG_ERROR << "Core | Unhandled Dashel exception: " << e.what() << endl;
-		return 1; 
+		return 1;
 	}
 
 	return 0;

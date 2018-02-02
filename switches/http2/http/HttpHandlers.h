@@ -22,7 +22,7 @@
 #define ASEBA_HTTP_HANDLERS
 
 #define REGISTER_HANDLER(handler, method, ...) \
-	registerHandler(bind(&HttpDispatcher::handler, this, _1), HttpMethod::method,  __VA_ARGS__);
+	registerHandler(bind(&HttpDispatcher::handler, this, _1), HttpMethod::method, __VA_ARGS__);
 
 namespace Aseba
 {

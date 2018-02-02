@@ -30,7 +30,7 @@ namespace Aseba
 	using namespace Dashel;
 
 	//! Constructor, protected to force the use of factories that set correct content-type
-	HttpResponse::HttpResponse(const HttpStatus::Code status):
+	HttpResponse::HttpResponse(const HttpStatus::Code status) :
 		protocol(HttpProtocol::HTTP_1_1),
 		status(status)
 	{
@@ -38,13 +38,13 @@ namespace Aseba
 		headers.emplace("content-length", "");
 		headers.emplace("access-control-allow-origin", "*");
 	}
-	
+
 	//! Factory, from status only
 	HttpResponse HttpResponse::fromStatus(const HttpStatus::Code status)
 	{
 		return HttpResponse(status);
 	}
-	
+
 	//! Factory, from a plain string
 	HttpResponse HttpResponse::fromPlainString(const std::string& content, const HttpStatus::Code status)
 	{
@@ -53,7 +53,7 @@ namespace Aseba
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
-	
+
 	//! Factory, from an UTF-8 encoded HTML string
 	HttpResponse HttpResponse::fromHTMLString(const std::string& content, const HttpStatus::Code status)
 	{
@@ -62,7 +62,7 @@ namespace Aseba
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
-	
+
 	//! Factory, from a JSON string
 	HttpResponse HttpResponse::fromJSONString(const std::string& content, const HttpStatus::Code status)
 	{
@@ -71,7 +71,7 @@ namespace Aseba
 		response.content.insert(response.content.end(), content.begin(), content.end());
 		return response;
 	}
-	
+
 	//! Factory, from a JSON object
 	HttpResponse HttpResponse::fromJSON(const json& content, const HttpStatus::Code status)
 	{
@@ -81,7 +81,7 @@ namespace Aseba
 		response.content.insert(response.content.end(), serializedContent.begin(), serializedContent.end());
 		return response;
 	}
-	
+
 	//! Factory, creates a Server-Side Event declaration for the client
 	HttpResponse HttpResponse::createSSE()
 	{
@@ -91,7 +91,7 @@ namespace Aseba
 		response.headers["connection"] = "keep-alive";
 		return response;
 	}
-	
+
 	//! Return a header or an empty string if not present
 	std::string HttpResponse::getHeader(const std::string& header) const
 	{
@@ -108,14 +108,14 @@ namespace Aseba
 	void HttpResponse::send(Dashel::Stream* stream)
 	{
 		ostringstream reply;
-		
+
 		// write status
 		reply << toString(protocol) << " " << unsigned(status) << " " << HttpStatus::toString(status) << "\r\n";
-		
+
 		// write headers
-		for (const auto& headerKV: headers)
+		for (const auto& headerKV : headers)
 		{
-			if (headerKV. first == "content-length") // override with actual size
+			if (headerKV.first == "content-length") // override with actual size
 			{
 				if (getHeader("content-type") != "text/event-stream") // but only if this is not an event stream
 					reply << headerKV.first << ": " << content.size() << "\r\n";
@@ -132,7 +132,7 @@ namespace Aseba
 		// send content payload
 		stream->write(&content[0], content.size());
 		stream->flush();
-		
+
 		if (status >= 400)
 		{
 			LOG_ERROR << "HTTP | On stream " << stream->getTargetName() << ", request error " << status << " " << HttpStatus::toString(status) << ": " << string(reinterpret_cast<const char*>(&content[0]), content.size()) << endl;
@@ -143,7 +143,7 @@ namespace Aseba
 		}
 		LOG_DUMP << "HTTP | On stream " << stream->getTargetName() << ": " << json(*this) << endl;
 	}
-	
+
 	//! Write the response as JSON
 	HttpResponse::operator json() const
 	{
@@ -160,5 +160,5 @@ namespace Aseba
 			{ "content", serializedContent }
 		};
 	}
-	
+
 } // namespace Aseba

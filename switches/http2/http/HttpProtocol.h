@@ -32,17 +32,17 @@ namespace Aseba
 		HTTP_1_0 = 0,
 		HTTP_1_1
 	};
-	
+
 	using domain_error = std::domain_error;
 	//! Invalid protocol
-	struct InvalidHttpProtocol: public domain_error
+	struct InvalidHttpProtocol : public domain_error
 	{
 		using domain_error::domain_error;
 	};
-	
+
 	std::string toString(const HttpProtocol& protocol);
 	HttpProtocol fromProtocolString(const std::string& protocol);
-	
+
 } // namespace Aseba
 
 #endif // ASEBA_HTTP_PROTOCOL

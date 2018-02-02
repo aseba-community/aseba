@@ -25,13 +25,13 @@
 namespace Aseba
 {
 	using namespace std;
-	
+
 	//! List of names of all known HTTP protocols
 	static const map<HttpProtocol, string> protocolNames = {
 		{ HttpProtocol::HTTP_1_0, "HTTP/1.0" },
 		{ HttpProtocol::HTTP_1_1, "HTTP/1.1" }
 	};
-	
+
 	//! Return a string representing the protocol
 	std::string toString(const HttpProtocol& protocol)
 	{
@@ -40,11 +40,11 @@ namespace Aseba
 			abort(); // if this arrives, the table above is not in sync with the enum content
 		return protocolIt->second;
 	}
-	
+
 	//! Return the protocol from a string, or throw InvalidHttpProtocol if it is not found
 	HttpProtocol fromProtocolString(const std::string& protocol)
 	{
-		for (const auto& protocolKV: protocolNames)
+		for (const auto& protocolKV : protocolNames)
 			if (protocolKV.second == protocol)
 				return protocolKV.first;
 		throw InvalidHttpProtocol(FormatableString("Invalid protocol %0").arg(protocol));

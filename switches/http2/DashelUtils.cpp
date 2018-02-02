@@ -24,18 +24,18 @@ namespace Dashel
 {
 	using std::string;
 	using namespace Dashel;
-	
+
 	string readLine(Stream* stream)
 	{
 		char c;
 		string line;
-		do {
+		do
+		{
 			stream->read(&c, sizeof(char));
 			line += c;
-		} while(c != '\n');
+		} while (c != '\n');
 
 		return line;
 	}
-	
-} // Dashel
 
+} // Dashel

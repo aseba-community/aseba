@@ -46,16 +46,16 @@ namespace Aseba
 			SERVICE_UNAVAILABLE = 503,
 			HTTP_VERSION_NOT_SUPPORTED = 505
 		};
-		
+
 		//! An HTTP error, providing a status code
-		struct InvalidCode: public std::domain_error
+		struct InvalidCode : public std::domain_error
 		{
 			InvalidCode(Code code);
 		};
-		
+
 		static std::string toString(Code code);
 	};
-	
+
 } // namespace Aseba
 
 #endif // ASEBA_HTTP_STATUS

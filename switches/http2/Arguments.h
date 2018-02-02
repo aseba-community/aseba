@@ -34,31 +34,31 @@ namespace Aseba
 	};
 
 	//! A command-line argument filled with values
-	struct Argument: public ArgumentDescription
+	struct Argument : public ArgumentDescription
 	{
 		//! Construct using a copy of base class
-		Argument(const ArgumentDescription& descr): 
+		Argument(const ArgumentDescription& descr) :
 			ArgumentDescription(descr)
 		{}
-		
+
 		std::vector<std::string> values; //!< values as string, could be converted by user class
 	};
 
 	//! Filled command-line arguments, typedef for constructor inheritance
 	typedef std::vector<Argument> ArgumentsBase;
-	
+
 	//! Filled command-line arguments
-	struct Arguments: public ArgumentsBase
+	struct Arguments : public ArgumentsBase
 	{
 		using ArgumentsBase::ArgumentsBase;
-		bool find(const std::string &key, std::vector<std::string>* values = nullptr) const;
+		bool find(const std::string& key, std::vector<std::string>* values = nullptr) const;
 	};
-	
+
 	//! Possible command-line arguments, typedef for constructor inheritance
 	typedef std::vector<ArgumentDescription> ArgumentDescriptionsBase;
-	
+
 	//! Possible command-line arguments
-	struct ArgumentDescriptions: public ArgumentDescriptionsBase
+	struct ArgumentDescriptions : public ArgumentDescriptionsBase
 	{
 		using ArgumentDescriptionsBase::ArgumentDescriptionsBase;
 		bool parse(const char* arg, int argc, const char* argv[], int& argCounter, Arguments& parsedArgs);

@@ -28,7 +28,7 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	//! Register all constants-related handlers
 	void HttpDispatcher::registerConstantsHandlers()
 	{
@@ -229,11 +229,11 @@ namespace Aseba
 			HttpResponse::fromPlainString(FormatableString("Constant %0 already exists").arg(name), HttpStatus::CONFLICT).send(context.stream);
 			return;
 		}
-		
+
 		// create the constant with a default value
-		context.asebaSwitch->commonDefinitions.constants.push_back({wname, 0});
+		context.asebaSwitch->commonDefinitions.constants.push_back({ wname, 0 });
 		const size_t position(context.asebaSwitch->commonDefinitions.constants.size() - 1);
-		
+
 		// update the value and return an answer
 		updateConstantValue(context, name, position, true);
 	}
@@ -243,21 +243,25 @@ namespace Aseba
 	{
 		json response(json::array());
 		unsigned i(0);
-		for (const auto& constant: context.asebaSwitch->commonDefinitions.constants)
+		for (const auto& constant : context.asebaSwitch->commonDefinitions.constants)
+		{
+			// clang-format off
 			response.push_back({
 				{ "id", i++ },
 				{ "name", WStringToUTF8(constant.name) },
 				{ "value", constant.value }
 			});
+			// clang-format on
+		}
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
 
-	//! handler for DELETE /constants 
+	//! handler for DELETE /constants
 	void HttpDispatcher::deleteConstantsHandler(HandlerContext& context)
 	{
 		// clear all constants
 		context.asebaSwitch->commonDefinitions.constants.clear();
-		
+
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
@@ -270,15 +274,16 @@ namespace Aseba
 		size_t position(0);
 		if (!findConstant(context, name, position))
 			return;
-		
+
+		// clang-format off
 		// return the constant
 		const NamedValue& constant(context.asebaSwitch->commonDefinitions.constants[position]);
 		HttpResponse::fromJSON({
 			{ "id", position },
-			{ "name",  name },
+			{ "name", name },
 			{ "value", constant.value }
-	
 		}).send(context.stream);
+		// clang-format on
 	}
 
 	//! handler for DELETE /constants/{name} -> application/json
@@ -289,11 +294,11 @@ namespace Aseba
 		size_t position(0);
 		if (!findConstant(context, name, position))
 			return;
-		
+
 		// delete the constant
 		NamedValuesVector& constants(context.asebaSwitch->commonDefinitions.constants);
 		constants.erase(constants.begin() + position);
-		
+
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
@@ -306,7 +311,7 @@ namespace Aseba
 		size_t position(0);
 		if (!findConstant(context, name, position))
 			return;
-		
+
 		// updated the value and return an answer
 		updateConstantValue(context, name, position, false);
 	}
@@ -319,7 +324,8 @@ namespace Aseba
 		// sets the value
 		const int value(context.parsedContent["value"].get<int>());
 		context.asebaSwitch->commonDefinitions.constants[position].value = value;
-		
+
+		// clang-format off
 		// return answer
 		if (created)
 			HttpResponse::fromJSON({
@@ -329,8 +335,9 @@ namespace Aseba
 			}, HttpStatus::CREATED).send(context.stream);
 		else
 			HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
+		// clang-format on
 	}
-	
+
 	//! try to find a constant, return true and update position if found, return false and send an error if not found
 	bool HttpDispatcher::findConstant(HandlerContext& context, string& name, size_t& position)
 	{
@@ -338,7 +345,7 @@ namespace Aseba
 		const auto templateIt(context.filledPathTemplates.find("name"));
 		assert(templateIt != context.filledPathTemplates.end());
 		name = templateIt->second;
-		
+
 		// if constant does not exist, respond an error
 		position = 0;
 		if (!context.asebaSwitch->commonDefinitions.constants.contains(UTF8ToWString(name), &position))
@@ -346,7 +353,7 @@ namespace Aseba
 			HttpResponse::fromPlainString(FormatableString("Constant %0 does not exist").arg(name), HttpStatus::NOT_FOUND).send(context.stream);
 			return false;
 		}
-		
+
 		return true;
 	}
 

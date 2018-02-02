@@ -27,73 +27,73 @@
 
 namespace Aseba
 {
-	class Switch: public Dashel::Hub, public NodesManager
+	class Switch : public Dashel::Hub, public NodesManager
 	{
 	public:
 		//! A vector of modules
 		typedef std::vector<std::unique_ptr<Module>> Modules;
-		
+
 	protected:
 		//! A set of streams
 		typedef std::set<std::string> StreamTargetSet;
-		
+
 		//! A map of local to global node id, to be used on a given stream
 		typedef std::map<unsigned, unsigned> IdRemapTable;
 		//! The global remap table for all Aseba targets
 		typedef std::map<std::string, IdRemapTable> IdRemapTables;
 		//! All global identifiers with their current associated stream
 		typedef std::map<unsigned, Dashel::Stream*> GlobalIdStreamMap;
-		
+
 		//! An association of stream to module
 		typedef std::map<Dashel::Stream*, Module*> StreamModuleMap;
-		
+
 		//! A node that has a program and the result of compilation attached
-		struct NodeWithProgram: public Node, public CompilationResult
+		struct NodeWithProgram : public Node, public CompilationResult
 		{
 			NodeWithProgram(const TargetDescription& targetDescription);
-			
+
 			void compile(const CommonDefinitions& commonDefinitions);
-			
+
 			std::wstring code; //!< the source code of the program
 			Compiler::SubroutineTable subroutineTable; //!< all subroutines with their address and source lines
-			
+
 			// FIXME: these variables make sense for a low-level interface,
 			// but maybe we want something closer to what DashelTarget proposes,
 			// at the level of a line in code
 			uint16 pc = 0; //!< last known program counter
 			uint16 executionFlags = 0; //!< last known execution flags
 		};
-		
+
 		friend class HttpDispatcher;
-		
+
 	public:
 		// public API for main
 		Switch();
-		
-		void dumpArgumentsDescription(std::ostream &stream) const;
+
+		void dumpArgumentsDescription(std::ostream& stream) const;
 		ArgumentDescriptions describeArguments() const;
 		void processArguments(const Arguments& arguments);
-		
+
 		void addAsebaTarget(const std::string& target);
-		
+
 		void run();
-		
+
 		const Modules& getModules() const { return modules; }
-		
+
 		// public API for modules
 		void registerModule(Module* module);
-		
+
 	protected:
 		// from Hub
-		virtual void connectionCreated(Dashel::Stream *stream);
-		virtual void incomingData(Dashel::Stream * stream);
-		virtual void connectionClosed(Dashel::Stream * stream, bool abnormal);
-		
+		virtual void connectionCreated(Dashel::Stream* stream);
+		virtual void incomingData(Dashel::Stream* stream);
+		virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
+
 		// from NodesManager
 		virtual Node* createNode(const TargetDescription& targetDescription);
 		virtual void nodeDescriptionReceived(unsigned nodeId);
 		virtual void sendMessage(const Message& message);
-		
+
 		// support functions
 		void broadcastMessage(const Message* message, const Dashel::Stream* exceptedThis);
 		void sendMessageWithRemap(Message* message, const Dashel::Stream* exceptedThis);
@@ -103,23 +103,23 @@ namespace Aseba
 		void connectNewTargets();
 		void reconnectDisconnectedTargets();
 		//bool isAsebaStream(Dashel::Stream* stream) const;
-	
+
 	public:
 		CommonDefinitions commonDefinitions; //!< global events and constants, user-definable
-		
+
 	protected:
 		int runDuration; //!< if positive, run only for duration (in seconds)
-		
+
 		StreamTargetSet toConnectTargets; //!< set of targets to attempt automatic connection, will be Aseba streams afterwards
 		StreamTargetSet toReconnectTargets; //!< set of targets to attempt automatic reconnection, will be Aseba streams afterwards
-		
+
 		IdRemapTables idRemapTables; //!< tables for remapping identifiers for different Aseba Dashel targets
 		GlobalIdStreamMap globalIdStreamMap; //!< all known global identifiers with their current associated stream
-		
+
 		Modules modules; //!< modules wanting to receive notification of messages
 		StreamModuleMap moduleSpecificStreams; //!< streams whose data processing responsibility are delegated to a module
 	};
-	
+
 } // namespace Aseba
 
 #endif // ASEBA_SWITCH_SWITCH

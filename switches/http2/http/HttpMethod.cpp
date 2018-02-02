@@ -25,7 +25,7 @@
 namespace Aseba
 {
 	using namespace std;
-	
+
 	//! List of names of all known HTTP methods
 	static const map<HttpMethod, string> methodNames = {
 		{ HttpMethod::GET, "GET" },
@@ -34,7 +34,7 @@ namespace Aseba
 		{ HttpMethod::OPTIONS, "OPTIONS" },
 		{ HttpMethod::DELETE, "DELETE" }
 	};
-	
+
 	//! Return a string representing the method
 	std::string toString(const HttpMethod& method)
 	{
@@ -43,11 +43,11 @@ namespace Aseba
 			abort(); // if this arrives, the table above is not in sync with the enum content
 		return methodIt->second;
 	}
-	
+
 	//! Return the method from a string, or throw InvalidHttpMethod if it is not found
 	HttpMethod fromMethodString(const std::string& method)
 	{
-		for (const auto& methodKV: methodNames)
+		for (const auto& methodKV : methodNames)
 			if (methodKV.second == method)
 				return methodKV.first;
 		throw InvalidHttpMethod(FormatableString("Invalid method %0").arg(method));

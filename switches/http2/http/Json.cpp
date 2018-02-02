@@ -26,7 +26,7 @@
 namespace Aseba
 {
 	using namespace std;
-	
+
 	//! Parse rawData as a string into JSON
 	json parse(const vector<uint8_t>& rawData)
 	{
@@ -34,7 +34,7 @@ namespace Aseba
 		istream is(&sbuf);
 		return json::parse(is);
 	}
-	
+
 	//! Valide data as JSON schema (see http://json-schema.org/latest/json-schema-core.html)
 	//! context is used to produced informative dump
 	void validate(const json& schema, const json& data, const string& context)
@@ -43,7 +43,7 @@ namespace Aseba
 		auto acceptedTypes(schema.at("type"));
 		if (!acceptedTypes.is_array())
 			acceptedTypes = json::array({ acceptedTypes.get<string>() });
-		
+
 		// constant type-to-string map for matching
 		const map<json::value_t, string> typeToStringMatch{
 			{ json::value_t::null, "null" },
@@ -55,9 +55,9 @@ namespace Aseba
 			{ json::value_t::array, "array" },
 			{ json::value_t::string, "string" }
 		};
-		
+
 		// iterate over all accepted type
-		for (const auto& acceptedType: acceptedTypes)
+		for (const auto& acceptedType : acceptedTypes)
 		{
 			if (typeToStringMatch.at(data.type()) == acceptedType)
 			{
@@ -65,19 +65,19 @@ namespace Aseba
 				return;
 			}
 		}
-		
+
 		// if no match were found, the type is not accepted
 		throw InvalidJsonSchema(FormatableString("In %0, type %1 is not in the list of accepted types %2").arg(context).arg(typeToStringMatch.at(data.type())).arg(acceptedTypes.dump()));
 	}
-	
+
 	//! Valide data as JSON schema for a specific type, data is assumed to be of the right type
 	void validateType(const json& schema, const string& type, const json& data, const string& context)
 	{
 		// Note: type could be passed as a json::value_t and a static map of function could be used
 		// for faster checks. However, performance here is not a critical element as schemas are small.
-		
+
 		// constant type-to-string map for debugging
-		const map<json::value_t, string> typeToStringDebug {
+		const map<json::value_t, string> typeToStringDebug{
 			{ json::value_t::null, "null" },
 			{ json::value_t::boolean, "boolean" },
 			{ json::value_t::number_integer, "integer number" },
@@ -87,7 +87,7 @@ namespace Aseba
 			{ json::value_t::array, "array" },
 			{ json::value_t::string, "string" }
 		};
-		
+
 		if (type == "array")
 		{
 			// check number of items
@@ -97,11 +97,11 @@ namespace Aseba
 			auto maxItemsIt(schema.find("maxItems"));
 			if ((maxItemsIt != schema.end()) && (data.size() > maxItemsIt->get<size_t>()))
 				throw InvalidJsonSchema(FormatableString("In %0, number of elements %1 is smaller than maximum %2").arg(context).arg(data.size()).arg(maxItemsIt->get<int>()));
-			
+
 			// iterate the items
 			const json itemSchema(schema.at("items"));
 			unsigned i(0);
-			for (const auto& item: data)
+			for (const auto& item : data)
 			{
 				validate(itemSchema, item, context + to_string(i++) + "/");
 			}
@@ -148,14 +148,14 @@ namespace Aseba
 				// validate element
 				validate(propertyIt.value(), it.value(), context + it.key() + "/");
 			}
-			
+
 			// are some fields required?
 			const auto requiredIt(schema.find("required"));
 			if (requiredIt != schema.end())
 			{
 				const json required(*requiredIt);
 				assert(required.is_array());
-				for (const auto& name: required)
+				for (const auto& name : required)
 				{
 					if (data.find(name) == data.end())
 						throw InvalidJsonSchema(FormatableString("In %0, required property \"%1\" not found in object").arg(context).arg(name.get<string>()));
@@ -168,7 +168,7 @@ namespace Aseba
 			auto minLengthIt(schema.find("minLength"));
 			if ((minLengthIt != schema.end()) && (data.get<string>().size() < minLengthIt->get<size_t>()))
 				throw InvalidJsonSchema(FormatableString("In %0, string \"%1\" is smaller than minimum length %2").arg(context).arg(data.get<string>()).arg(minLengthIt->get<unsigned>()));
-				
+
 			// check content using regular expression
 			auto patternIt(schema.find("pattern"));
 			if (patternIt != schema.end())
@@ -184,5 +184,5 @@ namespace Aseba
 			assert(false);
 		}
 	}
-	
+
 }; // namespace Aseba

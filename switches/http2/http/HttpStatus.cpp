@@ -25,13 +25,13 @@
 namespace Aseba
 {
 	using namespace std;
-	
+
 	//! Construct an exception telling a code is invalid
-	HttpStatus::InvalidCode::InvalidCode(Code code):
+	HttpStatus::InvalidCode::InvalidCode(Code code) :
 		domain_error(FormatableString("Invalid code %0").arg(code))
 	{
 	}
-	
+
 	//! List of names of all known HTTP status codes
 	static const map<HttpStatus::Code, string> statusNames = {
 		{ HttpStatus::OK, "OK" },
@@ -47,9 +47,9 @@ namespace Aseba
 		{ HttpStatus::INTERNAL_SERVER_ERROR, "Internal Server Error" },
 		{ HttpStatus::NOT_IMPLEMENTED, "Not Implemented" },
 		{ HttpStatus::SERVICE_UNAVAILABLE, "Service Unavailable" },
-		{ HttpStatus::HTTP_VERSION_NOT_SUPPORTED, "HTTP Version Not Supported"}
+		{ HttpStatus::HTTP_VERSION_NOT_SUPPORTED, "HTTP Version Not Supported" }
 	};
-	
+
 	//! Convert an HTTP status code into a string
 	string HttpStatus::toString(Code code)
 	{
@@ -58,5 +58,5 @@ namespace Aseba
 			throw InvalidCode(code);
 		return statusIt->second;
 	}
-	
+
 } // namespace Aseba

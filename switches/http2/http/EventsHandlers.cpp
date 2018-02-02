@@ -29,16 +29,16 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	// TODO: at some point, probably move this to streams-specific file
-	
+
 	//! handler for GET /streams/events
 	void HttpDispatcher::getStreamsEventsHandler(HandlerContext& context)
 	{
 		Switch* asebaSwitch(context.asebaSwitch);
 		Stream* stream(context.stream);
-		const PathTemplateMap &filledPathTemplates(context.filledPathTemplates);
-		
+		const PathTemplateMap& filledPathTemplates(context.filledPathTemplates);
+
 		const auto nameIt(filledPathTemplates.find("name"));
 		if (nameIt != filledPathTemplates.end())
 		{
@@ -65,7 +65,7 @@ namespace Aseba
 			HttpResponse::createSSE().send(stream);
 		}
 	}
-	
+
 	//! Register all events-related handlers
 	void HttpDispatcher::registerEventsHandlers()
 	{
@@ -273,15 +273,15 @@ namespace Aseba
 				]
 			})#json#"_json });
 	}
-	
+
 	// handlers
-	
-	//! handler for DELETE /events 
+
+	//! handler for DELETE /events
 	void HttpDispatcher::deleteEventsHandler(HandlerContext& context)
 	{
 		// clear all events
 		context.asebaSwitch->commonDefinitions.events.clear();
-		
+
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
@@ -296,11 +296,11 @@ namespace Aseba
 			HttpResponse::fromPlainString(FormatableString("Event %0 already exists").arg(name), HttpStatus::CONFLICT).send(context.stream);
 			return;
 		}
-		
+
 		// create the event with a default size
-		context.asebaSwitch->commonDefinitions.events.push_back({wname, 0});
+		context.asebaSwitch->commonDefinitions.events.push_back({ wname, 0 });
 		const size_t position(context.asebaSwitch->commonDefinitions.events.size() - 1);
-		
+
 		// update the size and return an answer
 		updateEventValue(context, name, position, true);
 	}
@@ -310,15 +310,19 @@ namespace Aseba
 	{
 		json response(json::array());
 		unsigned i(0);
-		for (const auto& event: context.asebaSwitch->commonDefinitions.events)
+		// clang-format off
+		for (const auto& event : context.asebaSwitch->commonDefinitions.events)
+		{
 			response.push_back({
 				{ "id", i++ },
 				{ "name", WStringToUTF8(event.name) },
 				{ "size", event.value }
 			});
+		}
+		// clang-format on
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
-	
+
 	//! handler for GET /events/{event} -> application/json
 	void HttpDispatcher::getEventHandler(HandlerContext& context)
 	{
@@ -327,7 +331,8 @@ namespace Aseba
 		size_t position(0);
 		if (!findEvent(context, name, position))
 			return;
-		
+
+		// clang-format off
 		// return the constant
 		const NamedValue& event(context.asebaSwitch->commonDefinitions.events[position]);
 		HttpResponse::fromJSON({
@@ -336,6 +341,7 @@ namespace Aseba
 			{ "size", event.value }
 	
 		}).send(context.stream);
+		// clang-format on
 	}
 
 	//! handler for DELETE /events/{name} -> application/json
@@ -346,11 +352,11 @@ namespace Aseba
 		size_t position(0);
 		if (!findEvent(context, name, position))
 			return;
-		
+
 		// delete the constant
 		NamedValuesVector& events(context.asebaSwitch->commonDefinitions.events);
 		events.erase(events.begin() + position);
-		
+
 		// return success
 		HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
 	}
@@ -363,7 +369,7 @@ namespace Aseba
 		size_t position(0);
 		if (!findEvent(context, name, position))
 			return;
-		
+
 		// updated the value and return an answer
 		updateEventValue(context, name, position, false);
 	}
@@ -376,7 +382,8 @@ namespace Aseba
 		// sets the value
 		const int value(context.parsedContent["size"].get<int>());
 		context.asebaSwitch->commonDefinitions.events[position].value = value;
-		
+
+		// clang-format off
 		// return answer
 		if (created)
 			HttpResponse::fromJSON({
@@ -386,8 +393,9 @@ namespace Aseba
 			}, HttpStatus::CREATED).send(context.stream);
 		else
 			HttpResponse::fromStatus(HttpStatus::NO_CONTENT).send(context.stream);
+		// clang-format on
 	}
-	
+
 	//! try to find an event, return true and update position if found, return false and send an error if not found
 	bool HttpDispatcher::findEvent(HandlerContext& context, string& name, size_t& position)
 	{
@@ -395,7 +403,7 @@ namespace Aseba
 		const auto templateIt(context.filledPathTemplates.find("name"));
 		assert(templateIt != context.filledPathTemplates.end());
 		name = templateIt->second;
-		
+
 		// if constant does not exist, respond an error
 		position = 0;
 		if (!context.asebaSwitch->commonDefinitions.events.contains(UTF8ToWString(name), &position))
@@ -403,8 +411,8 @@ namespace Aseba
 			HttpResponse::fromPlainString(FormatableString("Event %0 does not exist").arg(name), HttpStatus::NOT_FOUND).send(context.stream);
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 } // namespace Aseba

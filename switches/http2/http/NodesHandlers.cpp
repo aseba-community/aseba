@@ -28,13 +28,13 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	//! Hash the key, shift up nodeId 16 bits and xor with pos
 	size_t HttpDispatcher::VariableRequestKeyHash::operator()(const VariableRequestKey& key) const
 	{
 		return hash<unsigned>{}(key.nodeId << 16) ^ hash<unsigned>{}(key.pos);
 	}
-	
+
 	//! Register all nodes-related handlers
 	void HttpDispatcher::registerNodesHandlers()
 	{
@@ -332,28 +332,28 @@ namespace Aseba
 				]
 			})#json#"_json });
 	}
-	
+
 	// local helpers
-	
-	template <class Container, class Function>
-	typename std::vector<typename std::result_of<Function(const typename Container::value_type&)>::type> apply (const Container &cont, Function fun)
+
+	template<class Container, class Function>
+	typename std::vector<typename std::result_of<Function(const typename Container::value_type&)>::type> apply(const Container& cont, Function fun)
 	{
 		std::vector<typename std::result_of<Function(const typename Container::value_type&)>::type> ret;
 		ret.reserve(cont.size());
-		for (const auto &v : cont)
+		for (const auto& v : cont)
 		{
 			ret.push_back(fun(v));
 		}
 		return ret;
 	}
-	
+
 	// handlers
 
 	//! handler for GET /nodes -> application/json
 	void HttpDispatcher::getNodesHandler(HandlerContext& context)
 	{
 		json response(json::array());
-		for (const auto& nodeKV: context.asebaSwitch->nodes)
+		for (const auto& nodeKV : context.asebaSwitch->nodes)
 		{
 			const unsigned nodeId(nodeKV.first);
 			const NodesManager::Node* node(nodeKV.second.get());
@@ -375,7 +375,7 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		// details of node
 		json response;
 		response["description"] = jsonNodeDescription(node);
@@ -389,7 +389,7 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		HttpResponse::fromJSON(jsonNodeDescription(node)).send(context.stream);
 	}
 
@@ -399,11 +399,11 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		// copy code and compile
 		node.second->code = UTF8ToWString(string(context.request.content.begin(), context.request.content.end()));
 		node.second->compile(context.asebaSwitch->commonDefinitions);
-		
+
 		if (node.second->success)
 			HttpResponse::fromJSON(jsonNodeCompilationResult(node)).send(context.stream);
 		else
@@ -416,7 +416,7 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		HttpResponse::fromJSON(jsonNodeProgram(node)).send(context.stream);
 	}
 
@@ -439,12 +439,12 @@ namespace Aseba
 		const auto variable(findVariable(context));
 		if (!variable.found)
 			return;
-		
+
 		if (context.parsedContent.is_number())
 		{
 			// we have a single integer
 			const sint16 value(context.parsedContent.get<int>());
-			context.asebaSwitch->sendMessage(SetVariables(variable.nodeId, variable.pos, { value } ));
+			context.asebaSwitch->sendMessage(SetVariables(variable.nodeId, variable.pos, { value }));
 		}
 		else
 		{
@@ -455,7 +455,7 @@ namespace Aseba
 				HttpResponse::fromPlainString(FormatableString("Trying to write %0 elements while variable has only %1 elements").arg(count).arg(variable.size), HttpStatus::BAD_REQUEST).send(context.stream);
 				return;
 			}
-			
+
 			const vector<sint16> data = context.parsedContent;
 			context.asebaSwitch->sendMessage(SetVariables(variable.nodeId, variable.pos, data));
 		}
@@ -474,15 +474,16 @@ namespace Aseba
 		// request variable from node and keep track of request
 		context.asebaSwitch->sendMessage(GetVariables(variable.nodeId, variable.pos, variable.size));
 		pendingReads.emplace(VariableRequestKey{ variable.nodeId, variable.pos }, context.stream);
-		
+
 		// do not send any answer yet
 	}
-	
+
 	// support
-	
+
 	//! Return the description of a node in JSON
 	json HttpDispatcher::jsonNodeDescription(const NodeEntry& node) const
 	{
+		// clang-format off
 		return {
 			{ "id", node.first },
 			{ "name", WStringToUTF8(node.second->name) },
@@ -496,22 +497,24 @@ namespace Aseba
 			{ "nativeFunctions", jsonNodeNativeFunctions(node) },
 			{ "nativeVariables", jsonNodeNativeVariables(node) }
 		};
+		// clang-format on
 	}
-	
+
 	json HttpDispatcher::jsonNodeNativeEvents(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto& event: node.second->localEvents)
-			response.push_back( { {"name", WStringToUTF8(event.name) }, { "description", WStringToUTF8(event.description) } } );
+		for (auto& event : node.second->localEvents)
+			response.push_back({ { "name", WStringToUTF8(event.name) }, { "description", WStringToUTF8(event.description) } });
 		return response;
 	}
-	
+
 	json HttpDispatcher::jsonNodeNativeFunctions(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto& function: node.second->nativeFunctions)
+		for (auto& function : node.second->nativeFunctions)
 		{
 			json params(json::array());
+			// clang-format off
 			for (auto& param: function.parameters)
 			{
 				params.push_back({
@@ -524,30 +527,34 @@ namespace Aseba
 				{ "description", WStringToUTF8(function.description) },
 				{ "parameters", params }
 			} );
+			// clang-format on
 		}
 		return response;
 	}
-	
+
 	json HttpDispatcher::jsonNodeNativeVariables(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto& variable: node.second->namedVariables)
-			response.push_back( { {"name", WStringToUTF8(variable.name) }, { "size", variable.size } } );
+		for (auto& variable : node.second->namedVariables)
+			response.push_back({ { "name", WStringToUTF8(variable.name) }, { "size", variable.size } });
 		return response;
 	}
-	
+
 	//! Return the source and the compiled program of a node in JSON
 	json HttpDispatcher::jsonNodeProgram(const NodeEntry& node) const
 	{
+		// clang-format off
 		return {
 			{ "source", WStringToUTF8(node.second->code) },
 			{ "compilationResult", jsonNodeCompilationResult(node) }
 		};
+		// clang-format on
 	}
-	
+
 	//! Return the compiled program of a node in JSON
 	json HttpDispatcher::jsonNodeCompilationResult(const NodeEntry& node) const
 	{
+		// clang-format off
 		return {
 			{ "success", node.second->success },
 			{ "error", {
@@ -558,11 +565,13 @@ namespace Aseba
 			{ "bytecode", apply(node.second->bytecode, [](const BytecodeElement& element) { return element.bytecode; } ) },
 			{ "symbols", jsonNodeSymbolTable(node) }
 		};
+		// clang-format on
 	}
-	
+
 	//! Return the symbol table of a node in JSON
 	json HttpDispatcher::jsonNodeSymbolTable(const NodeEntry& node) const
 	{
+		// clang-format off
 		return {
 			{ "allocatedVariableCount", node.second->allocatedVariablesCount },
 			{ "maxStackDepth", node.second->bytecode.maxStackDepth },
@@ -573,64 +582,71 @@ namespace Aseba
 			{ "subroutines", jsonNodeSymbolSubroutines(node) },
 			{ "lineNumbers", apply(node.second->bytecode, [](const BytecodeElement& element) { return element.line; } ) },
 		};
+		// clang-format on
 	}
-	
+
 	//! Return the events vector part of the symbol table of a node in JSON
 	json HttpDispatcher::jsonNodeSymbolEventsVector(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto &eventKV: node.second->bytecode.getEventAddressesToIds())
+		for (auto& eventKV : node.second->bytecode.getEventAddressesToIds())
 		{
+			// clang-format off
 			response.push_back({
 				{ "address", eventKV.first },
 				{ "id", eventKV.second } 
 			});
+			// clang-format on
 		}
 		return response;
 	}
-	
+
 	//! Return the variables part of the symbol table of a node in JSON
 	json HttpDispatcher::jsonNodeSymbolVariables(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto &variableKV: node.second->variables)
+		for (auto& variableKV : node.second->variables)
 		{
+			// clang-format off
 			response.push_back({
 				{ "name", WStringToUTF8(variableKV.first) },
 				{ "address", variableKV.second.first },
 				{ "size", variableKV.second.second }
 			});
+			// clang-format on
 		}
 		return response;
 	}
-	
+
 	//! Return the subroutines part of the symbol table of a node in JSON
 	json HttpDispatcher::jsonNodeSymbolSubroutines(const NodeEntry& node) const
 	{
 		json response(json::array());
-		for (auto &subroutine: node.second->subroutineTable)
+		for (auto& subroutine : node.second->subroutineTable)
 		{
+			// clang-format off
 			response.push_back({
 				{ "name", WStringToUTF8(subroutine.name) },
 				{ "address", subroutine.address },
 				{ "line", subroutine.line }
 			});
+			// clang-format on
 		}
 		return response;
 	}
-	
-	//! Return true and fills nodeId, pos and size if a variable is found, 
+
+	//! Return true and fills nodeId, pos and size if a variable is found,
 	HttpDispatcher::VariableSearchResult HttpDispatcher::findVariable(HandlerContext& context) const
 	{
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return { false };
-		
+
 		// Get variable name from template
 		const auto templateIt(context.filledPathTemplates.find("variable"));
 		assert(templateIt != context.filledPathTemplates.end());
 		const wstring variableName(UTF8ToWString(templateIt->second));
-		
+
 		// Find variable
 		auto variableIt(node.second->variables.find(variableName));
 		if (variableIt == node.second->variables.end())
@@ -638,8 +654,8 @@ namespace Aseba
 			HttpResponse::fromPlainString(FormatableString("Node %0 does not contain variable %1").arg(node.first).arg(templateIt->second), HttpStatus::NOT_FOUND).send(context.stream);
 			return { false };
 		}
-		
+
 		return { true, node.first, variableIt->second.first, variableIt->second.second };
 	}
-	
+
 } // namespace Aseba

@@ -24,11 +24,12 @@
 #include "../../common/utils/utils.h"
 
 #ifndef _WIN32
-#define COLOR_OUTPUT_ANSI(X) # X
+#define COLOR_OUTPUT_ANSI(X) #X
 #else // _WIN32
 #define COLOR_OUTPUT_ANSI(X) ""
 #endif // _WIN32
 
+// clang-format off
 #define LOG_DUMP \
     if (!Aseba::_globals.dump) {} \
     else std::cout << COLOR_OUTPUT_ANSI(\x1B[30;1m), Aseba::dumpTime(std::cout, Aseba::_globals.rawTime), std::cout
@@ -39,6 +40,7 @@
 
 #define LOG_ERROR \
 	std::cerr << COLOR_OUTPUT_ANSI(\x1B[31m), Aseba::dumpTime(std::cerr, Aseba::_globals.rawTime), std::cerr
+// clang-format on
 
 namespace Aseba
 {
@@ -49,10 +51,9 @@ namespace Aseba
 		bool dump; //!< whether to print the content of all messages
 		bool rawTime; //!< if true, use raw time for logging
 	};
-	
+
 	extern Globals _globals;
-	
+
 }; // Aseba
 
 #endif // ASEBA_SWITCH_GLOBALS
-

@@ -40,10 +40,10 @@ namespace Aseba
 	public:
 		//! Headers are a map of key-value as strings
 		typedef std::map<std::string, std::string> Headers;
-		
+
 	protected:
 		HttpResponse(const HttpStatus::Code status = HttpStatus::OK);
-		
+
 	public:
 		static HttpResponse fromStatus(const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse fromPlainString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
@@ -51,10 +51,10 @@ namespace Aseba
 		static HttpResponse fromJSONString(const std::string& content, const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse fromJSON(const json& content, const HttpStatus::Code status = HttpStatus::OK);
 		static HttpResponse createSSE();
-		
+
 		void send(Dashel::Stream* stream);
 		operator json() const;
-		
+
 		std::string getHeader(const std::string& header) const;
 
 	public:

@@ -29,12 +29,12 @@ namespace Aseba
 {
 	using namespace std;
 	using namespace Dashel;
-	
+
 	// FIXME: this is currently a low-level interface (bytecode index),
 	// probably a high-level line-based makes more sense.
 	// In that case, we should make sure that we are aware if the code on the target
 	// does not correspond to our source.
-	
+
 	//! Register all debugs-related handlers
 	void HttpDispatcher::registerDebugsHandlers()
 	{
@@ -139,8 +139,9 @@ namespace Aseba
 	void HttpDispatcher::getDebugsHandler(HandlerContext& context)
 	{
 		json response(json::array());
-		for (const auto& nodeKV: context.asebaSwitch->nodes)
+		for (const auto& nodeKV : context.asebaSwitch->nodes)
 		{
+			// clang-format off
 			response.push_back({
 				{ "id", nodeKV.first },
 				{ "state", 
@@ -150,6 +151,7 @@ namespace Aseba
 					})
 				}
 			});
+			// clang-format on
 		}
 		HttpResponse::fromJSON(response).send(context.stream);
 	}
@@ -160,7 +162,7 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		HttpResponse::fromJSON(jsonDebugsNodeHandler(node)).send(context.stream);
 	}
 
@@ -170,16 +172,17 @@ namespace Aseba
 		const NodeEntry node(findNode(context));
 		if (!node.second)
 			return;
-		
+
 		// TODO: implement
 		HttpResponse::fromJSON({}).send(context.stream);
 	}
-	
+
 	// support
-	
+
 	//! Return the variables part of the symbol table of a node in JSON
 	json HttpDispatcher::jsonDebugsNodeHandler(const NodeEntry& node) const
 	{
+		// clang-format off
 		return {
 			{ "flags", {
 				{ "eventActive", bool(AsebaMaskIsSet(node.second->executionFlags, ASEBA_VM_EVENT_ACTIVE_MASK)) },
@@ -187,6 +190,7 @@ namespace Aseba
 			}},
 			{ "pc", node.second->pc }
 		};
+		// clang-format on
 	}
-	
+
 } // namespace Aseba

@@ -35,17 +35,17 @@ namespace Aseba
 		OPTIONS,
 		DELETE
 	};
-	
+
 	using domain_error = std::domain_error;
 	//! Invalid method
-	struct InvalidHttpMethod: public domain_error
+	struct InvalidHttpMethod : public domain_error
 	{
 		using domain_error::domain_error;
 	};
-	
+
 	std::string toString(const HttpMethod& method);
 	HttpMethod fromMethodString(const std::string& method);
-	
+
 } // namespace Aseba
 
 #endif // ASEBA_HTTP_METHOD
