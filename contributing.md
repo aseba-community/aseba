@@ -111,6 +111,12 @@ Do not use clever tricks, avoid over-design, do not be obsessed about pure objec
 Everything should be kept **as simple as possible, but no simpler.**
 This is a fundamental principle, and all new code should be kept with KISS—keep it simple, stupid—in mind.
 
+Dependencies to third-party libraries should be minimized.
+Indeed, Aseba is often used in embedded or low-memory targets.
+Morever, dependencies require the reader of the code to learn a new library to understand the code's behaviour, which harms readability and maintainability.
+A dependency should be added only if there is a clear benefit that would otherwise require a substantial rewrite of the feature of the dependency (for example [nlohman's JSON](https://github.com/nlohmann/json)), and modern, header-only libraries are prefered.
+When a dependency is not required for the core of the library (for example Qt), it should be optional.
+
 ### Pointers, references and ownership
 
 Please follow as much as possible the [resource acquisition is initialization](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) programming idiom.
