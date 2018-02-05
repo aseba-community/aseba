@@ -15,7 +15,7 @@ if(LIBXML2_FOUND)
 	
 	add_executable(asebahttp2 ${http2_SRCS})
 	
-	target_link_libraries(asebahttp2 asebacompiler asebacommon ${LIBXML2_LIBRARIES} asebacommon)
+	target_link_libraries(asebahttp2 asebacompiler asebacommon asebadashelplugins ${LIBXML2_LIBRARIES})
 
 	install(TARGETS asebahttp2 RUNTIME
 		DESTINATION bin

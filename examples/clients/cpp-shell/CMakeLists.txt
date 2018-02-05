@@ -6,5 +6,5 @@ if (LIBXML2_FOUND)
 	add_executable(asebashell
 		shell.cpp
 	)
-	target_link_libraries(asebashell asebacompiler ${LIBXML2_LIBRARIES} asebacommon)
+	target_link_libraries(asebashell asebadashelplugins asebacompiler ${LIBXML2_LIBRARIES} asebacommon)
 endif (LIBXML2_FOUND)
