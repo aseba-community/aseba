@@ -32,11 +32,6 @@ qt5_wrap_cpp(qt_plugins_MOCS
 	ThymioVPL/LogSignalMapper.h
 )
 
-if(ASEBA_ENABLE_BLOCKLY_PLUGIN)
-	list(APPEND qt_plugins_SRCS ThymioBlockly/ThymioBlockly.cpp)
-	qt5_wrap_cpp(qt_plugins_MOCS ThymioBlockly/AsebaJavascriptInterface.h ThymioBlockly/ThymioBlockly.h)
-endif(ASEBA_ENABLE_BLOCKLY_PLUGIN)
-
 if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 	execute_process(COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR}/ThymioVPL -I${CMAKE_CURRENT_SOURCE_DIR}/ThymioVPL ${CMAKE_CURRENT_SOURCE_DIR}/ThymioVPL/UsageProfile.proto)
 	include_directories(${CMAKE_CURRENT_BINARY_DIR}/ThymioVPL)
@@ -45,7 +40,7 @@ endif (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
 
 add_library(asebaqtplugins STATIC ${qt_plugins_SRCS} ${qt_plugins_MOCS})
 
-qt5_use_modules(asebaqtplugins Widgets Xml Svg WebKitWidgets)
+qt5_use_modules(asebaqtplugins Widgets Xml Svg)
 if (Qt5X11Extras_FOUND)
 	qt5_use_modules(asebaqtplugins X11Extras)
 endif ()
