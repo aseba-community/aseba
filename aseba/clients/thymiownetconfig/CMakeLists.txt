@@ -15,7 +15,7 @@ if (Qt5Widgets_FOUND)
 		add_dependencies(thymiownetconfig versionheader)
 	endif (HAS_DYN_VERSION)
 
-	target_link_libraries(thymiownetconfig Qt5::Widgets asebacommon)
+	target_link_libraries(thymiownetconfig Qt5::Widgets asebacommon asebadashelplugins)
 
 	install(TARGETS thymiownetconfig RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 

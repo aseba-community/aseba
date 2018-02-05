@@ -8,7 +8,7 @@ add_library(asebacommon
 	msg/TargetDescription.cpp
 )
 set_target_properties(asebacommon PROPERTIES VERSION ${LIB_VERSION_STRING})
-target_link_libraries(asebacommon PUBLIC aseba_conf asebadashelplugins)
+target_link_libraries(asebacommon PUBLIC aseba_conf)
 
 target_link_libraries(aseba_conf)
 
