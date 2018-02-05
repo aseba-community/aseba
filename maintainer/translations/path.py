@@ -50,7 +50,6 @@ compiler_ts_cpp = os.path.join(compiler_ts_path, 'CompilerTranslator.cpp')
 # path for strings to be translated
 plugin_path = os.path.join(studio_path, "plugins/")
 vpl_path = os.path.join(plugin_path, "ThymioVPL/")
-blockly_path = os.path.join(plugin_path, "ThymioBlockly/")
 
 # path to file that must be updated when adding a new language
 dashel_target = os.path.join(studio_path, "DashelTarget.cpp")
