@@ -16,7 +16,7 @@ add_library(asebacompiler ${ASEBACOMPILER_SRC})
 set_target_properties(asebacompiler PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 
-target_link_libraries(asebacompiler aseba_conf)
+target_link_libraries(asebacompiler asebacommon)
 
 install(TARGETS asebacompiler
                 LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
