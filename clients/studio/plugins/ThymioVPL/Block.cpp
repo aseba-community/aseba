@@ -31,7 +31,9 @@
 #include <QSlider>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#ifdef Q_WS_X11
 #include <QX11Info>
+#endif // Q_WS_X11
 #include <QDebug>
 #include <cassert>
 #include <cmath>
