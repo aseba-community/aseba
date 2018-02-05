@@ -976,6 +976,11 @@ void AsebaNative_mathsqrt(AsebaVMState *vm)
 	for (i = 0; i < length; i++)
 	{
 		int16_t x = vm->variables[xIndex++];
+		if (x < 0)
+		{
+			AsebaVMEmitNodeSpecificError(vm, "Negative input to sqrt");
+			return;
+		}
 		vm->variables[destIndex++] = aseba_sqrt(x);
 	}
 }
