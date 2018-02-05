@@ -116,6 +116,7 @@ namespace Aseba
 		languageSelectionBox->addItem(QString::fromUtf8("汉语"), "zh");
 		languageSelectionBox->addItem(QString::fromUtf8("ελληνικά"), "el");
 		languageSelectionBox->addItem(QString::fromUtf8("Türk"), "tr");
+		languageSelectionBox->addItem(QString::fromUtf8("ру́сский язы́к"), "ru");
 		/* insert translation here (DO NOT REMOVE -> for automated script) */
 		//qDebug() << "locale is " << QLocale::system().name();
 		for (int i = 0; i < languageSelectionBox->count(); ++i)

@@ -8,6 +8,7 @@
 	<file>qtabout_zh.qm</file>
 	<file>qtabout_el.qm</file>
 	<file>qtabout_tr.qm</file>
+	<file>qtabout_ru.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 </qresource>
 </RCC>
