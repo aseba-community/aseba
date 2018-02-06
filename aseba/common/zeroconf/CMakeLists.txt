@@ -25,7 +25,7 @@ install(FILES ${ASEBAZEROCONF_HDR}
 )
 
 # Zeroconf with Qt
-if (Qt5Core_FOUND)
+if (Qt5Network_FOUND)
 	set(CMAKE_AUTOMOC ON)
 	add_library(asebazeroconfqt zeroconf-qt.cpp)
 	set_target_properties(asebazeroconfqt PROPERTIES VERSION ${LIB_VERSION_STRING})
@@ -45,6 +45,6 @@ if (Qt5Core_FOUND)
 		DESTINATION include/aseba/common/zeroconf
 	)
 endif ()
-add_feature_info(QT_ZEROCONF Qt5Core_FOUND "Qt Zeroconf library ( depend on QtCore )")
+add_feature_info(QT_ZEROCONF Qt5Network_FOUND "Qt Zeroconf library ( depend on QtNetwork )")
 
 
