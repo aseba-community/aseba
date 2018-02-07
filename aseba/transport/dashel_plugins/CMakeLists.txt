@@ -16,7 +16,7 @@ add_library(asebadashelplugins ${ASEBADASHEL_PLUGINS_SRC})
 set_target_properties(asebadashelplugins PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 
-target_link_libraries(asebadashelplugins dashel aseba_conf)
+target_link_libraries(asebadashelplugins PUBLIC dashel aseba_conf)
 
 install(TARGETS asebadashelplugins 
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR} 

@@ -22,7 +22,7 @@ if(LIBXML2_FOUND)
 	)
 
 	add_library(asebahttp2hub ${http2_SRCS})
-	target_link_libraries(asebahttp2hub aseba_conf)
+	target_link_libraries(asebahttp2hub asebacompiler asebacommon asebadashelplugins ${LIBXML2_LIBRARIES} )
 	set_target_properties(asebahttp2hub PROPERTIES VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR})
 
 	install(TARGETS asebahttp2hub
