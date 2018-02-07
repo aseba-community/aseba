@@ -31,7 +31,7 @@ find_package(Qt5 5.6 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Co
 find_package(Qwt)
 
 if (UNIX AND NOT APPLE)
-	find_package(Qt5DBus 5.6 REQUIRED)
+	find_package(Qt5DBus 5.6)
 endif ()
 
 # Zeroconf
