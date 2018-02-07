@@ -48,7 +48,7 @@
 find_path ( QWT_INCLUDE_DIR
   NAMES qwt_plot.h
   HINTS ${QT_INCLUDE_DIR}
-  PATH_SUFFIXES qwt-qt5
+  PATH_SUFFIXES qwt
 )
 
 set ( QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIR} )
@@ -100,11 +100,7 @@ endif ()
 
 # handle the QUIETLY and REQUIRED arguments
 include ( FindPackageHandleStandardArgs )
-if ( CMAKE_VERSION LESS 2.8.3 )
-  find_package_handle_standard_args( Qwt DEFAULT_MSG QWT_LIBRARY QWT_INCLUDE_DIR _QWT_VERSION_MATCH )
-else ()
-  find_package_handle_standard_args( Qwt REQUIRED_VARS QWT_LIBRARY QWT_INCLUDE_DIR _QWT_VERSION_MATCH VERSION_VAR QWT_VERSION_STRING )
-endif ()
+find_package_handle_standard_args( Qwt REQUIRED_VARS QWT_LIBRARY QWT_INCLUDE_DIR _QWT_VERSION_MATCH VERSION_VAR QWT_VERSION_STRING )
 
 
 mark_as_advanced (
