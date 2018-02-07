@@ -1,7 +1,7 @@
 set (ASEBAVMBUFFER_SRC
 	vm-buffer.c
 )
-add_library(asebavmbuffer ${ASEBAVMBUFFER_SRC})
+add_library(asebavmbuffer STATIC ${ASEBAVMBUFFER_SRC})
 set_target_properties(asebavmbuffer PROPERTIES VERSION ${LIB_VERSION_STRING} 
                                         SOVERSION ${LIB_VERSION_MAJOR})
 
@@ -10,7 +10,7 @@ install(TARGETS asebavmbuffer
                 ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
 
-target_link_libraries(asebavmbuffer aseba_conf)
+target_link_libraries(asebavmbuffer asebavm)
 
 set (ASEBATRANSPORT_HDR_BUFFER
 	vm-buffer.h
