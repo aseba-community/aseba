@@ -22,6 +22,12 @@
 #define ASEBA_ASSERT
 #endif
 
+#include <iostream>
+#include <sstream>
+#include <valarray>
+#include <cassert>
+#include <cstring>
+
 #include "vm/vm.h"
 #include "vm/natives.h"
 #include "common/productids.h"
@@ -33,13 +39,8 @@
 #endif // ZEROCONF_SUPPORT
 #include "transport/buffer/vm-buffer.h"
 #include <dashel/dashel.h>
-#include <iostream>
-#include <sstream>
-#include <valarray>
-#include <cassert>
-#include <cstring>
 
-extern AsebaVMDescription nodeDescription;
+static AsebaVMDescription nodeDescription;
 
 class AsebaNode: public Dashel::Hub
 {

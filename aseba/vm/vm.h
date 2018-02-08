@@ -215,7 +215,7 @@ typedef enum
 } AsebaAssertReason;
 
 /*! If ASEBA_ASSERT is defined, this function is called when an error arise */
-void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason);
+extern void AsebaAssert(AsebaVMState *vm, AsebaAssertReason reason);
 
 #endif /* ASEBA_ASSERT */
 
