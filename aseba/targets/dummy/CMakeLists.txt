@@ -1,5 +1,3 @@
-if (HAS_ZEROCONF_SUPPORT)
-	add_executable(asebadummynode dummynode.cpp dummynode_description.c)
-	target_link_libraries(asebadummynode asebavmbuffer asebavm asebazeroconf asebacommon)
-	install(TARGETS asebadummynode RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-endif()
+add_executable(asebadummynode dummynode.cpp dummynode_description.c)
+target_link_libraries(asebadummynode asebavmbuffer asebavm asebacommon)
+install(TARGETS asebadummynode RUNTIME DESTINATION bin LIBRARY DESTINATION bin)

@@ -42,4 +42,7 @@ install(FILES ${ASEBACORE_HDR_COMMON}
 )
 
 add_subdirectory(about)
-add_subdirectory(zeroconf)
+
+if(HAS_ZEROCONF_SUPPORT)
+	add_subdirectory(zeroconf)
+endif()
