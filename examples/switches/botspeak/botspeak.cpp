@@ -24,6 +24,7 @@
 #include <memory>
 #include <functional>
 #include <cstdlib>
+#include <cctype>
 #include "botspeak.h"
 #include "common/utils/utils.h"
 #include "transport/dashel_plugins/dashel-plugins.h"
