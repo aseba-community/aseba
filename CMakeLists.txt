@@ -26,12 +26,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 find_package(Threads REQUIRED)
 
 # Qt and Qwt
-find_package(Qt5 5.6 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg X11Extras Test)
+find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg X11Extras Test)
 
 find_package(Qwt)
 
 if (UNIX AND NOT APPLE)
-	find_package(Qt5DBus 5.6)
+	find_package(Qt5DBus)
 endif ()
 
 # Zeroconf
