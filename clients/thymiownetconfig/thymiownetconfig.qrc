@@ -10,6 +10,7 @@
 	<file>thymiownetconfig_el.qm</file>
 	<file>thymiownetconfig_tr.qm</file>
 	<file>thymiownetconfig_ru.qm</file>
+	<file>thymiownetconfig_tl.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 </qresource>
 </RCC>

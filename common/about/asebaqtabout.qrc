@@ -9,6 +9,7 @@
 	<file>qtabout_el.qm</file>
 	<file>qtabout_tr.qm</file>
 	<file>qtabout_ru.qm</file>
+	<file>qtabout_tl.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 </qresource>
 </RCC>
