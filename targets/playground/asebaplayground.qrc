@@ -9,6 +9,7 @@
 	<file>asebaplayground_el.qm</file>
 	<file>asebaplayground_tr.qm</file>
 	<file>asebaplayground_ru.qm</file>
+	<file>asebaplayground_tl.qm</file>
 	<!-- insert translation here (DO NOT REMOVE) -->
 	<file>images/icons/asebaplayground.svgz</file>
 </qresource>

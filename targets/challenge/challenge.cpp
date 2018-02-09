@@ -1110,6 +1110,7 @@ LanguageSelectionDialog::LanguageSelectionDialog()
 	languageSelectionBox->addItem(QString::fromUtf8("ελληνικά"), "el");
 	languageSelectionBox->addItem(QString::fromUtf8("Türk"), "tr");
 	languageSelectionBox->addItem(QString::fromUtf8("ру́сский язы́к"), "ru");
+	languageSelectionBox->addItem(QString::fromUtf8("Filipino"), "tl");
 	/* insert translation here (DO NOT REMOVE -> for automated script) */
 	//qDebug() << "locale is " << QLocale::system().name();
 	for (int i = 0; i < languageSelectionBox->count(); ++i)
