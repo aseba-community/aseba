@@ -74,15 +74,15 @@ The following people have provided additional contributions:
 	VPL logging
 	contributed to: vpl
 
-*	Vincent Becker <vincent dot becker at mobsya dot org>
+*	Vincent Becker <vincent dot becker at mobsya dot org> [3]
 	Textures for Thymio 3D model
 	contributed to: simulator
 
-*	[Francesco Mondada](https://people.epfl.ch/francesco.mondada) <francesco dot mondada at epfl dot ch>
+*	[Francesco Mondada](https://people.epfl.ch/francesco.mondada) <francesco dot mondada at epfl dot ch> [1]
 	bug reporting and dissemination
 	contributed to: studio, vpl, blockly
 
-*	Stefan Witwicki
+*	Stefan Witwicki [1]
 	Examples
 	contributed to: example
 
@@ -126,7 +126,7 @@ The following people have provided additional contributions:
 	Italian translation
 	contributed to: translation
 
-*	Paolo Rossetti <paolo dot rossetti at mobsya dot org>
+*	Paolo Rossetti <paolo dot rossetti at mobsya dot org> [3]
 	Italian translation
 	contributed to: translation
 
