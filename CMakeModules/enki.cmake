@@ -8,5 +8,5 @@ else()
 	target_link_libraries(enki INTERFACE ${enki_LIBRARIES})
 
 	add_library(enki_viewer INTERFACE)
-	target_link_libraries(enki INTERFACE enki ${enki_VIEWER_LIBRARY} Qt5::OpenGL Qt5::Widgets )
+	target_link_libraries(enki INTERFACE enki ${enki_VIEWER_LIBRARY} Qt5::OpenGL Qt5::Widgets Qt5::Gui Qt5::Core)
 endif()
