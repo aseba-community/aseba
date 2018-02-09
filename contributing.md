@@ -75,7 +75,7 @@ It is good practice to define an acceptance test whenever you propose a new feat
 
 If you would like to propose a test *before* an implementation is proposed, please tell CMake either to disable the test, or explicitly that the test will fail. For example, in `CMakeLists.txt`:
 ```
-add_test(testUnimplementedFeature ${EXECUTABLE_OUTPUT_PATH}/testUnimplementedFeature)
+add_test(testUnimplementedFeature testUnimplementedFeature)
 set_tests_properties(testUnimplementedFeature PROPERTIES WILL_FAIL true)
 ```
 This also applies if you discover a bug, and can propose a test before the fix is found.
