@@ -1,8 +1,5 @@
 find_package(OpenGL REQUIRED)
-
-set(QT_USE_QTMAIN ON)
-set(QT_USE_QTOPENGL ON)
-include(${QT_USE_FILE})
+set(CMAKE_AUTOMOC ON)
 
 set(enki_SRCS
 	AsebaMarxbot.cpp
