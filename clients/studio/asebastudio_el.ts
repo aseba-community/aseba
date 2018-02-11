@@ -103,37 +103,37 @@
     <message>
         <location filename="DashelTarget.cpp" line="+87"/>
         <source>Discovered targets</source>
-        <translation type="unfinished"></translation>
+        <translation>Ανακαλυφθέντες στόχοι</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Selected target</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιλεγμένος στόχος</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Serial port</source>
-        <translation type="unfinished"></translation>
+        <translation>Σειριακή θύρα</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Local TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>Τοπικό TCP</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Τεκμήρια</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Γλώσσα</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -153,27 +153,27 @@
     <message>
         <location line="+50"/>
         <source> – type %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – τύπος %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>local on computer</source>
-        <translation type="unfinished"></translation>
+        <translation>τοπικά στον υπολογιστή</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>distant on network</source>
-        <translation type="unfinished"></translation>
+        <translation>απομακρυσμένο στο δίκτυο</translation>
     </message>
     <message>
         <location line="+63"/>
         <source> – device %1</source>
-        <translation type="unfinished"></translation>
+        <translation> – συσκευή %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>serial port or USB</source>
-        <translation type="unfinished"></translation>
+        <translation>σειριακή θύρα ή USB</translation>
     </message>
 </context>
 <context>
@@ -330,7 +330,7 @@
 Find &amp;Next</source>
         <oldsource>Replace and 
 Find &amp;Next</oldsource>
-        <translation type="unfinished">Αντικατάσταση και 
+        <translation>Αντικατάσταση και 
 Εύρεση &amp;Επομένου</translation>
     </message>
     <message>
@@ -339,7 +339,7 @@ Find &amp;Next</oldsource>
 Find Previo&amp;us</source>
         <oldsource>Replace and 
 Find Previo&amp;us</oldsource>
-        <translation type="unfinished">Αντικατάσταση και 
+        <translation>Αντικατάσταση και 
 Εύρεση Προηγούμε&amp;νου</translation>
     </message>
     <message>
@@ -348,7 +348,7 @@ Find Previo&amp;us</oldsource>
 Occurrences</source>
         <oldsource>Replace &amp;All 
 Occurrences</oldsource>
-        <translation type="unfinished">Αντικατάσταση &amp;Όλων 
+        <translation>Αντικατάσταση &amp;Όλων 
 των Εμφανίσεων</translation>
     </message>
     <message>
@@ -493,13 +493,13 @@ Occurrences</oldsource>
         <location line="+1"/>
         <source>8 bits range (0–255)</source>
         <oldsource>8 bits range (0â255)</oldsource>
-        <translation type="unfinished">εύρος 8 bits (0-255)</translation>
+        <translation>εύρος 8 bits (0-255)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>percent range (0–100)</source>
         <oldsource>percent range (0â100)</oldsource>
-        <translation type="unfinished">ποσοστιαίο εύρος (0-100)</translation>
+        <translation>ποσοστιαίο εύρος (0-100)</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -577,13 +577,15 @@ Occurrences</oldsource>
         <location line="+13"/>
         <source>The following nodes are not present in the current network and their associated content was not imported:
 </source>
-        <translation>Οι ακόλουθοι κόμβοι δεν υπάρχουν στο παρόν δίκτυο και δεν έγινε εισαγωγή του σχετικού περιεχομένου τους:</translation>
+        <translation>Οι ακόλουθοι κόμβοι δεν υπάρχουν στο παρόν δίκτυο και δεν έγινε εισαγωγή του σχετικού περιεχομένου τους:
+</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The following variables are not present in the current network and their associated content was not imported:
 </source>
-        <translation>Οι ακόλουθες μεταβλητές δεν υπάρχουν στο παρόν δίκτυο και δεν έγινε εισαγωγή του σχετικού περιεχομένου τους:</translation>
+        <translation>Οι ακόλουθες μεταβλητές δεν υπάρχουν στο παρόν δίκτυο και δεν έγινε εισαγωγή του σχετικού περιεχομένου τους:
+</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -700,30 +702,33 @@ Occurrences</oldsource>
     <message>
         <location line="-1403"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Το Aseba Studio είναι ένα περιβάλλον για διαλογικό προγραμματισμό ρομπότ με μια γλώσσα κειμένου.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>https://www.thymio.org/en:asebastudio</source>
-        <translation type="unfinished"></translation>
+        <translation>https://www.thymio.org/en:asebastudio</translation>
     </message>
     <message>
         <location line="+918"/>
         <source>Number of arguments</source>
         <comment>For the newly created event</comment>
-        <translation type="unfinished">Πλήθος ορισμάτων</translation>
+        <translatorcomment>Για το νεοδημιουργημένο γεγονός</translatorcomment>
+        <translation>Πλήθος ορισμάτων</translation>
     </message>
     <message>
         <location line="+91"/>
         <source>Value</source>
         <comment>Value assigned to the constant</comment>
-        <translation type="unfinished">Τιμή</translation>
+        <translatorcomment>Τιμή που αποδίδεται στη σταθερά</translatorcomment>
+        <translation>Τιμή</translation>
     </message>
     <message>
         <location line="+138"/>
         <source>
 event %0 : </source>
-        <translation type="unfinished"></translation>
+        <translation>
+συμβάν %0 : </translation>
     </message>
     <message>
         <location line="+39"/>
@@ -923,66 +928,75 @@ event %0 : </source>
     <message>
         <location line="+4"/>
         <source>Cu&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Κόψ&amp;ε</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Re&amp;do</source>
-        <translation type="unfinished"></translation>
+        <translation>Κάνε&amp;ξανά</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Ctrl+G</source>
         <comment>Edit|Go To Line</comment>
-        <translation type="unfinished">Ctrl+G</translation>
+        <translatorcomment>Επεξεργασία|Μετάβαση στη Γραμμή</translatorcomment>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Ctrl+D</source>
         <comment>Edit|Comment the selection</comment>
-        <translation type="unfinished">Ctrl+D</translation>
+        <translatorcomment>Επεξεργασία|Σχολιάστε την επιλογή</translatorcomment>
+        <translation>Ctrl+D</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Shift+Ctrl+D</source>
         <comment>Edit|Uncomment the selection</comment>
-        <translation type="unfinished">Shift+Ctrl+D</translation>
+        <translatorcomment>Επεξεργασία|Αποσύνδεση της επιλογής</translatorcomment>
+        <translation>Shift+Ctrl+D</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>F11</source>
         <comment>View|Show Line Numbers</comment>
-        <translation type="unfinished">F11</translation>
+        <translatorcomment>Προβολή|Εμφάνιση αριθμών γραμμής</translatorcomment>
+        <translation>F11</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>F7</source>
         <comment>Load|Load all</comment>
-        <translation type="unfinished">F7</translation>
+        <translatorcomment>Φόρτωση|Φόρτωση όλων</translatorcomment>
+        <translation>F7</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>F8</source>
         <comment>Debug|Reset all</comment>
-        <translation type="unfinished">F8</translation>
+        <translatorcomment>Debug|Επαναφορά όλων</translatorcomment>
+        <translation>F8</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>F9</source>
         <comment>Debug|Run all</comment>
-        <translation type="unfinished">F9</translation>
+        <translatorcomment>Debug|Εκτελέστε όλα</translatorcomment>
+        <translation>F9</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>F10</source>
         <comment>Debug|Pause all</comment>
-        <translation type="unfinished">F10</translation>
+        <translatorcomment>Debug|Παύση όλων</translatorcomment>
+        <translation>F10</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Ctrl+B</source>
         <comment>Debug|Toggle breakpoint</comment>
-        <translation type="unfinished">Ctrl+B</translation>
+        <translatorcomment>Debug|Εναλλαγή σημείου διακοπής</translatorcomment>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>&amp;Cut</source>
@@ -1258,13 +1272,15 @@ event %0 : </source>
         <location filename="MainWindow.cpp" line="-2169"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
-        <translation type="unfinished">Όνομα</translation>
+        <translatorcomment>Το όνομα της ονομαστικής τιμής (μπορεί να είναι μια σταθερά, συμβάν,...)</translatorcomment>
+        <translation>Όνομα</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Default description</source>
         <comment>When no description is given for the named value</comment>
-        <translation type="unfinished">Προκαθορισμένη περιγραφή</translation>
+        <translatorcomment>Όταν δεν δίνεται καμία περιγραφή για την ονομαστική τιμή</translatorcomment>
+        <translation>Προκαθορισμένη περιγραφή</translation>
     </message>
 </context>
 <context>
@@ -1326,7 +1342,7 @@ event %0 : </source>
     <message>
         <location line="+7"/>
         <source>F&amp;ilter:</source>
-        <translation>&amp;Φίλτρο</translation>
+        <translation>Φ&amp;ίλτρο:</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -1494,7 +1510,8 @@ event %0 : </source>
         <location line="+61"/>
         <source>Blockly for Thymio robot allows to program by visually assembling elements.
 Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Το Blockly για το ρομπότ Thymio επιτρέπει τον προγραμματισμό με την οπτική συναρμολόγηση στοιχείων.
+Το Blockly είναι ένα &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;λογισμικό τρίτου από την Google&lt;/a&gt;.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1694,12 +1711,12 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+41"/>
         <source>The Visual Programming Language (VPL) for the Thymio robot allows to program by associating event and actions blocks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Η Visual Γλώσσα Προγραμματισμού (VPL) για το ρομπότ Thymio επιτρέπει τον προγραμματισμό συνδυάζοντας μπλοκ συμβάντων και ενεργειών.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>https://www.thymio.org/en:thymiovpl</source>
-        <translation type="unfinished"></translation>
+        <translation>https://www.thymio.org/en:thymiovpl</translation>
     </message>
     <message>
         <source>http://aseba.wikidot.com/en:thymiovpl</source>
@@ -1826,7 +1843,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     <message>
         <location line="+64"/>
         <source>[modified] </source>
-        <translation>[τροποποιημένο]</translation>
+        <translation>[τροποποιημένο] </translation>
     </message>
     <message>
         <location line="+2"/>
