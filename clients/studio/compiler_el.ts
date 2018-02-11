@@ -81,7 +81,7 @@
     <message>
         <location line="+4"/>
         <source> Col: </source>
-        <translation>Στήλη: </translation>
+        <translation> Στήλη: </translation>
     </message>
     <message>
         <location line="+4"/>
