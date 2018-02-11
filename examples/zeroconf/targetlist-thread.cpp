@@ -21,8 +21,8 @@
 #include <iostream>
 #include <functional>
 #include <unordered_set>
-#include "../../common/utils/utils.h"
-#include "../../common/zeroconf/zeroconf-thread.h"
+#include "common/utils/utils.h"
+#include "common/zeroconf/zeroconf-thread.h"
 
 namespace Aseba
 {

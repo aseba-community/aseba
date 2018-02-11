@@ -20,12 +20,12 @@
 
 #include <cstring>
 #include <dashel/dashel.h>
-#include "../../common/productids.h"
-#include "../../common/consts.h"
-#include "../../common/msg/msg.h"
-#include "../../common/msg/NodesManager.h"
-#include "../../common/utils/utils.h"
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "common/productids.h"
+#include "common/consts.h"
+#include "common/msg/msg.h"
+#include "common/msg/NodesManager.h"
+#include "common/utils/utils.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
 
 namespace Aseba
 {

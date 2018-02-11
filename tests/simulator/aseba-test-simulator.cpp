@@ -18,10 +18,10 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../../targets/playground/EnkiGlue.h"
-#include "../../targets/playground/Robots.h"
-#include "../../common/msg/NodesManager.h"
-#include "../../compiler/compiler.h"
+#include "targets/playground/EnkiGlue.h"
+#include "targets/playground/Robots.h"
+#include "common/msg/NodesManager.h"
+#include "compiler/compiler.h"
 #include <iostream>
 #include <iterator>
 

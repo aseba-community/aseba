@@ -21,7 +21,7 @@
 #include <functional>
 #include <unordered_set>
 #include <QCoreApplication>
-#include "../../common/zeroconf/zeroconf-qt.h"
+#include "common/zeroconf/zeroconf-qt.h"
 
 class QtTargetLister : public QCoreApplication
 {

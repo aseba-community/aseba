@@ -1,0 +1,7 @@
+if (Qt5Core_FOUND AND Qt5Xml_FOUND)
+	add_executable(asebamassloader massloader.cpp)
+	target_link_libraries(asebamassloader asebacommon asebadashelplugins asebacompiler Qt5::Xml Qt5::Core)
+	install(TARGETS asebamassloader RUNTIME DESTINATION bin)
+	SET(HAS_MASSLOADER ON)
+endif ()
+add_feature_info(MASSLOADER HAS_MASSLOADER "Massloader ( depends on Qt xml )")
