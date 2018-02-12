@@ -6,6 +6,10 @@
 pipeline {
 	agent any
 
+	environment {
+		VERBOSE = "1"
+	}
+
 	// Jenkins will prompt for parameters when a branch is build manually
 	parameters {
 		string(defaultValue: 'aseba-community/dashel/master', description: 'Dashel project', name: 'project_dashel')
