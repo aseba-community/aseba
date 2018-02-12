@@ -239,6 +239,13 @@ namespace Aseba
 			u8"Italian translation",
 			{ u8"translation", }
 		},
+		{
+			u8"Paraskevas Leivadaros",
+			u8"",
+			u8"",
+			u8"Greek translation",
+			{ u8"translation", }
+		},
 	};
 } // namespace Aseba
 

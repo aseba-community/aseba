@@ -119,7 +119,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="playground.cpp" line="+448"/>
+        <location filename="playground.cpp" line="+447"/>
         <source>%2 on %3</source>
         <translation>%2 στα %3</translation>
     </message>

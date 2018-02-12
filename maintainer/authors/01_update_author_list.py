@@ -39,7 +39,7 @@ namespace Aseba
 	struct AuthorInfo
 	{
 		using Tags = std::set<std::string>;
-		
+
 		std::string name;
 		std::string email;
 		std::string web;
@@ -47,7 +47,7 @@ namespace Aseba
 		Tags tags;
 	};
 	using AuthorInfos = std::vector<AuthorInfo>;
-	
+
 	struct InstitutionInfo
 	{
 		std::string name;
@@ -61,7 +61,7 @@ namespace Aseba
 authors_file_contrib_step = \
 """\
 	};
-	
+
 	static const AuthorInfos thankToList = {
 """
 

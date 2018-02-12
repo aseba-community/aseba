@@ -4,7 +4,7 @@
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
-        <location filename="AeslEditor.cpp" line="+499"/>
+        <location filename="AeslEditor.cpp" line="+501"/>
         <source>Clear breakpoint</source>
         <translation>Καθαρισμός σημείου διακοπής</translation>
     </message>
@@ -22,7 +22,7 @@
 <context>
     <name>Aseba::CompilationLogDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="+162"/>
+        <location filename="MainWindow.cpp" line="+163"/>
         <source>Aseba Studio: Output of last compilation</source>
         <translation>Aseba Studio: Έξοδος τελευταίας μεταγγλώτισης</translation>
     </message>
@@ -58,7 +58,7 @@
 <context>
     <name>Aseba::ConstantsModel</name>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="+319"/>
+        <location filename="NamedValuesVectorModel.cpp" line="+314"/>
         <source>Constant already defined</source>
         <translation>Σταθερά ήδη δηλωμένη</translation>
     </message>
@@ -131,7 +131,7 @@
         <translation>Τεκμήρια</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+28"/>
         <source>Language</source>
         <translation>Γλώσσα</translation>
     </message>
@@ -220,7 +220,7 @@
 <context>
     <name>Aseba::EventViewer</name>
     <message>
-        <location filename="EventViewer.cpp" line="+95"/>
+        <location filename="EventViewer.cpp" line="+96"/>
         <source>Time (seconds)</source>
         <translation>Χρόνος (δευτερόλεπτα)</translation>
     </message>
@@ -510,7 +510,7 @@ Occurrences</oldsource>
 <context>
     <name>Aseba::MainWindow</name>
     <message>
-        <location filename="MainWindow.cpp" line="+1443"/>
+        <location filename="MainWindow.cpp" line="+1448"/>
         <source>Event number %0</source>
         <translation>Αριθμός συμβάντος %0</translation>
     </message>
@@ -519,7 +519,7 @@ Occurrences</oldsource>
         <translation type="vanished">&lt;h1&gt;Σχετικά με το Aseba&lt;/h1&gt;Πληροφορίες Έκδοσης&lt;ul&gt;&lt;li&gt;Aseba ver. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(υποστηριζόμενοι τύποι ροής δεδομένων: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Διαβάστε περισσότερα στο &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; και λοιποί συνεργάτες (κάντε κλικ στο &quot;Εμφάνιση λεπτομερειών&quot; για πλήρη λίστα)&lt;/p&gt;&lt;p&gt;Το Aseba είναι ανοικτού κώδικα με άδεια από &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL έκδοση 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+1726"/>
+        <location line="+1733"/>
         <source>http://aseba.wikidot.com/en:start</source>
         <translation>http://aseba.wikidot.com/en:start</translation>
     </message>
@@ -528,7 +528,7 @@ Occurrences</oldsource>
         <translation type="vanished">Σχετικά με το Aseba Studio</translation>
     </message>
     <message>
-        <location line="-1611"/>
+        <location line="-1613"/>
         <source>Open Script</source>
         <translation>Άνοιγμα Σεναρίου (Script)</translation>
     </message>
@@ -644,12 +644,12 @@ Occurrences</oldsource>
     </message>
     <message>
         <location line="+136"/>
-        <location line="+550"/>
+        <location line="+552"/>
         <source>Add a new event</source>
         <translation>Προσθήκη νέου συμβάντος</translation>
     </message>
     <message>
-        <location line="-550"/>
+        <location line="-552"/>
         <location line="+91"/>
         <source>Name:</source>
         <translation>Όνομα:</translation>
@@ -686,7 +686,7 @@ Occurrences</oldsource>
     </message>
     <message>
         <location line="+53"/>
-        <location line="+393"/>
+        <location line="+395"/>
         <source>Add a new constant</source>
         <translation>Προσθήκη νέας σταθεράς</translation>
     </message>
@@ -700,7 +700,7 @@ Occurrences</oldsource>
         <translation type="vanished">συμβάν %0 : </translation>
     </message>
     <message>
-        <location line="-1403"/>
+        <location line="-1410"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
         <translation>Το Aseba Studio είναι ένα περιβάλλον για διαλογικό προγραμματισμό ρομπότ με μια γλώσσα κειμένου.</translation>
     </message>
@@ -710,7 +710,7 @@ Occurrences</oldsource>
         <translation>https://www.thymio.org/en:asebastudio</translation>
     </message>
     <message>
-        <location line="+918"/>
+        <location line="+923"/>
         <source>Number of arguments</source>
         <comment>For the newly created event</comment>
         <translatorcomment>Για το νεοδημιουργημένο γεγονός</translatorcomment>
@@ -724,7 +724,7 @@ Occurrences</oldsource>
         <translation>Τιμή</translation>
     </message>
     <message>
-        <location line="+138"/>
+        <location line="+140"/>
         <source>
 event %0 : </source>
         <translation>
@@ -1269,7 +1269,7 @@ event %0 : </source>
         <translation type="vanished">Προκαθορισμένη περιγραφή</translation>
     </message>
     <message>
-        <location filename="MainWindow.cpp" line="-2169"/>
+        <location filename="MainWindow.cpp" line="-2176"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
         <translatorcomment>Το όνομα της ονομαστικής τιμής (μπορεί να είναι μια σταθερά, συμβάν,...)</translatorcomment>
@@ -1286,18 +1286,18 @@ event %0 : </source>
 <context>
     <name>Aseba::NodeTab</name>
     <message>
-        <location line="-1089"/>
+        <location line="-1094"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
         <translation>&lt;b&gt;Δεσμευμένες λέξεις&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+21"/>
-        <location line="+738"/>
+        <location line="+739"/>
         <source>unknown</source>
         <translation>άγνωστο</translation>
     </message>
     <message>
-        <location line="-736"/>
+        <location line="-737"/>
         <source>Load</source>
         <translation>Φόρτωση</translation>
     </message>
@@ -1308,14 +1308,13 @@ event %0 : </source>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+315"/>
-        <location line="+561"/>
-        <location line="+14"/>
+        <location line="+879"/>
+        <location line="+15"/>
         <source>Run</source>
         <translation>Εκτέλεση</translation>
     </message>
     <message>
-        <location line="-888"/>
+        <location line="-891"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
@@ -1401,12 +1400,12 @@ event %0 : </source>
         <translation>Παύση</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>step by step</source>
         <translation>βήμα-βήμα</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>stopped</source>
         <translation>σταματημένο</translation>
     </message>
@@ -1440,7 +1439,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetFunctionsModel</name>
     <message>
-        <location filename="TargetModels.cpp" line="+602"/>
+        <location filename="TargetModels.cpp" line="+610"/>
         <location line="+19"/>
         <source>hidden</source>
         <translation>κρυφό</translation>
@@ -1449,7 +1448,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetVariablesModel</name>
     <message>
-        <location line="-441"/>
+        <location line="-445"/>
         <source>names</source>
         <translation>ονόματα</translation>
     </message>
@@ -1462,87 +1461,72 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
         <source>Thymio Blockly Interface</source>
-        <translation>Διεπαφή Thymio Blockly</translation>
+        <translation type="vanished">Διεπαφή Thymio Blockly</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>New</source>
-        <translation>Δημιουργία</translation>
+        <translation type="vanished">Δημιουργία</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Open</source>
-        <translation>Άνοιγμα</translation>
+        <translation type="vanished">Άνοιγμα</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save</source>
-        <translation>Αποθήκευση</translation>
+        <translation type="vanished">Αποθήκευση</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save as</source>
-        <translation>Αποθήκευση ως</translation>
+        <translation type="vanished">Αποθήκευση ως</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Load &amp; Run</source>
-        <translation>Φόρτωση &amp; Εκτέλεση</translation>
+        <translation type="vanished">Φόρτωση &amp; Εκτέλεση</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Stop</source>
-        <translation>Σταμάτημα</translation>
+        <translation type="vanished">Σταμάτημα</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Help</source>
-        <translation>Βοήθεια</translation>
+        <translation type="vanished">Βοήθεια</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Screenshot</source>
-        <translation>Στιγμιότυπο οθόνης</translation>
+        <translation type="vanished">Στιγμιότυπο οθόνης</translation>
     </message>
     <message>
-        <location line="+61"/>
         <source>Blockly for Thymio robot allows to program by visually assembling elements.
 Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
-        <translation>Το Blockly για το ρομπότ Thymio επιτρέπει τον προγραμματισμό με την οπτική συναρμολόγηση στοιχείων.
+        <translation type="vanished">Το Blockly για το ρομπότ Thymio επιτρέπει τον προγραμματισμό με την οπτική συναρμολόγηση στοιχείων.
 Το Blockly είναι ένα &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;λογισμικό τρίτου από την Google&lt;/a&gt;.</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
+        <translation type="vanished">http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Export program as image</source>
-        <translation>Εξαγωγή προγράμματος ως εικόνα</translation>
+        <translation type="vanished">Εξαγωγή προγράμματος ως εικόνα</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Launch Blockly</source>
-        <translation>Εκκίνηση Blockly</translation>
+        <translation type="vanished">Εκκίνηση Blockly</translation>
     </message>
     <message>
-        <location line="+138"/>
         <source>Warning</source>
-        <translation>Προειδοποίηση</translation>
+        <translation type="vanished">Προειδοποίηση</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation>Το έγγραφο Blockly έχει τροποποιηθεί.&lt;p&gt;Επιθυμείτε να αποθηκεύσετε τις αλλαγές;</translation>
+        <translation type="vanished">Το έγγραφο Blockly έχει τροποποιηθεί.&lt;p&gt;Επιθυμείτε να αποθηκεύσετε τις αλλαγές;</translation>
     </message>
 </context>
 <context>
     <name>Aseba::ThymioVPL::Block</name>
     <message>
-        <location filename="plugins/ThymioVPL/Block.cpp" line="+131"/>
+        <location filename="plugins/ThymioVPL/Block.cpp" line="+133"/>
         <source>buttons</source>
         <translation>πλήκτρα</translation>
     </message>
@@ -1795,12 +1779,12 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
     </message>
     <message>
         <location line="+102"/>
-        <location line="+222"/>
+        <location line="+223"/>
         <source>Thymio VPL Error</source>
         <translation>Σφάλμα Thymio VPL</translation>
     </message>
     <message>
-        <location line="-221"/>
+        <location line="-222"/>
         <source>You need to connect a Thymio II to use this application.</source>
         <translation>Χρειάζεται να συνδέσετε ένα Thymio II για να χρησιμοποιήσετε αυτήν την εφαρμογή.</translation>
     </message>
@@ -1810,7 +1794,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation>Αποθήκευση Σεναρίου (Script)</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+70"/>
         <source>Open Script</source>
         <translation>Άνοιγμα Σεναρίου (Script)</translation>
     </message>
@@ -1878,7 +1862,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>QObject</name>
     <message>
-        <location line="-465"/>
+        <location line="-468"/>
         <source>Unexpected Dashel Error</source>
         <translation>Απροσδόκητο Σφάλμα Dashel</translation>
     </message>

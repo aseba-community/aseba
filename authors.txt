@@ -130,6 +130,10 @@ The following people have provided additional contributions:
 	Italian translation
 	contributed to: translation
 
+*	Paraskevas Leivadaros
+	Greek translation
+	contributed to: translation
+
 # Institutions
 
 Many of the authors and contributors have spent their free time on Aseba.
