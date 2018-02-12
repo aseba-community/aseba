@@ -47,7 +47,7 @@
     <message>
         <location line="-89"/>
         <source>Flash into dongle</source>
-        <translation type="unfinished">Αποθήκευση στον πομποδέκτη (dongle)</translation>
+        <translation>Αποθήκευση στην συσκευή κλειδώματος</translation>
     </message>
     <message>
         <location line="+1"/>

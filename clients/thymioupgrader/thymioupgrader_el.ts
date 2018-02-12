@@ -83,7 +83,7 @@
     <message>
         <location line="+0"/>
         <source>Your are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the upgrade!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Πρόκειται να γράψετε νέο υλικολογισμικό στο Thymio II. Βεβαιωθείτε ότι το ρομπότ είναι φορτισμένο και ότι το καλώδιο USB είναι σωστά συνδεδεμένο.&lt;p&gt;&lt;b&gt;Μην αποσυνδέετε το ρομπότ κατά την αναβάθμιση!&lt;/b&gt;&lt;/p&gt;Είστε βέβαιοι ότι θέλετε να προχωρήσετε;</translation>
     </message>
     <message>
         <source>You are about to write a new firmware to the Thymio II. Make sure that the robot is charged and that the USB cable is properly connected.&lt;p&gt;&lt;b&gt;Do not unplug the robot during the upgrade!&lt;/b&gt;&lt;/p&gt;Are you sure you want to proceed?</source>
