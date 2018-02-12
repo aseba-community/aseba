@@ -8,10 +8,16 @@ Welcome to Aseba's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Aseba:
 
+   studio
    aseba-language
    aseba-std-natives
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Thymio:
+
    thymio-api
 
 
