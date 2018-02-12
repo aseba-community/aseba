@@ -43,7 +43,7 @@ if (Qt5Widgets_FOUND AND Qt5OpenGL_FOUND AND Qt5Xml_FOUND)
 
 	add_executable(asebaplayground WIN32 ${playground_SRCS} ${playground_MOCS} ${resfiles})
 
-	target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm asebaqtabout asebazeroconfqt enki_viewer ${OPENGL_LIBRARIES} Qt5::OpenGL Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Network ${EXTRA_LIBS})
+	target_link_libraries(asebaplayground asebasim asebavmbuffer asebavm asebaqtabout asebazeroconfqt enki_viewer Qt5::Xml Qt5::Svg Qt5::Network ${EXTRA_LIBS})
 	install(TARGETS asebaplayground RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
 
 endif ()

@@ -6,7 +6,15 @@ else()
 	add_library(enki INTERFACE)
 	target_include_directories(enki INTERFACE ${enki_INCLUDE_DIR})
 	target_link_libraries(enki INTERFACE ${enki_LIBRARY})
-	add_library(enki_viewer INTERFACE)
-	target_include_directories(enki_viewer INTERFACE ${enki_INCLUDE_DIR})
-	target_link_libraries(enki_viewer INTERFACE ${enki_VIEWER_LIBRARY} enki Qt5::OpenGL Qt5::Widgets Qt5::Gui Qt5::Core)
+
+	find_package(Qt5Widgets)
+	find_package(Qt5OpenGL)
+	find_package(OpenGL)
+
+	if (Qt5Widgets_FOUND AND Qt5OpenGL_FOUND AND OPENGL_FOUND)
+		add_library(enki_viewer INTERFACE)
+		target_include_directories(enki_viewer INTERFACE ${enki_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS})
+		target_link_libraries(enki_viewer INTERFACE ${enki_VIEWER_LIBRARY} enki Qt5::OpenGL Qt5::Widgets Qt5::Gui Qt5::Core ${OPENGL_LIBRARIES})
+	endif()
+
 endif()
