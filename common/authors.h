@@ -89,8 +89,8 @@ namespace Aseba
 			u8"Fanny Riedo",
 			u8"fanny dot riedo at mobsya dot org",
 			u8"",
-			u8"macOS packaging, translation, quality insurance",
-			{ u8"packaging", u8"translation", }
+			u8"macOS packaging, translation, quality insurance, bug reporting",
+			{ u8"packaging", u8"translation", u8"vpl", u8"studio", }
 		},
 		{
 			u8"Michael Bonani",
@@ -170,7 +170,7 @@ namespace Aseba
 			{ u8"simulator", }
 		},
 		{
-			u8"Sandra Moser ",
+			u8"Sandra Moser",
 			u8"",
 			u8"",
 			u8"German translation",
@@ -241,7 +241,7 @@ namespace Aseba
 		},
 		{
 			u8"Paraskevas Leivadaros",
-			u8"",
+			u8"paraskevasleivadaros at gmail dot com",
 			u8"",
 			u8"Greek translation",
 			{ u8"translation", }
