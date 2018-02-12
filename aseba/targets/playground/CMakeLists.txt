@@ -10,12 +10,12 @@ set (ASEBASIM_SRC
 	robots/thymio2/Thymio2-descriptions.c
 )
 
-add_library(asebasim ${ASEBASIM_SRC})
+add_library(asebasim STATIC ${ASEBASIM_SRC})
 set_target_properties(asebasim PROPERTIES VERSION ${LIB_VERSION_STRING}
 										SOVERSION ${LIB_VERSION_MAJOR})
 
 
-target_link_libraries(asebasim PUBLIC aseba_conf)
+target_link_libraries(asebasim PUBLIC aseba_conf enki)
 
 install(TARGETS asebasim
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR}
