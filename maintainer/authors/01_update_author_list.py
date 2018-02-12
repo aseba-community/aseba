@@ -105,7 +105,7 @@ with open(authors_dest_file, 'wb') as f:
 			author = {}
 			nameLine = line.split('<')
 			if len(nameLine) < 2:
-				author["name"] = line.split('[')[0]
+				author["name"] = line.split('[')[0].strip(' \t\n\r')
 			else:
 				name, rest = nameLine
 				if name[0] == '[':
