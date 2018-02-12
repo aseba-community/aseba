@@ -3,7 +3,7 @@ add_executable(aseba-test-natives-count
 	aseba-test-natives-count.cpp
 )
 target_link_libraries(aseba-test-natives-count asebavm asebavmdummycallbacks asebacommon)
-add_test(natives-count aseba-test-natives-count)
+add_test(NAME natives-count COMMAND aseba-test-natives-count)
 
 # tests for bugs in VM
 add_test(NAME bytecode-corrupted-on-reset-639 COMMAND asebatest --memcmp
