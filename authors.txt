@@ -130,7 +130,7 @@ The following people have provided additional contributions:
 	Italian translation
 	contributed to: translation
 
-*	Paraskevas Leivadaros
+*	Paraskevas Leivadaros <paraskevasleivadaros at gmail dot com>
 	Greek translation
 	contributed to: translation
 
