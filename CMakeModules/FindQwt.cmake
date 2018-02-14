@@ -48,7 +48,7 @@
 find_path ( QWT_INCLUDE_DIR
   NAMES qwt_plot.h
   HINTS ${QT_INCLUDE_DIR}
-  PATH_SUFFIXES qwt
+  PATH_SUFFIXES qwt qwt-qt5
 )
 
 set ( QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIR} )
@@ -82,7 +82,7 @@ endif ()
 
 
 find_library ( QWT_LIBRARY
-  NAMES qwt-qt5
+  NAMES qwt qwt-qt5
   HINTS ${QT_LIBRARY_DIR}
 )
 

@@ -5,6 +5,9 @@ init:
 
 shallow_clone: true
 
+matrix:
+  fast_finish: true
+
 install:
   - git clone https://github.com/cor3ntin/enki.git %APPVEYOR_BUILD_FOLDER%\enki --depth=1 --branch fix_cmake
   - git clone https://github.com/aseba-community/dashel.git %APPVEYOR_BUILD_FOLDER%\dashel --depth=1 --branch fix_includes
@@ -14,30 +17,32 @@ install:
 
   # Install Bonjour
   - 7z x "%APPVEYOR_BUILD_FOLDER%\third_party\bonjoursdksetup.exe"
-  - if [%platform%]==[x64] msiexec /i BonjourSDK64.msi /qb /quiet
-  - if [%platform%]==[x86] msiexec /i BonjourSDK4.msi /qb /quiet
+  - if [%platform%]==[x64] cd C:\projects\deps && msiexec /i C:\projects\deps\Bonjour64.msi /qb /quiet
+  - if [%platform%]==[x64] cd C:\projects\deps && msiexec /i C:\projects\deps\BonjourSDK64.msi /qb /quiet
+  - if [%platform%]==[x86] cd C:\projects\deps && msiexec /i C:\projects\deps\Bonjour.msi /qb /quiet
+  - if [%platform%]==[x86] cd C:\projects\deps && msiexec /i C:\projects\deps\BonjourSDK.msi /qb /quiet
 
   # Use msys packages for the mingw builds
   - if [%COMPILER%]==[MinGW] (
-      %BASH% -lc "pacman -R catgets libcatgets --noconfirm" &&
-      %BASH% -lc "pacman --noconfirm --force -Syu"
+      %BASH% -lc "pacman -R catgets libcatgets --noconfirm"
     )
 
-  - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x86] %BASH% -lc "pacman --noconfirm -S mingw-w64-i686-{toolchain,cmake,qt5,qwt-qt5,libxml2,SDL2}"
-  - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x64] %BASH% -lc "pacman --noconfirm -S mingw-w64-x86_64-{toolchain,cmake,qt5,qwt-qt5,libxml2,SDL2}"
+  - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x86] %BASH% -lc "pacman --noconfirm -Sy -d mingw-w64-i686-{binutils,gcc,gcc-libs,cmake,qt5,qwt-qt5,libxml2,SDL2}"
+  - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x64] %BASH% -lc "pacman --noconfirm -Sy -d mingw-w64-x86_64-{binutils,gcc,gcc-libs,cmake,qt5,qwt-qt5,libxml2,SDL2}"
 
 
   # Install cmake
   - if [%COMPILER%]==[MSVC17] (
+      cd C:\projects\deps &&
       set CMAKE_URL="https://cmake.org/files/v3.8/cmake-3.8.0-win64-x64.zip" &&
       appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip &&
       7z x cmake.zip -oC:\projects\deps > nul &&
       move C:\projects\deps\cmake-* C:\projects\deps\cmake &&
-      set PATH=C:\projects\deps\cmake\bin;%PATH%
+      set "PATH=C:\projects\deps\cmake\bin;%PATH%"
+      cmake --version
     )
   # Install SDL ( for msvc )
   - if [%COMPILER%]==[MSVC17] (
-      cmake --version &&
       set SDL_URL="https://libsdl.org/release/SDL2-devel-2.0.7-VC.zip" &&
       appveyor DownloadFile %SDL_URL% -FileName sdl.zip  &&
       7z x sdl.zip -oC:\projects\deps\sdl > nul
@@ -46,7 +51,7 @@ install:
   - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip"
   - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
   - 7z x ninja.zip -oC:\projects\deps\ninja > nul
-  - set PATH=C:\projects\deps\ninja;%PATH%
+  - set "PATH=C:\projects\deps\ninja;%PATH%"
   - ninja --version
 
 before_build:
@@ -62,8 +67,11 @@ build_script:
   - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x86] set MinGWPath="/mingw32"
   - if [%COMPILER%]==[MinGW] if [%ARCH%]==[x64] set MinGWPath="/mingw64"
   - if [%COMPILER%]==[MinGW] (
-      %BASH% -lc "cd '%APPVEYOR_BUILD_FOLDER%\\build' && export PATH="/%MinGWPath%/bin:${PATH}"  && cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH='/%MinGWPath%;/c/Program Files/Bonjour SDK' && ninja -v"
+      %BASH% -x -lc "cd '%APPVEYOR_BUILD_FOLDER%\\build' && export PATH=\"%MinGWPath%/bin:${PATH}\"  && cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH='%MinGWPath%;/c/Program Files/Bonjour SDK' && ninja -v"
     )
+  #- if [%COMPILER%]==[MinGW] (
+      #%BASH% -x -lc "cd '%APPVEYOR_BUILD_FOLDER%\\build' && CTEST_OUTPUT_ON_FAILURE=1 ctest -v"
+    #)
 
 cache:
   - '%MSYS_CACHE%'
@@ -90,7 +98,7 @@ environment:
       BASH: C:\msys64\usr\bin\bash
       image: Visual Studio 2015
       MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
-	- platform: x64
+    - platform: x64
       COMPILER: MinGW
       ARCH: x64
       BASH: C:\msys64\usr\bin\bash
