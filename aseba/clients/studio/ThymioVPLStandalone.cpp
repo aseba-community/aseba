@@ -39,7 +39,6 @@ namespace Aseba
  	/** \addtogroup studio */
 	/*@{*/
 
-	using namespace ThymioVPL;
 	using namespace std;
 
 	ThymioVPLStandaloneInterface::ThymioVPLStandaloneInterface(ThymioVPLStandalone* vplStandalone):
@@ -509,7 +508,7 @@ namespace Aseba
 		id = node;
 
 		// create the VPL widget and add it
-		vpl = new ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false, debugLog, execFeedback);
+		vpl = new ThymioVPL::ThymioVisualProgramming(new ThymioVPLStandaloneInterface(this), false, debugLog, execFeedback);
 		vplLayout->addWidget(vpl);
 
 		// connect callbacks
