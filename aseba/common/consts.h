@@ -230,6 +230,22 @@ typedef enum
 /*! Macro to avoid the warning "unused variable", if we have a valid reason to keep this variable */
 #define ASEBA_UNUSED(x) do { (void)(x); } while (0)
 
+#if defined __cplusplus && defined(__has_cpp_attribute)
+#	if __has_cpp_attribute(fallthrough)
+#		define ASEBA_FALLTHROUGH [[fallthrough]]
+#	elif __has_cpp_attribute(gnu::fallthrough)
+#		define ASEBA_FALLTHROUGH [[gnu::fallthrough]]
+#	elif __has_cpp_attribute(clang::fallthrough)
+#		define ASEBA_FALLTHROUGH [[clang::fallthrough]]
+#	endif
+#endif
+#ifndef ASEBA_FALLTHROUGH
+#	if defined(__GNUC__) && __GNUC__ >=7
+#		define ASEBA_FALLTHROUGH __attribute__((fallthrough))  // C compat for GCC 7+
+#	else
+#		define ASEBA_FALLTHROUGH
+#	endif
+#endif
 /*@}*/
 
 #endif
