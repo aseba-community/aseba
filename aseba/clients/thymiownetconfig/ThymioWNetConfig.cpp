@@ -58,7 +58,7 @@ namespace Aseba
 
 	typedef std::map<int, std::pair<std::string, std::string> > PortsMap;
 
-	#ifdef MSVC
+	#ifdef Q_CC_MSVC
 		#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
 	#else
 		#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
