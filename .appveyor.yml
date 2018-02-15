@@ -34,7 +34,6 @@ install:
   # Install cmake
   - if [%USE_VS_TOOLCHAIN%]==[true] (
       cd C:\projects\deps &&
-      set CMAKE_URL="https://cmake.org/files/v3.8/cmake-3.8.0-win64-x64.zip" &&
       appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip &&
       7z x cmake.zip -oC:\projects\deps > nul &&
       move C:\projects\deps\cmake-* C:\projects\deps\cmake &&
@@ -47,17 +46,15 @@ install:
       cd C:\projects\deps &&
       appveyor DownloadFile %LLVM_URL% -FileName llvm.exe &&
       7z x llvm.exe -oC:\projects\deps\llvm > nul &&
-      set "PATH=C:\projects\deps\llvm\bin;%PATH%"
-      clang-cl --version
+      set "PATH=C:\projects\deps\llvm\bin;%PATH%" &&
+      set "LLD_LINK=C:\projects\deps\llvm\bin\lld-link.exe"
     )
   # Install SDL ( for msvc & clang)
   - if [%USE_VS_TOOLCHAIN%]==[true] (
-      set SDL_URL="https://libsdl.org/release/SDL2-devel-2.0.7-VC.zip" &&
       appveyor DownloadFile %SDL_URL% -FileName sdl.zip  &&
       7z x sdl.zip -oC:\projects\deps\sdl > nul
     )
 
-  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip"
   - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
   - 7z x ninja.zip -oC:\projects\deps\ninja > nul
   - set "PATH=C:\projects\deps\ninja;%PATH%"
@@ -80,7 +77,7 @@ build_script:
     )
 
   - if [%COMPILER%]==[ClangCL] (
-      cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF "-DCMAKE_TOOLCHAIN_FILE=%APPVEYOR_BUILD_FOLDER%\windows\clang-cl-toolchain.cmake" -DCMAKE_LINKER=lld-link -DCMAKE_PREFIX_PATH="%QT5%;C:\Program Files\Bonjour SDK" -DCMAKE_BUILD_TYPE=Release &&
+      cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF "-DCMAKE_TOOLCHAIN_FILE=%APPVEYOR_BUILD_FOLDER%\windows\clang-cl-toolchain.cmake" "-DCMAKE_LINKER=%LLD_LINK%" "-DCMAKE_PREFIX_PATH=%QT5%;C:\Program Files\Bonjour SDK" -DCMAKE_BUILD_TYPE=Release &&
       ninja -v &&
       ctest
    )
@@ -94,6 +91,9 @@ cache:
   - '%MSYS_CACHE%'
 
 environment:
+  NINJA_URL: https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip
+  SDL_URL: https://libsdl.org/release/SDL2-devel-2.0.7-VC.zip
+  CMAKE_URL: https://cmake.org/files/v3.8/cmake-3.8.0-win64-x64.zip
   APPVEYOR_CACHE_ENTRY_ZIP_ARGS: "-t7z -m0=lzma -mx=5"
   matrix:
     #- platform: x86
@@ -109,23 +109,25 @@ environment:
       #QT5: C:\Qt\5.10.0\msvc2017_64
       #CXXFLAGS: "-DNOMINMAX -DWIN32_LEAN_AND_MEAN"
       #COMPILER: MSVC17
-    #- platform: x64
-      #COMPILER: MinGW
-      #ARCH: x86
-      #BASH: C:\msys64\usr\bin\bash
-      #image: Visual Studio 2015
-      #MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
-    #- platform: x64
-      #COMPILER: MinGW
-      #ARCH: x64
-      #BASH: C:\msys64\usr\bin\bash
-      #image: Visual Studio 2015
-      #MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
+
+    - platform: x64
+      COMPILER: MinGW
+      ARCH: x86
+      BASH: C:\msys64\usr\bin\bash
+      image: Visual Studio 2015
+      MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
+
+    - platform: x64
+      COMPILER: MinGW
+      ARCH: x64
+      BASH: C:\msys64\usr\bin\bash
+      image: Visual Studio 2015
+      MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
 
     - platform: x64
       COMPILER: ClangCL
       ARCH: x64
-      image: Visual Studio 2017
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       LLVM_URL: http://prereleases.llvm.org/win-snapshots/LLVM-7.0.0-r323406-win64.exe
       LLVM_VERSION: 7.0
       USE_VS_TOOLCHAIN: true
