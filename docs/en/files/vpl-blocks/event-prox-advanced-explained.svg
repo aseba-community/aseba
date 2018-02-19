@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="90.311089mm"
+   height="90.311089mm"
+   viewBox="-180 -40 256 255.99969"
+   version="1.2"
+   id="svg4681"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="event-prox-advanced-explained.svg">
+  <metadata
+     id="metadata5186">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>VPL program </dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2256"
+     inkscape:window-height="1256"
+     id="namedview5184"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="2.6911872"
+     inkscape:cx="85.961041"
+     inkscape:cy="134.6093"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg4681" />
+  <title
+     id="title4683">VPL program </title>
+  <desc
+     id="desc4685">This image was generated with Thymio VPL from Aseba, get it at http://thymio.org</desc>
+  <defs
+     id="defs4687">
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       x1="146"
+       y1="0"
+       x2="99"
+       y2="0"
+       id="gradient1">
+      <stop
+         offset="0"
+         stop-color="#ffffff"
+         stop-opacity="1"
+         id="stop4690" />
+      <stop
+         offset="1"
+         stop-color="#000000"
+         stop-opacity="1"
+         id="stop4692" />
+    </linearGradient>
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       cx="15"
+       cy="78"
+       r="12"
+       fx="15"
+       fy="78"
+       xml:id="gradient2"
+       id="radialGradient4694">
+      <stop
+         offset="0"
+         stop-color="#ff0000"
+         stop-opacity="1"
+         id="stop4696" />
+      <stop
+         offset="0.02"
+         stop-color="#ff0000"
+         stop-opacity="0.980392"
+         id="stop4698" />
+      <stop
+         offset="0.04"
+         stop-color="#ff0000"
+         stop-opacity="0.960784"
+         id="stop4700" />
+      <stop
+         offset="0.06"
+         stop-color="#ff0000"
+         stop-opacity="0.941176"
+         id="stop4702" />
+      <stop
+         offset="0.08"
+         stop-color="#ff0000"
+         stop-opacity="0.921569"
+         id="stop4704" />
+      <stop
+         offset="0.1"
+         stop-color="#ff0000"
+         stop-opacity="0.901961"
+         id="stop4706" />
+      <stop
+         offset="0.12"
+         stop-color="#ff0000"
+         stop-opacity="0.882353"
+         id="stop4708" />
+      <stop
+         offset="0.14"
+         stop-color="#ff0000"
+         stop-opacity="0.862745"
+         id="stop4710" />
+      <stop
+         offset="0.16"
+         stop-color="#ff0000"
+         stop-opacity="0.843137"
+         id="stop4712" />
+      <stop
+         offset="0.18"
+         stop-color="#ff0000"
+         stop-opacity="0.819608"
+         id="stop4714" />
+      <stop
+         offset="0.2"
+         stop-color="#ff0000"
+         stop-opacity="0.8"
+         id="stop4716" />
+      <stop
+         offset="0.22"
+         stop-color="#ff0000"
+         stop-opacity="0.780392"
+         id="stop4718" />
+      <stop
+         offset="0.24"
+         stop-color="#ff0000"
+         stop-opacity="0.760784"
+         id="stop4720" />
+      <stop
+         offset="0.26"
+         stop-color="#ff0000"
+         stop-opacity="0.741176"
+         id="stop4722" />
+      <stop
+         offset="0.28"
+         stop-color="#ff0000"
+         stop-opacity="0.721569"
+         id="stop4724" />
+      <stop
+         offset="0.3"
+         stop-color="#ff0000"
+         stop-opacity="0.701961"
+         id="stop4726" />
+      <stop
+         offset="0.32"
+         stop-color="#ff0000"
+         stop-opacity="0.682353"
+         id="stop4728" />
+      <stop
+         offset="0.34"
+         stop-color="#ff0000"
+         stop-opacity="0.658824"
+         id="stop4730" />
+      <stop
+         offset="0.36"
+         stop-color="#ff0000"
+         stop-opacity="0.639216"
+         id="stop4732" />
+      <stop
+         offset="0.38"
+         stop-color="#ff0000"
+         stop-opacity="0.619608"
+         id="stop4734" />
+      <stop
+         offset="0.4"
+         stop-color="#ff0000"
+         stop-opacity="0.6"
+         id="stop4736" />
+      <stop
+         offset="0.42"
+         stop-color="#ff0000"
+         stop-opacity="0.580392"
+         id="stop4738" />
+      <stop
+         offset="0.44"
+         stop-color="#ff0000"
+         stop-opacity="0.560784"
+         id="stop4740" />
+      <stop
+         offset="0.46"
+         stop-color="#ff0000"
+         stop-opacity="0.541176"
+         id="stop4742" />
+      <stop
+         offset="0.48"
+         stop-color="#ff0000"
+         stop-opacity="0.521569"
+         id="stop4744" />
+      <stop
+         offset="0.5"
+         stop-color="#ff0000"
+         stop-opacity="0.498039"
+         id="stop4746" />
+      <stop
+         offset="0.52"
+         stop-color="#ff0000"
+         stop-opacity="0.478431"
+         id="stop4748" />
+      <stop
+         offset="0.54"
+         stop-color="#ff0000"
+         stop-opacity="0.458824"
+         id="stop4750" />
+      <stop
+         offset="0.56"
+         stop-color="#ff0000"
+         stop-opacity="0.439216"
+         id="stop4752" />
+      <stop
+         offset="0.58"
+         stop-color="#ff0000"
+         stop-opacity="0.419608"
+         id="stop4754" />
+      <stop
+         offset="0.6"
+         stop-color="#ff0000"
+         stop-opacity="0.4"
+         id="stop4756" />
+      <stop
+         offset="0.62"
+         stop-color="#ff0000"
+         stop-opacity="0.380392"
+         id="stop4758" />
+      <stop
+         offset="0.64"
+         stop-color="#ff0000"
+         stop-opacity="0.360784"
+         id="stop4760" />
+      <stop
+         offset="0.66"
+         stop-color="#ff0000"
+         stop-opacity="0.341176"
+         id="stop4762" />
+      <stop
+         offset="0.68"
+         stop-color="#ff0000"
+         stop-opacity="0.317647"
+         id="stop4764" />
+      <stop
+         offset="0.7"
+         stop-color="#ff0000"
+         stop-opacity="0.298039"
+         id="stop4766" />
+      <stop
+         offset="0.72"
+         stop-color="#ff0000"
+         stop-opacity="0.278431"
+         id="stop4768" />
+      <stop
+         offset="0.74"
+         stop-color="#ff0000"
+         stop-opacity="0.258824"
+         id="stop4770" />
+      <stop
+         offset="0.76"
+         stop-color="#ff0000"
+         stop-opacity="0.239216"
+         id="stop4772" />
+      <stop
+         offset="0.78"
+         stop-color="#ff0000"
+         stop-opacity="0.219608"
+         id="stop4774" />
+      <stop
+         offset="0.8"
+         stop-color="#ff0000"
+         stop-opacity="0.2"
+         id="stop4776" />
+      <stop
+         offset="0.82"
+         stop-color="#ff0000"
+         stop-opacity="0.180392"
+         id="stop4778" />
+      <stop
+         offset="0.84"
+         stop-color="#ff0000"
+         stop-opacity="0.156863"
+         id="stop4780" />
+      <stop
+         offset="0.86"
+         stop-color="#ff0000"
+         stop-opacity="0.137255"
+         id="stop4782" />
+      <stop
+         offset="0.88"
+         stop-color="#ff0000"
+         stop-opacity="0.117647"
+         id="stop4784" />
+      <stop
+         offset="0.9"
+         stop-color="#ff0000"
+         stop-opacity="0.0980392"
+         id="stop4786" />
+      <stop
+         offset="0.92"
+         stop-color="#ff0000"
+         stop-opacity="0.0784314"
+         id="stop4788" />
+      <stop
+         offset="0.94"
+         stop-color="#ff0000"
+         stop-opacity="0.0588235"
+         id="stop4790" />
+      <stop
+         offset="0.96"
+         stop-color="#ff0000"
+         stop-opacity="0.0392157"
+         id="stop4792" />
+      <stop
+         offset="0.98"
+         stop-color="#ff0000"
+         stop-opacity="0.0196078"
+         id="stop4794" />
+      <stop
+         offset="1"
+         stop-color="#000000"
+         stop-opacity="0"
+         id="stop4796" />
+    </radialGradient>
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       cx="40"
+       cy="234"
+       r="12"
+       fx="40"
+       fy="234"
+       xml:id="gradient3"
+       id="radialGradient4798">
+      <stop
+         offset="0"
+         stop-color="#ff0000"
+         stop-opacity="1"
+         id="stop4800" />
+      <stop
+         offset="0.02"
+         stop-color="#ff0000"
+         stop-opacity="0.980392"
+         id="stop4802" />
+      <stop
+         offset="0.04"
+         stop-color="#ff0000"
+         stop-opacity="0.960784"
+         id="stop4804" />
+      <stop
+         offset="0.06"
+         stop-color="#ff0000"
+         stop-opacity="0.941176"
+         id="stop4806" />
+      <stop
+         offset="0.08"
+         stop-color="#ff0000"
+         stop-opacity="0.921569"
+         id="stop4808" />
+      <stop
+         offset="0.1"
+         stop-color="#ff0000"
+         stop-opacity="0.901961"
+         id="stop4810" />
+      <stop
+         offset="0.12"
+         stop-color="#ff0000"
+         stop-opacity="0.882353"
+         id="stop4812" />
+      <stop
+         offset="0.14"
+         stop-color="#ff0000"
+         stop-opacity="0.862745"
+         id="stop4814" />
+      <stop
+         offset="0.16"
+         stop-color="#ff0000"
+         stop-opacity="0.843137"
+         id="stop4816" />
+      <stop
+         offset="0.18"
+         stop-color="#ff0000"
+         stop-opacity="0.819608"
+         id="stop4818" />
+      <stop
+         offset="0.2"
+         stop-color="#ff0000"
+         stop-opacity="0.8"
+         id="stop4820" />
+      <stop
+         offset="0.22"
+         stop-color="#ff0000"
+         stop-opacity="0.780392"
+         id="stop4822" />
+      <stop
+         offset="0.24"
+         stop-color="#ff0000"
+         stop-opacity="0.760784"
+         id="stop4824" />
+      <stop
+         offset="0.26"
+         stop-color="#ff0000"
+         stop-opacity="0.741176"
+         id="stop4826" />
+      <stop
+         offset="0.28"
+         stop-color="#ff0000"
+         stop-opacity="0.721569"
+         id="stop4828" />
+      <stop
+         offset="0.3"
+         stop-color="#ff0000"
+         stop-opacity="0.701961"
+         id="stop4830" />
+      <stop
+         offset="0.32"
+         stop-color="#ff0000"
+         stop-opacity="0.682353"
+         id="stop4832" />
+      <stop
+         offset="0.34"
+         stop-color="#ff0000"
+         stop-opacity="0.658824"
+         id="stop4834" />
+      <stop
+         offset="0.36"
+         stop-color="#ff0000"
+         stop-opacity="0.639216"
+         id="stop4836" />
+      <stop
+         offset="0.38"
+         stop-color="#ff0000"
+         stop-opacity="0.619608"
+         id="stop4838" />
+      <stop
+         offset="0.4"
+         stop-color="#ff0000"
+         stop-opacity="0.6"
+         id="stop4840" />
+      <stop
+         offset="0.42"
+         stop-color="#ff0000"
+         stop-opacity="0.580392"
+         id="stop4842" />
+      <stop
+         offset="0.44"
+         stop-color="#ff0000"
+         stop-opacity="0.560784"
+         id="stop4844" />
+      <stop
+         offset="0.46"
+         stop-color="#ff0000"
+         stop-opacity="0.541176"
+         id="stop4846" />
+      <stop
+         offset="0.48"
+         stop-color="#ff0000"
+         stop-opacity="0.521569"
+         id="stop4848" />
+      <stop
+         offset="0.5"
+         stop-color="#ff0000"
+         stop-opacity="0.498039"
+         id="stop4850" />
+      <stop
+         offset="0.52"
+         stop-color="#ff0000"
+         stop-opacity="0.478431"
+         id="stop4852" />
+      <stop
+         offset="0.54"
+         stop-color="#ff0000"
+         stop-opacity="0.458824"
+         id="stop4854" />
+      <stop
+         offset="0.56"
+         stop-color="#ff0000"
+         stop-opacity="0.439216"
+         id="stop4856" />
+      <stop
+         offset="0.58"
+         stop-color="#ff0000"
+         stop-opacity="0.419608"
+         id="stop4858" />
+      <stop
+         offset="0.6"
+         stop-color="#ff0000"
+         stop-opacity="0.4"
+         id="stop4860" />
+      <stop
+         offset="0.62"
+         stop-color="#ff0000"
+         stop-opacity="0.380392"
+         id="stop4862" />
+      <stop
+         offset="0.64"
+         stop-color="#ff0000"
+         stop-opacity="0.360784"
+         id="stop4864" />
+      <stop
+         offset="0.66"
+         stop-color="#ff0000"
+         stop-opacity="0.341176"
+         id="stop4866" />
+      <stop
+         offset="0.68"
+         stop-color="#ff0000"
+         stop-opacity="0.317647"
+         id="stop4868" />
+      <stop
+         offset="0.7"
+         stop-color="#ff0000"
+         stop-opacity="0.298039"
+         id="stop4870" />
+      <stop
+         offset="0.72"
+         stop-color="#ff0000"
+         stop-opacity="0.278431"
+         id="stop4872" />
+      <stop
+         offset="0.74"
+         stop-color="#ff0000"
+         stop-opacity="0.258824"
+         id="stop4874" />
+      <stop
+         offset="0.76"
+         stop-color="#ff0000"
+         stop-opacity="0.239216"
+         id="stop4876" />
+      <stop
+         offset="0.78"
+         stop-color="#ff0000"
+         stop-opacity="0.219608"
+         id="stop4878" />
+      <stop
+         offset="0.8"
+         stop-color="#ff0000"
+         stop-opacity="0.2"
+         id="stop4880" />
+      <stop
+         offset="0.82"
+         stop-color="#ff0000"
+         stop-opacity="0.180392"
+         id="stop4882" />
+      <stop
+         offset="0.84"
+         stop-color="#ff0000"
+         stop-opacity="0.156863"
+         id="stop4884" />
+      <stop
+         offset="0.86"
+         stop-color="#ff0000"
+         stop-opacity="0.137255"
+         id="stop4886" />
+      <stop
+         offset="0.88"
+         stop-color="#ff0000"
+         stop-opacity="0.117647"
+         id="stop4888" />
+      <stop
+         offset="0.9"
+         stop-color="#ff0000"
+         stop-opacity="0.0980392"
+         id="stop4890" />
+      <stop
+         offset="0.92"
+         stop-color="#ff0000"
+         stop-opacity="0.0784314"
+         id="stop4892" />
+      <stop
+         offset="0.94"
+         stop-color="#ff0000"
+         stop-opacity="0.0588235"
+         id="stop4894" />
+      <stop
+         offset="0.96"
+         stop-color="#ff0000"
+         stop-opacity="0.0392157"
+         id="stop4896" />
+      <stop
+         offset="0.98"
+         stop-color="#ff0000"
+         stop-opacity="0.0196078"
+         id="stop4898" />
+      <stop
+         offset="1"
+         stop-color="#000000"
+         stop-opacity="0"
+         id="stop4900" />
+    </radialGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#gradient1"
+       id="linearGradient5188"
+       gradientUnits="userSpaceOnUse"
+       x1="-254.12079"
+       y1="27.943068"
+       x2="-301.12094"
+       y2="27.943068"
+       gradientTransform="translate(400,120.00063)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#gradient1"
+       id="linearGradient5190"
+       gradientUnits="userSpaceOnUse"
+       x1="146"
+       y1="0"
+       x2="99"
+       y2="0"
+       gradientTransform="translate(400,120.00063)" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient4798"
+       id="radialGradient5338"
+       cx="15"
+       cy="78"
+       fx="15"
+       fy="78"
+       r="12"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient4798"
+       id="radialGradient5346"
+       cx="40"
+       cy="234"
+       fx="40"
+       fy="234"
+       r="12"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4904"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-400,-120.00063)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4906"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-360,37.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4912"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-360,37.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4914"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-220,-80.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4938"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-220,-80.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4940"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(788,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4952"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(788,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4954"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(400,275.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4966"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(400,275.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g4968"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#f6871f;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel"
+     id="g4970"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4972"
+       d="M 0,5 C 0,2.23858 2.23858,0 5,0 l 246,0 c 2.761,0 5,2.23858 5,5 l 0,246 c 0,2.761 -2.239,5 -5,5 L 5,256 c -2.76142,0 -5,-2.239 -5,-5 L 0,5"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel"
+     id="g4974"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4976"
+       d="M 252,82 C 252,42.2355 196.483,10 128,10 59.5167,10 4,42.2355 4,82 l 248,0"
+       vector-effect="non-scaling-stroke" />
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4978"
+       d="m 4,81 c 0,-2.7614 2.23858,-5 5,-5 l 238,0 c 2.761,0 5,2.2386 5,5 l 0,166 c 0,2.761 -2.239,5 -5,5 L 9,252 c -2.76142,0 -5,-2.239 -5,-5 L 4,81"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#dcdcdc;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel"
+     id="g4980"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4982"
+       d="m 32,100 192,0 0,96 -192,0 0,-96"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:1"
+     id="g4984"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4986"
+       d="m 32,100 192,0 0,48 -192,0 0,-48"
+       vector-effect="none" />
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4988"
+       d="m 32,148 192,0 0,48 -192,0 0,-48"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel"
+     id="g4990"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4992"
+       d="m 146,100 78,0 0,48 -78,0 0,-48"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:1"
+     id="g4994"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path4996"
+       d="m 146,100 78,0 0,48 -78,0 0,-48"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel"
+     id="g4998"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5000"
+       d="m 32,148 67,0 0,48 -67,0 0,-48"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:1"
+     id="g5002"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5004"
+       d="m 32,148 67,0 0,48 -67,0 0,-48"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:url(#linearGradient5190);fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;fill-opacity:1.0"
+     id="g5006"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:url(#linearGradient5188);fill-rule:evenodd;fill-opacity:1"
+       id="path5008"
+       d="m 146,124 -47,0 0,48 47,0 0,-48"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#800000;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:1"
+     id="g5010"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5012"
+       d="m 146,124 -47,0 0,48 47,0 0,-48"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:1"
+     id="g5014"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5016"
+       d="m 169,100 -46,0 0,23 23,23 23,-23 0,-23"
+       vector-effect="none" />
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5018"
+       d="m 99,150 23,23 0,23 -46,0 0,-23 23,-23"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5020"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5022"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:url(#radialGradient5338);fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;fill-opacity:1.0"
+     id="g5024"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd;fill-opacity:1.0;fill:url(#radialGradient5338)"
+       inkscape:connector-curvature="0"
+       id="path5026"
+       d="M 27,78 C 27,84.6274 21.6274,90 15,90 8.37258,90 3,84.6274 3,78 3,71.3726 8.37258,66 15,66 c 6.6274,0 12,5.3726 12,12"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5028"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5030"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';opacity:0.5;fill:url(#radialGradient5346);fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;fill-opacity:1.0"
+     id="g5032"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)">
+    <path
+       style="fill-rule:evenodd;fill-opacity:1.0;fill:url(#radialGradient5346)"
+       inkscape:connector-curvature="0"
+       id="path5034"
+       d="m 52,234 c 0,6.627 -5.3726,12 -12,12 -6.6274,0 -12,-5.373 -12,-12 0,-6.627 5.3726,-12 12,-12 6.6274,0 12,5.373 12,12"
+       vector-effect="non-scaling-stroke" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5036"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-180,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5038"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,-0.642788,0.642788,0.766044,-148.418,20.092365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5040"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,-0.642788,0.642788,0.766044,-148.418,20.092365)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5042"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5044"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,-0.642788,0.642788,0.766044,-148.418,20.092365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5046"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,-0.34202,0.34202,0.939693,-103.303,-5.9546348)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#dcdcdc;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5048"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,-0.34202,0.34202,0.939693,-103.303,-5.9546348)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5050"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5052"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,-0.34202,0.34202,0.939693,-103.303,-5.9546348)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5054"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-52,-15.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#dcdcdc;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5056"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-52,-15.000635)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5058"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5060"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-52,-15.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5062"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,0.34202,-0.34202,0.939693,-0.697,-5.9546348)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#dcdcdc;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5064"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,0.34202,-0.34202,0.939693,-0.697,-5.9546348)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5066"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5068"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.939693,0.34202,-0.34202,0.939693,-0.697,-5.9546348)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5070"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,0.642788,-0.642788,0.766044,44.418,20.092365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5072"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,0.642788,-0.642788,0.766044,44.418,20.092365)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5074"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5076"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0.766044,0.642788,-0.642788,0.766044,44.418,20.092365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5078"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-116,193.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#808080;fill-opacity:1;fill-rule:evenodd;stroke:#800000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5080"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-116,193.99937)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5082"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5084"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-116,193.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5086"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(12,193.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:#dcdcdc;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g5088"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(12,193.99937)">
+    <path
+       style="fill-rule:evenodd"
+       inkscape:connector-curvature="0"
+       id="path5090"
+       d="m -16,-16 32,0 0,32 -32,0 0,-32"
+       vector-effect="none" />
+  </g>
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5092"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(12,193.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5094"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(116,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5106"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(116,-40.000635)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5108"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(199,47.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5118"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(199,47.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5120"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0,1,-1,0,289,47.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5130"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0,1,-1,0,289,47.999365)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5132"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0,-1,1,0,199,137.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5142"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(0,-1,1,0,199,137.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5144"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(-1,0,0,-1,289,137.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5154"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="matrix(-1,0,0,-1,289,137.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5156"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-220,359.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5180"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-220,359.99937)" />
+  <g
+     style="font-style:normal;font-weight:400;font-size:13px;font-family:'.Helvetica Neue DeskInterface';fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1"
+     id="g5182"
+     font-style="normal"
+     font-weight="400"
+     font-size="13"
+     transform="translate(-400,-120.00063)" />
+</svg>
