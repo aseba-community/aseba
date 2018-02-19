@@ -19,6 +19,7 @@ Welcome to Aseba's documentation!
    :caption: Thymio:
 
    thymio-api
+   thymio-simulator-api.rst
 
 
 

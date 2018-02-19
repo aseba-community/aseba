@@ -17,6 +17,8 @@ div[class^="highlight"] pre {
 
 @media screen {
 
+    table.docutils div.line-block { margin-left: 0; }
+
     /* content column
      *
      * RTD theme's default is 800px as max width for the content, but we have
