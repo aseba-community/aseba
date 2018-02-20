@@ -46,9 +46,9 @@ The following people have provided additional contributions:
 	macOS packaging, translation, quality insurance, bug reporting
 	contributed to: packaging, translation, vpl, studio
 
-*	Michael Bonani <michael dot bonani at mobsya dot org> [3]
-	French translation, packaging, quality insurance
-	contributed to: packaging, translation
+*	Michael Bonani <michael dot bonani at mobsya dot org> [1] 10.2006-01.2011; [3] 02.2011-
+	French translation, packaging, quality insurance, bug reporting
+	contributed to: packaging, translation, vpl, studio, blockly
 
 *	Dean Brettle <dean at brettle dot com>
 	RPM packaging
