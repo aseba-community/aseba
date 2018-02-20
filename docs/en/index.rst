@@ -10,6 +10,7 @@ Welcome to Aseba's documentation!
    :maxdepth: 1
    :caption: Aseba:
 
+   about
    studio
    aseba-language
    aseba-std-natives
