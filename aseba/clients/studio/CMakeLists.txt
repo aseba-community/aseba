@@ -17,6 +17,8 @@ ENDMACRO(MAKE_WINDOWS_PATH)
 # link for Studio
 set(ADDITIONAL_LIBRARIES "")
 
+set(cmake_automoc on)
+
 # Google protobuf
 find_package(Protobuf)
 if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
@@ -133,39 +135,32 @@ endif ()
 add_dependencies(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler )
 target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
 
-install(TARGETS asebastudio RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+install_qt_app(asebastudio)
 
 # Thymio VPL standalone
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/plugins/ThymioVPL)
-set(thymiovpl_SRCS
-	ThymioVPLStandalone.cpp
-	thymiovpl.cpp
-)
-qt5_wrap_cpp(thymiovpl_MOCS
-	ThymioVPLStandalone.h
-)
 
 if (ANDROID)
-	add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${thymiovpl_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
 else ()
-	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${thymiovpl_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
 endif ()
 if (HAS_DYN_VERSION)
 	add_dependencies(thymiovpl versionheader)
 endif ()
 
+target_include_directories(thymiovpl PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/plugins/ThymioVPL)
+qt5_wrap_cpp(vpl_MOCS
+	ThymioVPLStandalone.h
+)
+target_sources(thymiovpl PUBLIC ThymioVPLStandalone.cpp ${vpl_MOCS} thymiovpl.cpp)
 target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler asebaqtabout asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Svg Qt5::Network Qt5::Xml Qt5::Widgets)
 
-# Render blocks helper
-set(rendervplblocks_SRCS
-	rendervplblocks.cpp
-)
-add_executable(rendervplblocks WIN32 ${rendervplblocks_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
-qt5_use_modules(rendervplblocks Xml)
-target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Svg Qt5::Widgets)
 
-install(TARGETS thymiovpl RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
-
+#renderblocks
+add_executable(rendervplblocks ${CMAKE_BINARY_DIR}/version.h)
+target_sources(rendervplblocks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/rendervplblocks.cpp ${resfiles})
+target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Xml Qt5::Svg Qt5::Widgets)
+install_qt_app(rendervplblocks)
 
 # Zeroconf
 if (HAS_ZEROCONF_SUPPORT)
