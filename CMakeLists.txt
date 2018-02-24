@@ -32,7 +32,8 @@ find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concur
 find_package(Qwt)
 
 if (UNIX AND NOT APPLE)
-	find_package(Qt5DBus X11Extras)
+	find_package(Qt5X11Extras)
+	find_package(Qt5DBus)
 endif ()
 
 # Zeroconf
