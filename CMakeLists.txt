@@ -62,12 +62,27 @@ if (UNIX)
 endif()
 
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/thymio-blockly-standalone/CMakeLists.txt)
+	add_subdirectory(${PROJECT_SOURCE_DIR}/thymio-blockly-standalone)
+	message("-- Found thymio-blockly-standalone, will bundle blockly")
+endif()
+
+
 feature_summary( WHAT PACKAGES_FOUND PACKAGES_NOT_FOUND ENABLED_FEATURES DISABLED_FEATURES)
 
 
+if(WIN32)
+	add_subdirectory(third_party/bonjour)
+	set(ASEBA_SOURCE_DIRECTORY "${PROJECT_SOURCE_DIR}")
+	set(CPACK_MODULE_PATH ${PROJECT_SOURCE_DIR}/windows ${CPACK_MODULE_PATH})
+	set(CPACK_MONOLITHIC_INSTALL 1)
+	configure_file(
+		${PROJECT_SOURCE_DIR}/windows/NSIS.definitions.nsh.in
+		${CMAKE_CURRENT_BINARY_DIR}/resources/NSIS.definitions.nsh
+	)
 
-
-
+endif()
+include(CPack)
 
 
 

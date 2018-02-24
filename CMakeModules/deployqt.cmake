@@ -38,6 +38,7 @@ function(windeployqt target directory)
         COMMAND "${CMAKE_COMMAND}" -E
             env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
                 --no-compiler-runtime
+                --plugindir plugins
                 \"$<TARGET_FILE:${target}>\"
         COMMENT "Deploying Qt..."
     )
@@ -65,6 +66,7 @@ function(windeployqt target directory)
                 env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
                     --dry-run
                     --list mapping
+                    --plugindir plugins
                     \${_file}
             OUTPUT_VARIABLE _output
             OUTPUT_STRIP_TRAILING_WHITESPACE
