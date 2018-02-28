@@ -64,6 +64,7 @@ install:
   - ninja --version
 
 
+  # NSIS
   - ps: |
       if (Test-Path "C:/Program Files (x86)/NSIS/makensis.exe") {
           echo "using nsis from cache"
@@ -71,6 +72,11 @@ install:
           choco install -y nsis.install
       }
   - cmd: SET PATH=%PATH%;C:\Program Files (x86)\NSIS
+
+  # Blockly deps
+  - python -m pip install -U pip setuptools wheel
+  - python -m pip install beautifulsoup4 lxml
+
 
 before_build:
   - if [%USE_VS_TOOLCHAIN%]==[true] (
