@@ -13,6 +13,7 @@ matrix:
 install:
   - git clone https://github.com/cor3ntin/enki.git %APPVEYOR_BUILD_FOLDER%\enki --depth=1 --branch test_build_windows
   - git clone https://github.com/aseba-community/dashel.git %APPVEYOR_BUILD_FOLDER%\dashel --depth=1 --branch fix_includes
+  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git %APPVEYOR_BUILD_FOLDER%\thymio-blockly-standalone --depth=1 --branch master
 
   - mkdir C:\projects\deps
   - cd C:\projects\deps
@@ -62,6 +63,15 @@ install:
   - set "PATH=C:\projects\deps\ninja;%PATH%"
   - ninja --version
 
+
+  - ps: |
+      if (Test-Path "C:/Program Files (x86)/NSIS/makensis.exe") {
+          echo "using nsis from cache"
+      } else {
+          choco install -y nsis.install
+      }
+  - cmd: SET PATH=%PATH%;C:\Program Files (x86)\NSIS
+
 before_build:
   - if [%USE_VS_TOOLCHAIN%]==[true] (
       set "PATH=%QT5%\bin;%PATH%" &&
@@ -92,6 +102,9 @@ build_script:
 
 cache:
   - '%MSYS_CACHE%'
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  - 'C:\Program Files (x86)\NSIS'
 
 image: Visual Studio 2017
 platform: x64
