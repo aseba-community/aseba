@@ -13,7 +13,7 @@ matrix:
 install:
   - git clone https://github.com/cor3ntin/enki.git %APPVEYOR_BUILD_FOLDER%\enki --depth=1 --branch test_build_windows
   - git clone https://github.com/aseba-community/dashel.git %APPVEYOR_BUILD_FOLDER%\dashel --depth=1 --branch fix_includes
-  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git %APPVEYOR_BUILD_FOLDER%\thymio-blockly-standalone --depth=1 --branch master
+  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git %APPVEYOR_BUILD_FOLDER%\thymio-blockly-standalone --depth=1 --branch master --recurse-submodules
 
   - mkdir C:\projects\deps
   - cd C:\projects\deps
