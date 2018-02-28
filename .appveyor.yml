@@ -19,7 +19,7 @@ install:
   - cd C:\projects\deps
 
   # Install Bonjour
-  - 7z x "%APPVEYOR_BUILD_FOLDER%\third_party\bonjoursdksetup.exe"
+  - 7z x "%APPVEYOR_BUILD_FOLDER%\third_party\bonjour\bonjoursdksetup.exe"
   - if [%platform%]==[x64] cd C:\projects\deps && msiexec /i C:\projects\deps\Bonjour64.msi /qb /quiet
   - if [%platform%]==[x64] cd C:\projects\deps && msiexec /i C:\projects\deps\BonjourSDK64.msi /qb /quiet
   - if [%platform%]==[x86] cd C:\projects\deps && msiexec /i C:\projects\deps\Bonjour.msi /qb /quiet
