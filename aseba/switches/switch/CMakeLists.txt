@@ -10,3 +10,5 @@ endif()
 install(TARGETS asebaswitch RUNTIME
 	DESTINATION bin
 )
+
+codesign(asebaswitch)

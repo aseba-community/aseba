@@ -18,6 +18,8 @@ set_target_properties(asebacompiler PROPERTIES VERSION ${LIB_VERSION_STRING}
 
 target_link_libraries(asebacompiler asebacommon)
 
+codesign(asebacompiler)
+
 install(TARGETS asebacompiler
                 LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
                 ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 

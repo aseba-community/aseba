@@ -31,6 +31,7 @@ if (Qt5Network_FOUND)
 	set_target_properties(asebazeroconfqt PROPERTIES VERSION ${LIB_VERSION_STRING})
 	target_include_directories(asebazeroconfqt PUBLIC ${DNSSD_INCLUDE_DIRS})
 	target_link_libraries(asebazeroconfqt PUBLIC asebazeroconf Qt5::Core Qt5::Network)
+	codesign(asebazeroconfqt)
 
 
 	install(TARGETS asebazeroconfqt

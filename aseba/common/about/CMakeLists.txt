@@ -25,5 +25,7 @@ if (Qt5Svg_FOUND)
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 		ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
 	)
+	codesign(asebaqtabout)
+
 endif ()
 add_feature_info(ABOUT_QT QT_USE_QTSVG "About Windows")

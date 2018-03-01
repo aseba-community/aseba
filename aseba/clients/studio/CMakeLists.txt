@@ -86,6 +86,8 @@ add_library(asebaqtcommon STATIC ${qt_common_SRCS} ${qt_common_MOCS})
 target_link_libraries(asebaqtcommon aseba_conf asebadashelplugins)
 qt5_use_modules(asebaqtcommon Gui Widgets Xml Network)
 
+codesign(asebaqtcommon)
+
 # plugins
 add_subdirectory(plugins)
 
@@ -136,6 +138,7 @@ add_dependencies(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacomp
 target_link_libraries(asebastudio asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Help Qt5::Svg Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets)
 
 install_qt_app(asebastudio)
+codesign(asebastudio)
 
 # Thymio VPL standalone
 
@@ -154,13 +157,14 @@ qt5_wrap_cpp(vpl_MOCS
 )
 target_sources(thymiovpl PUBLIC ThymioVPLStandalone.cpp ${vpl_MOCS} thymiovpl.cpp)
 target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler asebaqtabout asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Svg Qt5::Network Qt5::Xml Qt5::Widgets)
-
+codesign(thymiovpl)
 
 #renderblocks
 add_executable(rendervplblocks ${CMAKE_BINARY_DIR}/version.h)
 target_sources(rendervplblocks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/rendervplblocks.cpp ${resfiles})
 target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Xml Qt5::Svg Qt5::Widgets)
 install_qt_app(rendervplblocks)
+codesign(rendervplblocks)
 
 # Zeroconf
 if (HAS_ZEROCONF_SUPPORT)

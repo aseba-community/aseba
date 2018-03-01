@@ -46,6 +46,7 @@ if (Qt5Widgets_FOUND AND Qt5OpenGL_FOUND AND Qt5Xml_FOUND)
 	target_link_libraries(asebaplayground asebasim asebacommon asebavmbuffer asebavm asebaqtabout enkiviewer Qt5::Xml Qt5::Svg Qt5::Network ${EXTRA_LIBS})
 
 	install_qt_app(asebaplayground)
+	codesign(asebaplayground)
 
 	if(HAS_ZEROCONF_SUPPORT)
 		target_link_libraries(asebaplayground asebazeroconfqt)

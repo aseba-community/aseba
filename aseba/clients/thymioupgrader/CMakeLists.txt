@@ -23,4 +23,6 @@ if (Qt5Widgets_FOUND AND Qt5Concurrent_FOUND AND Qt5Network_FOUND AND Qt5Xml_FOU
 	target_link_libraries(thymioupgrader Qt5::Concurrent Qt5::Network Qt5::Xml Qt5::Widgets asebacommon asebadashelplugins)
 
 	install_qt_app(thymioupgrader)
+	codesign(thymioupgrader)
+
 endif ()

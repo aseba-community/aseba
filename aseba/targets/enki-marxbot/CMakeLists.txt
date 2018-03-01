@@ -10,3 +10,4 @@ set(enki_SRCS
 add_executable(asebamarxbot WIN32 ${enki_SRCS})
 
 target_link_libraries(asebamarxbot asebavmbuffer asebavm enkiviewer asebacommon)
+codesign(asebamarxbot)

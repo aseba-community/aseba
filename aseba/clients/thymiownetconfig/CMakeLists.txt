@@ -18,6 +18,7 @@ if (Qt5Widgets_FOUND)
 	target_link_libraries(thymiownetconfig Qt5::Widgets asebacommon asebadashelplugins)
 
 	install_qt_app(thymiownetconfig)
+	codesign(thymiownetconfig)
 
 endif ()
 

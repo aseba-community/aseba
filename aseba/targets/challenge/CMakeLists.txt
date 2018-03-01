@@ -17,3 +17,5 @@ add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS})
 
 target_link_libraries(asebachallenge asebavmbuffer asebavm enkiviewer asebacommon)
 install_qt_app(asebachallenge)
+
+codesign(asebachallenge)

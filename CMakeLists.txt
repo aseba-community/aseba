@@ -18,6 +18,8 @@ include(CMakeModules/aseba_conf.cmake)
 include(CMakeModules/dashel.cmake)
 include(CMakeModules/enki.cmake)
 include(CMakeModules/deployqt.cmake)
+include(CMakeModules/codesign.cmake)
+
 
 # testing and defines
 enable_testing()

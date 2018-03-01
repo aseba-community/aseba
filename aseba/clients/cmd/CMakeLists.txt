@@ -5,3 +5,4 @@ target_link_libraries(asebacmd asebacommon asebadashelplugins)
 install(TARGETS asebacmd RUNTIME
 	DESTINATION bin
 )
+codesign(asebacmd)
