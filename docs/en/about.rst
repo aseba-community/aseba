@@ -3,7 +3,7 @@ About Aseba
 
 Aseba is a set of tools which allow novices to program robots easily and efficiently.
 For these reasons, Aseba is well-suited for robotic education and research.
-Aseba is an open-source software created and maintained by
+Aseba is an open-source software created by
 Dr. Stéphane Magnenat with contributions from the community.
 
 More Specifically, Aseba is an event-based architecture for real-time

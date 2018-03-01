@@ -1,12 +1,12 @@
 # Aseba
 
-Copyright (C) 2007–2017:
-Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net) and other contributors, see [authors.txt](authors.txt) for details.
+Aseba is a set of tools which allow novices to program robots easily and efficiently.
+For these reasons, Aseba is well-suited for robotic education and research.
+Aseba is an open-source software created by [Dr. Stéphane Magnenat](http://stephane.magnenat.net) with contributions from the community.
+Copyright (C) 2007–2018 the authors, see [authors.txt](authors.txt) for details.
 Released under LGPL3, see [license.txt](license.txt) for details.
-	
-Aseba means **a**ctuator and **s**ensor **e**vent-**b**ased **a**rchitecture.
-It is a set of tools which allow beginners to program robots easily and efficiently.
-For more information, see: http://aseba.wikidot.com
+
+More informations are avaliable on [read the docs](http://aseba.readthedocs.io).
 
 ## Supported platforms
 
