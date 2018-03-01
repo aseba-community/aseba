@@ -176,8 +176,11 @@ Shift right the suffix of deque :math:`$Q$` starting at index :math:`$i$` by :ma
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Erase :math:`$k$` elements from deque :math:`$Q$` at index :math:`$i$` by shifting the suffix starting from :math:`$i+k$` left. Length :math:`$k$` should be the tuple size or a multiple.
 
+Example
+^^^^^^^
+
 Here is a simple motion queue, that accepts `operations` defined by a time and motor speeds, and executes them first-in, first-out.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. code::
 
     var operation[3] # Tuple of size 3
