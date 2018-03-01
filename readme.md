@@ -6,8 +6,6 @@ Aseba is an open-source software created by [Dr. Stéphane Magnenat](http://step
 Copyright (C) 2007–2018 the authors, see [authors.txt](authors.txt) for details.
 Released under LGPL3, see [license.txt](license.txt) for details.
 
-More informations are avaliable on [read the docs](http://aseba.readthedocs.io).
-
 ## Supported platforms
 
 The following platforms are supported:
@@ -18,7 +16,7 @@ The following platforms are supported:
 
 ## Use Aseba
 
-Informations on how to use Aseba is available on [http://aseba.wikidot.com](https://www.thymio.org/en:asebausermanual).
+Informations on how to use Aseba is available on [read the docs](http://aseba.readthedocs.io).
 
 If you use Aseba in an academic project leading to a publication, please cite:
 
