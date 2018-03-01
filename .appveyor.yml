@@ -74,8 +74,8 @@ install:
   - cmd: SET PATH=%PATH%;C:\Program Files (x86)\NSIS
 
   # Blockly deps
-  - if [%USE_VS_TOOLCHAIN%]==[true] python2 -m pip install -U pip setuptools wheel
-  - if [%USE_VS_TOOLCHAIN%]==[true] python2 -m pip install beautifulsoup4 lxml
+  - if [%USE_VS_TOOLCHAIN%]==[true] python -m pip install -U pip setuptools wheel
+  - if [%USE_VS_TOOLCHAIN%]==[true] python -m pip install beautifulsoup4 lxml
 
   - if [%COMPILER%]==[MinGW] appveyor DownloadFile %https://bootstrap.pypa.io/get-pip.py% -FileName get-pip.py
   - if [%COMPILER%]==[MinGW] (
