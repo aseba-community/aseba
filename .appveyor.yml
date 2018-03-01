@@ -74,11 +74,12 @@ install:
   - cmd: SET PATH=%PATH%;C:\Program Files (x86)\NSIS
 
   # Blockly deps
-  - if [%USE_VS_TOOLCHAIN%]==[true] python -m pip install -U pip setuptools wheel
-  - if [%USE_VS_TOOLCHAIN%]==[true] python -m pip install beautifulsoup4 lxml
+  - if [%USE_VS_TOOLCHAIN%]==[true] python2 -m pip install -U pip setuptools wheel
+  - if [%USE_VS_TOOLCHAIN%]==[true] python2 -m pip install beautifulsoup4 lxml
 
+  - if [%COMPILER%]==[MinGW] appveyor DownloadFile %https://bootstrap.pypa.io/get-pip.py% -FileName get-pip.py
   - if [%COMPILER%]==[MinGW] (
-      %BASH% -x -lc "python -m pip install -U pip setuptools wheel && python -m pip install beautifulsoup4 lxml"
+      %BASH% -x -lc "python2 get-pip.py --user && python2 -m pip install -U pip setuptools wheel && python2 -m pip install beautifulsoup4 lxml"
     )
 
 
@@ -125,6 +126,11 @@ environment:
   CMAKE_URL: https://cmake.org/files/v3.8/cmake-3.8.0-win64-x64.zip
   APPVEYOR_CACHE_ENTRY_ZIP_ARGS: "-t7z -m0=lzma -mx=5"
   matrix:
+    - COMPILER: MinGW
+      ARCH: x86
+      BASH: C:\msys64\usr\bin\bash
+      MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
+
     - ARCH: x86
       QT5: C:\Qt\5.10.0\msvc2015
       COMPILER: MSVC
@@ -134,11 +140,6 @@ environment:
       COMPILER: MSVC
       QT5: C:\Qt\5.10.0\msvc2017_64
       USE_VS_TOOLCHAIN: true
-
-    - COMPILER: MinGW
-      ARCH: x86
-      BASH: C:\msys64\usr\bin\bash
-      MSYS_CACHE: C:\msys64\var\cache\pacman\pkg
 
     - platform: x64
       COMPILER: MinGW
