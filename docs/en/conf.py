@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Aseba'
-copyright = u'2018, Stéphane Magnenat, Mobsya'
-author = u'Stéphane Magnenat, Mobsya'
+copyright = u'2007–2018, Stéphane Magnenat and other contributors'
+author = u'Stéphane Magnenat and other contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -143,7 +143,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Aseba.tex', u'Aseba Documentation',
-     u'Stéphane Magnenat, Mobsya', 'manual'),
+     u'Stéphane Magnenat and other contributors', 'manual'),
 ]
 
 
@@ -164,7 +164,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Aseba', u'Aseba Documentation',
-     author, 'Aseba', 'One line description of project.',
+     author, 'Aseba', 'A set of tools which allow beginners to program robots easily and efficiently.',
      'Miscellaneous'),
 ]
 
