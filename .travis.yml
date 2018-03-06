@@ -1,0 +1,75 @@
+language: cpp
+
+cache:
+  ccache: true
+  directories:
+    - $HOME/Library/Caches/Homebrew
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main'
+            - sourceline: 'ppa:corentinjabot/cmake-backport'
+          packages:
+            - g++-6
+            - clang-6.0
+            - cmake-data
+            - cmake
+            - libudev-dev
+            - qt5-qmake
+            - qtbase5-dev
+            - qttools5-dev
+            - qtbase5-dev-tools
+            - libqt5help5
+            - libqt5svg5-dev
+            - libqt5x11extras5-dev
+            - libqt5opengl5-dev
+            - libboost-python-dev
+            - ninja-build
+            - libxml2-dev
+            - libsdl2-dev
+            - libavahi-compat-libdnssd-dev
+            - valgrind
+            - lcov
+      env: COMPILER=clang-6.0  CXX_COMPILER=clang++-6.0
+
+    - os: osx
+      osx_image: xcode8
+      env: COMPILER=clang  CXX_COMPILER=clang++
+
+before_script:
+  - cd ${TRAVIS_BUILD_DIR}
+  - git clone https://github.com/cor3ntin/enki.git --branch fix_cmake
+  - git clone https://github.com/aseba-community/dashel.git --branch fix_includes
+
+before_install:
+  - |
+    set -e
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update
+      brew bundle
+    fi
+    set +e
+
+script:
+  - |
+    set -e
+    export CC=${COMPILER}
+    export CXX=${CXX_COMPILER}
+    export CFLAGS="-Wall -Wextra -Wno-unused-parameter"
+    export CXXFLAGS="-Wall -Wextra -Wno-unused-parameter"
+    cd ${TRAVIS_BUILD_DIR}
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      export CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:$(brew --prefix qt)"
+      #export PATH="(brew --prefix llvm)/bin:${PATH}"
+    fi
+
+    mkdir build && cd build
+    cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF .. #-DCMAKE_CXX_CLANG_TIDY="clang-tidy\;-checks=-clang-diagnostic-error,clang-analyzer-*"
+    ninja -v
+    #CTEST_OUTPUT_ON_FAILURE=1 ctest
+    set +e
