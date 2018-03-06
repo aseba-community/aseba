@@ -5,14 +5,18 @@ init:
 - git config --global core.autocrlf input
 #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://gist.githubusercontent.com/cor3ntin/1327dbf8aedab79f9fa305c001190268/raw/05155caad3a68c48be5f6873c3aca6ad8a30e31a/rdp.ps1'))
 
-shallow_clone: true
+clone_script:
+  - git clone --shallow-submodules --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git checkout %APPVEYOR_REPO_COMMIT%
+  - git submodule init
+  - git submodule update --recursive --remote
+  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git thymio-blockly-standalone --branch master --recurse-submodules
 
 matrix:
   fast_finish: true
 
 install:
-  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git %APPVEYOR_BUILD_FOLDER%\thymio-blockly-standalone --depth=1 --branch master --recurse-submodules
-
   - mkdir C:\projects\deps
   - cd C:\projects\deps
 

@@ -1,6 +1,7 @@
 # Aseba
 
 [![Build Status](https://travis-ci.org/aseba-community/aseba.svg?branch=master)](https://travis-ci.org/aseba-community/aseba)
+[![Build status](https://ci.appveyor.com/api/projects/status/5vyae6rhf7qonqv2/branch/master?svg=true)](https://ci.appveyor.com/project/cor3ntin/aseba-v3obg/branch/master)
 
 Aseba is a set of tools which allow novices to program robots easily and efficiently.
 For these reasons, Aseba is well-suited for robotic education and research.
