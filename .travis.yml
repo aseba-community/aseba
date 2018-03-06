@@ -43,8 +43,6 @@ matrix:
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
-  - git clone https://github.com/cor3ntin/enki.git --branch fix_cmake
-  - git clone https://github.com/aseba-community/dashel.git --branch fix_includes
 
 before_install:
   - |
