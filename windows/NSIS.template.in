@@ -1,0 +1,445 @@
+/*
+	Aseba - an event-based framework for distributed robot control
+	Copyright (C) 2007--2011:
+		Stephane Magnenat <stephane at magnenat dot net>
+		(http://stephane.magnenat.net)
+		and other contributors, see authors.txt for details
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published
+	by the Free Software Foundation, version 3 of the License.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+Unicode true
+
+
+  !define VERSION "@CPACK_PACKAGE_VERSION@"
+  !define PATCH  "@CPACK_PACKAGE_VERSION_PATCH@"
+  !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
+;--------------------------------
+;Includes
+
+  !include "MUI2.nsh"		; Modern UI 2
+  !include LogicLib.nsh		; ${If} statement
+  !include "WinVer.nsh"		; To test the Windows version
+  !define REGISTRY_KEY "Software\aseba"
+  !include "x64.nsh"		; x64 support
+  !include "..\..\..\resources\NSIS.definitions.nsh"
+  !AddIncludeDir "${INSTALLER_SOURCE_DIRECTORY}"
+
+  ; Compression
+  SetCompressor /SOLID lzma
+
+;--------------------------------
+;Defines
+  !define DRV_SRC "${INSTALLER_SOURCE_DIRECTORY}\thymio-drivers"
+  !define DRV_INF_WIN "${INSTALLER_SOURCE_DIRECTORY}\thymio-drivers\drivers\win_xp-7"
+  !define DRV_INF_WIN8 "${INSTALLER_SOURCE_DIRECTORY}\thymio-drivers\drivers\win_8"
+  !define DEVCON_SRC "${INSTALLER_SOURCE_DIRECTORY}\recover"
+
+  ShowInstDetails show
+  ShowUninstDetails show
+
+  ;Get installation folder from registry if available
+  InstallDirRegKey HKCU ${REGISTRY_KEY} ""
+
+  ;Remember the language selection
+  !define MUI_LANGDLL_REGISTRY_ROOT "HKCU"
+  !define MUI_LANGDLL_REGISTRY_KEY ${REGISTRY_KEY}
+  !define MUI_LANGDLL_REGISTRY_VALUENAME "Language"
+
+  RequestExecutionLevel admin
+
+;--------------------------------
+;Variables
+
+Var StartMenuFolder
+Var AlreadyInstalled
+
+;--------------------------------
+;Interface Settings
+
+  !define MUI_ABORTWARNING
+
+;--------------------------------
+;Language macros (from http://nsis.sourceforge.net/Creating_language_files_and_integrating_with_MUI)
+
+!macro LANG_LOAD LANGLOAD
+  !insertmacro MUI_LANGUAGE "${LANGLOAD}"
+  !include "translations\${LANGLOAD}.nsh"
+  !undef LANG
+!macroend
+
+!macro LANG_STRING NAME VALUE
+  LangString "${NAME}" "${LANG_${LANG}}" "${VALUE}"
+!macroend
+
+!macro LANG_UNSTRING NAME VALUE
+  !insertmacro LANG_STRING "un.${NAME}" "${VALUE}"
+!macroend
+
+; From: http://nsis.sourceforge.net/CreateInternetShortcut_macro_%26_function
+!macro CreateInternetShortcut FILENAME URL ICONFILE ICONINDEX
+  WriteINIStr "${FILENAME}.url" "InternetShortcut" "URL" "${URL}"
+  WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconFile" "${ICONFILE}"
+  WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
+!macroend
+
+; Convenience macro for the devel package
+!macro ASEBA_INSTALL_HEADER DIRECTORY
+	SetOutPath "$INSTDIR\include\aseba\${DIRECTORY}"
+	File "${ASEBA_SOURCE_DIRECTORY}\${DIRECTORY}\*.h"
+!macroend
+
+!macro ASEBA_INSTALL_HEADER_FILE DIRECTORY FILE
+	SetOutPath "$INSTDIR\include\aseba\${DIRECTORY}"
+	File "${ASEBA_SOURCE_DIRECTORY}\${DIRECTORY}\${FILE}"
+!macroend
+
+!macro CleanShortcuts un
+Function ${un}CleanShortcuts
+	DetailPrint $(STR_Clean)
+
+	DetailPrint $(STR_Uninst_Menu)
+	; Try both current user / all users
+	SetShellVarContext all		; current / all. Install program for all users
+	!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
+	RMDir /r "$SMPROGRAMS\$StartMenuFolder"
+
+	SetShellVarContext current		; current / all. Install program for all users
+	!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
+	RMDir /r "$SMPROGRAMS\$StartMenuFolder"
+
+	DetailPrint $(STR_Done)
+FunctionEnd
+!macroend
+
+!insertmacro CleanShortcuts ""
+!insertmacro CleanShortcuts "un."
+
+; Function WriteVersionFile
+; 	LogText "Writing version.txt"
+; 	FileOpen $0 "$INSTDIR\version.txt" w 	; Overwrite
+; 	FileWrite $0 "${VERSION}"
+; 	FileClose $0
+; FunctionEnd
+
+  ;Default installation folder
+  InstallDir "$PROGRAMFILES\AsebaStudio"
+
+;--------------------------------
+;Pages
+
+  !define MUI_WELCOMEPAGE_TITLE_3LINES		; Add extra space for the title on the welcome page
+  !insertmacro MUI_PAGE_WELCOME
+
+  ; Licence
+  !define MUI_LICENSEPAGE_TEXT_TOP $(STR_License_Top)
+  !insertmacro MUI_PAGE_LICENSE $(license)
+
+  ; Choose directory
+  !insertmacro MUI_PAGE_DIRECTORY
+
+  ;Start Menu Folder Page Configuration
+  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Aseba"
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGISTRY_KEY}
+  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+  !insertmacro MUI_PAGE_STARTMENU "Application" $StartMenuFolder
+
+  !insertmacro MUI_PAGE_INSTFILES
+
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+
+;Translations
+  !insertmacro LANG_LOAD "English"			; translations/English.nsh
+  !insertmacro LANG_LOAD "French"			; translations/French.nsh
+  !insertmacro LANG_LOAD "German"			; translations/German.nsh
+  !insertmacro LANG_LOAD "Italian"			; translations/Italian.nsh
+
+; License: only the english license is used, because FSF strongly discourage using an unofficial translation
+LicenseLangString license ${LANG_ENGLISH} "${ASEBA_SOURCE_DIRECTORY}\license.txt"
+LicenseLangString license ${LANG_FRENCH}  "${ASEBA_SOURCE_DIRECTORY}\license.txt"
+LicenseLangString license ${LANG_GERMAN}  "${ASEBA_SOURCE_DIRECTORY}\license.txt"
+LicenseLangString license ${LANG_ITALIAN} "${ASEBA_SOURCE_DIRECTORY}\license.txt"
+
+;--------------------------------
+;Name and file (Defined here to be translation-enabled)
+Name "@CPACK_NSIS_PACKAGE_NAME@"
+OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
+
+@CPACK_NSIS_DEFINES@
+
+
+
+SectionGroup /e "-Aseba" GroupAseba
+	Section "-CPack" CPack
+	SetOutPath "$INSTDIR"
+
+	@CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
+	@CPACK_NSIS_FULL_INSTALL@
+
+	SectionEnd
+	Section "-Menus" Menu
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\asebastudio.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\asebastudiothymio.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\thymiovpl.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\thymioupgrader.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\asebahelp.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\thymiownetconfig.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\thymiowebbridge.ico"
+		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\scratchblock.ico"
+
+; 		# Version file (version.txt)
+; 		Call WriteVersionFile
+;  		${If} $Language == '1036'
+;  			; French
+;  			File "README.fr.txt"
+;  		${ElseIf} $Language == '1031'
+;  			; German
+;  			File "README.de.txt"
+;  		${ElseIf} $Language == '1040'
+;  			; Italian
+;  			File "README.it.txt"
+;  		${Else}
+;  			File "README.en.txt"
+;  		${EndIf}
+
+		;Store installation folder
+		WriteRegStr HKCU ${REGISTRY_KEY} "" $INSTDIR
+
+		;Create uninstaller
+		WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+		; Populate the start menu
+		${If} $AlreadyInstalled == "true"
+			; Clean old shortcuts
+			Call CleanShortcuts
+		${EndIf}
+		SetShellVarContext current
+		SetOutPath "$DOCUMENTS"		; Working directory for the shortcut
+		SetShellVarContext all		; current / all. Install program for all users
+		!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+			; Application
+			CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Uninstall).lnk" "$INSTDIR\Uninstall.exe"
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Package_Name).lnk" "$INSTDIR\bin\asebastudio.exe" "" "$INSTDIR\asebastudio.ico"		; Regular Aseba Studio
+			; Doc
+			CreateDirectory "$SMPROGRAMS\$StartMenuFolder\$(STR_Doc_Dir)"
+;  			${If} $Language == '1036'
+;  				; French
+;  				!insertmacro CreateInternetShortcut "$SMPROGRAMS\$StartMenuFolder\$(STR_Doc_Dir)\$(STR_Doc_Browser_Online)" "https://www.thymio.org/fr:start" "$INSTDIR\asebahelp.ico" "0"
+;  			${ElseIf} $Language == '1031'
+;  				; German
+;  				!insertmacro CreateInternetShortcut "$SMPROGRAMS\$StartMenuFolder\$(STR_Doc_Dir)\$(STR_Doc_Browser_Online)" "https://www.thymio.org/de:start" "$INSTDIR\asebahelp.ico" "0"
+;  			${ElseIf} $Language == '1040'
+;  				; Italian
+;  				!insertmacro CreateInternetShortcut "$SMPROGRAMS\$StartMenuFolder\$(STR_Doc_Dir)\$(STR_Doc_Browser_Online)" "https://www.thymio.org/it:start" "$INSTDIR\asebahelp.ico" "0"
+;  			${Else}
+;  				!insertmacro CreateInternetShortcut "$SMPROGRAMS\$StartMenuFolder\$(STR_Doc_Dir)\$(STR_Doc_Browser_Online)" "https://www.thymio.org/en:start" "$INSTDIR\asebahelp.ico" "0"
+;  			${EndIf}
+			; Thymio stuff?
+			; Aseba Thymio without auto-refresh
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Package_Name_Thymio).lnk" "$INSTDIR\bin\asebastudio.exe" "ser:name=Thymio-II" "$INSTDIR\asebastudiothymio.ico"
+			; Thymio VPL
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Thymio VPL.lnk" "$INSTDIR\bin\thymiovpl.exe" "ser:name=Thymio" "$INSTDIR\thymiovpl.ico"
+			; Thymio Blockly
+			!insertmacro CreateInternetShortcut "$SMPROGRAMS\$StartMenuFolder\Thymio Blockly" "file://$INSTDIR/thymio-blockly-standalone/index.html" "$INSTDIR\scratchblock.ico" "0"
+			; Thymio flasher
+			; CreateDirectory "$SMPROGRAMS\$StartMenuFolder\Thymio Firmware Upgrader"
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Thymio Firmware Upgrader.lnk" "$INSTDIR\bin\thymioupgrader.exe" "" "$INSTDIR\thymioupgrader.ico"
+			; Thymio wireless configurator
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Wireless Thymio Network Configurator.lnk" "$INSTDIR\bin\thymiownetconfig.exe" "" "$INSTDIR\thymiownetconfig.ico"
+			; Thymio asebahttp bridge
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Thymio Web Bridge.lnk" "$INSTDIR\bin\asebahttp.exe" "--autorestart -s 33333 ser:name=Thymio" "$INSTDIR\thymiowebbridge.ico"
+			CreateDirectory "$SMPROGRAMS\$StartMenuFolder\$(STR_Simulations)"
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Simulations)\Aseba Challenge.lnk" "$INSTDIR\bin\asebachallenge.exe" "" "$INSTDIR\asebachallenge.ico"
+			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Simulations)\Aseba Playground.lnk" "$INSTDIR\bin\asebaplayground.exe" "" "$INSTDIR\asebaplayground.ico"
+		!insertmacro MUI_STARTMENU_WRITE_END
+
+		@CPACK_NSIS_EXTRA_INSTALL_COMMANDS@
+	SectionEnd
+
+SectionGroupEnd
+Section "-Install the driver" InstDriver	; Hidden section -> always executed
+	CreateDirectory "$INSTDIR\drivers"
+	SetOutPath "$INSTDIR\drivers"
+
+	DetailPrint $(STR_Drv_Install)
+
+	${If} ${AtLeastWin8}
+		; Windows 8 or above
+		DetailPrint "We are on Windows 8 (or above)"
+		File "${DRV_INF_WIN8}\mchpcdc.inf"
+		File "${DRV_INF_WIN8}\mchpcdcw.inf"
+		File "${DRV_INF_WIN8}\mchpcdc.cat"
+		File "${DRV_INF_WIN8}\mchpcdcw.cat"
+	${Else}
+		; Other windows (XP)
+		DetailPrint "We are on Windows XP or above"
+		File "${DRV_INF_WIN}\mchpcdc.inf"
+		File "${DRV_INF_WIN}\mchpcdcw.inf"
+		File "${DRV_INF_WIN}\mchpcdc.cat"
+		File "${DRV_INF_WIN}\mchpcdcw.cat"
+	${EndIf}
+
+	File "${DRV_SRC}\dpinst32.exe"
+	File "${DRV_SRC}\dpinst64.exe"
+
+	${If} ${RunningX64}
+		DetailPrint $(STR_Drv_64bits)
+		ExecWait '"$INSTDIR\drivers\dpinst64.exe" /c /sa /lm /sw /PATH "$INSTDIR\drivers"' $0
+	${Else}
+		DetailPrint $(STR_Drv_32bits)
+		ExecWait '"$INSTDIR\drivers\dpinst32.exe" /c /sa /lm /sw /PATH "$INSTDIR\drivers"' $0
+	${EndIf}
+	DetailPrint "$(STR_Drv_Return_Code) $0"
+	IntCmpU $0 0x80000000 drv_error no_error drv_error
+	drv_error:
+		DetailPrint $(STR_Drv_Problem)
+		Goto done
+	no_error:
+		DetailPrint $(STR_Done)
+	done:
+SectionEnd
+
+; Section "-Install devcon" InstDevcon	; Hidden section -> always executed
+; 	SetOutPath "$INSTDIR"
+; 	File "${DEVCON_SRC}\restart.bat"
+; 	File "${DEVCON_SRC}\restartusb.exe"
+;
+; 	SetShellVarContext all		; current / all. Install program for all users
+; 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+; 		CreateDirectory "$SMPROGRAMS\$StartMenuFolder\$(STR_Tools)"
+; 		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\$(STR_Tools)\$(STR_USB_Restart).lnk" "$INSTDIR\restart.bat" "$INSTDIR"
+; 	!insertmacro MUI_STARTMENU_WRITE_END
+; SectionEnd
+
+Section "-Install Bonjour" InstBonjour	; Hidden section -> always executed
+	SetOutPath "$INSTDIR"
+
+	File "${BONJOUR64_MSI}"
+	File "${BONJOUR_MSI}"
+
+	${If} ${RunningX64}
+		DetailPrint $(Bonjour_64bits)
+		ExecWait '"msiexec" /i "$INSTDIR\Bonjour64.msi"  /passive'
+	${Else}
+		DetailPrint $(Bonjour_32bits)
+		ExecWait '"msiexec" /i "$INSTDIR\Bonjour.msi"  /passive'
+	${EndIf}
+SectionEnd
+
+
+Section "-PostInstall"
+	DetailPrint "Post install..."
+
+	; Black voodoo to order the menu correctly
+	DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\MenuOrder\Start Menu\Programs\Aseba Studio"
+	DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\MenuOrder\Start Menu2\Programs\Aseba Studio"
+
+	DetailPrint "Done."
+SectionEnd
+
+; First function to be executed by the installer
+Function .onInit
+	; Display the "Language Select" menu
+	!insertmacro MUI_LANGDLL_DISPLAY
+	InitPluginsDir
+
+	; Check for a previous installation
+	ReadRegStr $0 HKCU ${REGISTRY_KEY} ""	; Read installation folder
+	${If} $0 != ""
+		DetailPrint "Previous installation detected at $0"
+		StrCpy $AlreadyInstalled "true"
+		MessageBox MB_YESNO $(STR_Previous_Install) /SD IDYES IDNO cancel IDYES ok
+		cancel:
+			Abort
+		ok:
+	${Else}
+		StrCpy $AlreadyInstalled "false"
+	${EndIf}
+
+FunctionEnd
+
+; First function to be executed by the uninstaller
+Function un.onInit
+  ; Get the language preference from the registry
+  !insertmacro MUI_UNGETLANGUAGE
+FunctionEnd
+  Name "@CPACK_NSIS_PACKAGE_NAME@"
+  OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
+
+;--------------------------------
+;Uninstaller Section
+
+Section "Uninstall"
+	; Remove the driver
+	${If} ${FileExists} "$INSTDIR\drivers\mchpcdc.inf"
+		; Driver was installed
+		DetailPrint $(STR_Drv_Uninstall)
+		${If} ${RunningX64}
+			DetailPrint $(STR_Drv_64bits)
+			ExecWait '"$INSTDIR\drivers\dpinst64.exe" /c /u "$INSTDIR\drivers\mchpcdc.inf" /d'
+			${If} ${FileExists} "$INSTDIR\drivers\mchpcdcw.inf"
+				; Driver was installed
+				ExecWait '"$INSTDIR\drivers\dpinst64.exe" /c /u "$INSTDIR\drivers\mchpcdcw.inf" /d'
+			${EndIf}
+		${Else}
+			DetailPrint $(STR_Drv_32bits)cer
+			ExecWait '"$INSTDIR\drivers\dpinst32.exe" /c /u "$INSTDIR\drivers\mchpcdc.inf" /d'
+			${If} ${FileExists} "$INSTDIR\drivers\mchpcdcw.inf"
+				; Driver was installed
+				ExecWait '"$INSTDIR\drivers\dpinst32.exe" /c /u "$INSTDIR\drivers\mchpcdcw.inf" /d'
+			${EndIf}
+		${EndIf}
+
+		${If} ${AtLeastWin7}
+			; Windows 7 or above
+			; We must uninstall our certificate
+			DetailPrint "Uninstalling the security certificate..."
+			${If} ${RunningX64}
+				ExecWait '"$INSTDIR\drivers\certmgr_x64.exe" -del -c -n "Mobsya" -s -r LocalMachine root' $0
+			${Else}
+				ExecWait '"$INSTDIR\drivers\certmgr_x86.exe" -del -c -n "Mobsya" -s -r LocalMachine root' $0
+			${EndIf}
+			DetailPrint "Done."
+			IntCmp $0 0x0 cert_un_ok cert_un_error cert_un_error
+			cert_un_ok:
+				DetailPrint "Certificate uninstalled"
+				Goto cert_un_done
+			cert_un_error:
+				DetailPrint "A problem occured"
+			cert_un_done:
+			; Done
+		${EndIf}
+
+		RMDir /r "$INSTDIR\drivers"
+		DetailPrint $(STR_Done)
+	${EndIf}
+
+	@CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
+	;Remove files we installed.
+	;Keep the list of directories here in sync with the File commands above.
+	@CPACK_NSIS_DELETE_FILES@
+	@CPACK_NSIS_DELETE_DIRECTORIES@
+
+	; Remove the application
+	DetailPrint $(STR_Uninst_Folder)
+	RMDir /r "$INSTDIR"
+	DetailPrint $(STR_Done)
+
+	Call un.CleanShortcuts
+
+	DeleteRegKey HKCU ${REGISTRY_KEY}
+	DetailPrint $(STR_Done)
+SectionEnd

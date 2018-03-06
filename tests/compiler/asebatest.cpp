@@ -1,11 +1,11 @@
 // Aseba
-#include "../../compiler/compiler.h"
-#include "../../vm/vm.h"
-#include "../../vm/natives.h"
-#include "../../common/consts.h"
-#include "../../common/msg/msg.h"
-#include "../../common/utils/utils.h"
-#include "../../common/utils/FormatableString.h"
+#include "compiler/compiler.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
+#include "common/consts.h"
+#include "common/msg/msg.h"
+#include "common/utils/utils.h"
+#include "common/utils/FormatableString.h"
 using namespace Aseba;
 
 // C++

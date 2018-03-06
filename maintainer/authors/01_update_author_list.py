@@ -22,9 +22,11 @@
 import os.path
 import re
 
-top_level_path = "../.."
+SCRIPT_DIRECTORY = sys.path[0]
+
+top_level_path = os.path.join(SCRIPT_DIRECTORY, "..", "..")
 authors_source_file = os.path.join(top_level_path, "authors.txt")
-authors_dest_file = os.path.join(top_level_path, "common/authors.h")
+authors_dest_file = os.path.join(top_level_path, "aseba/common/authors.h")
 
 authors_file_head = \
 """\

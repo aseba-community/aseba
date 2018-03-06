@@ -18,10 +18,10 @@
 */
 
 // Aseba
-#include "../../transport/buffer/vm-buffer.h"
-#include "../../vm/vm.h"
-#include "../../vm/natives.h"
-#include "../../common/consts.h"
+#include "transport/buffer/vm-buffer.h"
+#include "vm/vm.h"
+#include "vm/natives.h"
+#include "common/consts.h"
 
 // C++
 #include <iostream>

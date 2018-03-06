@@ -66,13 +66,11 @@ if(WIN32)
   else()
     set(_dnssd_lib_paths "$ENV{ProgramW6432}/Bonjour SDK")
   endif()
-else()
-  list(APPEND _dnssd_lib_paths /usr /usr/local /opt/local /opt)
 endif()
+list(APPEND _dnssd_lib_paths /usr /usr/local /opt/local /opt  $ENV{DNSSD_ROOT} ${DNSSD_ROOT})
 
 find_path(_dnssd_INCLUDE_DIR dns_sd.h
-  HINTS $ENV{DNSSD_ROOT} ${DNSSD_ROOT}
-  PATH_SUFFIXES include
+  PATH_SUFFIXES include Include
   PATHS ${_dnssd_lib_paths}
   )
 
@@ -95,22 +93,20 @@ endif()
 
 if(APPLE)
   find_library(_dnssd_LIBRARY System
-    HINTS $ENV{DNSSD_ROOT} ${DNSSD_ROOT}
     PATH_SUFFIXES lib PATHS ${_dnssd_lib_paths}
     )
 elseif(WIN32)
-  if("${CMAKE_SHARED_LINKER_FLAGS}" MATCHES "x64")
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(_dnssd_lib_postfix "x64")
   else()
     set(_dnssd_lib_postfix "Win32")
   endif()
-  find_library(_dnssd_LIBRARY dnssd.lib
-    HINTS $ENV{DNSSD_ROOT} ${DNSSD_ROOT}
-    PATH_SUFFIXES lib
-    PATHS ${_dnssd_lib_paths}/Lib/${_dnssd_lib_postfix})
+  find_library(_dnssd_LIBRARY dnssd
+    PATH_SUFFIXES Lib/${_dnssd_lib_postfix} lib/${_dnssd_lib_postfix}
+    PATHS ${_dnssd_lib_paths}
+  )
 else()
   find_library(_dnssd_LIBRARY dns_sd
-    HINTS $ENV{DNSSD_ROOT} ${DNSSD_ROOT}
     PATH_SUFFIXES lib PATHS ${_dnssd_lib_paths}
     )
 endif()

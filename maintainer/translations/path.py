@@ -21,17 +21,19 @@
 import sys
 import os.path
 
-QTABOUT_PATH = "../../common/about/"
-STUDIO_PATH = "../../clients/studio/"
-COMPILER_PATH = "../../compiler"
-PLAYGROUND_PATH = "../../targets/playground/"
-CHALLENGE_PATH = "../../targets/challenge/"
-THYMIOUPGRADER_PATH = "../../clients/thymioupgrader/"
-THYMIOWNETCONFIG_PATH = "../../clients/thymiownetconfig/"
+SCRIPT_DIRECTORY = sys.path[0]
+SOURCES_DIRECTORY = os.path.join(SCRIPT_DIRECTORY, "..", "..", "aseba")
+
+QTABOUT_PATH   = os.path.join(SOURCES_DIRECTORY, "common", "about")
+STUDIO_PATH    = os.path.join(SOURCES_DIRECTORY, "clients", "studio")
+COMPILER_PATH  = os.path.join(SOURCES_DIRECTORY, "compiler")
+PLAYGROUND_PATH = os.path.join(SOURCES_DIRECTORY, "targets", "playground")
+CHALLENGE_PATH = os.path.join(SOURCES_DIRECTORY, "targets", "challenge")
+THYMIOUPGRADER_PATH = os.path.join(SOURCES_DIRECTORY, "clients", "thymioupgrader")
+THYMIOWNETCONFIG_PATH = os.path.join(SOURCES_DIRECTORY, "clients", "thymiownetconfig")
 
 # will be the working directory
-my_path = os.path.dirname(os.path.abspath(sys.argv[0])) # getcwd won't work in all cases
-updatedoc_path = os.path.abspath(os.path.join(my_path, "../updatedoc/"))
+updatedoc_path = os.path.abspath(os.path.join(SCRIPT_DIRECTORY, "../updatedoc/"))
 qtabout_path = os.path.abspath(QTABOUT_PATH)
 compiler_path = os.path.abspath(COMPILER_PATH)
 studio_path = os.path.abspath(STUDIO_PATH)
@@ -54,7 +56,7 @@ vpl_path = os.path.join(plugin_path, "ThymioVPL/")
 # path to file that must be updated when adding a new language
 dashel_target = os.path.join(studio_path, "DashelTarget.cpp")
 studio_qrc = os.path.join(studio_path, "asebastudio.qrc")
-sync_compiler_py = os.path.join(my_path, "sync_compiler_translation.py")
+sync_compiler_py = os.path.join(SCRIPT_DIRECTORY, "sync_compiler_translation.py")
 updatedoc = os.path.join(updatedoc_path, "updatedoc.py")
 challenge_cpp = os.path.join(challenge_path, "challenge.cpp")
 challenge_qrc = os.path.join(challenge_path, "challenge-textures.qrc")

@@ -155,11 +155,19 @@ Insert tuple :math:`$A$` after the last tuple in deque :math:`$Q$`.
 :code:`deque.pop_front(Q,A)`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Remove the first :math:`length($A$)` elements of deque :math:`$Q$` and place them in tuple :math:`$A$`.
+<<<<<<< HEAD
 
 :code:`deque.pop_back(Q,A)`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Remove the last :math:`length($A$)` elements of deque :math:`$Q$` and place them in tuple :math:`$A$`.
 
+=======
+
+:code:`deque.pop_back(Q,A)`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Remove the last :math:`length($A$)` elements of deque :math:`$Q$` and place them in tuple :math:`$A$`.
+
+>>>>>>> nsis
 :code:`deque.get(Q,A,i)`
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Copy into tuple :math:`$A$` , :math:`length($A$)` elements from deque :math:`$Q$` starting from index :math:`$i$`.
