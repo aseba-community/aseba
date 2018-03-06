@@ -269,7 +269,7 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location line="+41"/>
+        <location line="+39"/>
         <source>Wireless Thymio found</source>
         <oldsource>Wireless Thymio II found</oldsource>
         <translation>Wireless Thymio encontró</translation>

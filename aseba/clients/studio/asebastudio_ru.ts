@@ -4,7 +4,7 @@
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
-        <location filename="AeslEditor.cpp" line="+501"/>
+        <location filename="AeslEditor.cpp" line="+500"/>
         <source>Clear breakpoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -22,7 +22,7 @@
 <context>
     <name>Aseba::CompilationLogDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="+163"/>
+        <location filename="MainWindow.cpp" line="+162"/>
         <source>Aseba Studio: Output of last compilation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,7 +30,7 @@
 <context>
     <name>Aseba::ConfigDialog</name>
     <message>
-        <location filename="ConfigDialog.cpp" line="+275"/>
+        <location filename="ConfigDialog.cpp" line="+274"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
@@ -58,7 +58,7 @@
 <context>
     <name>Aseba::ConstantsModel</name>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="+314"/>
+        <location filename="NamedValuesVectorModel.cpp" line="+313"/>
         <source>Constant already defined</source>
         <translation type="unfinished"></translation>
     </message>
@@ -81,7 +81,7 @@
 <context>
     <name>Aseba::DashelConnectionDialog</name>
     <message>
-        <location filename="DashelTarget.cpp" line="+87"/>
+        <location filename="DashelTarget.cpp" line="+86"/>
         <source>Discovered targets</source>
         <translation type="unfinished"></translation>
     </message>
@@ -111,7 +111,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+28"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
@@ -200,7 +200,7 @@
 <context>
     <name>Aseba::EventViewer</name>
     <message>
-        <location filename="EventViewer.cpp" line="+96"/>
+        <location filename="EventViewer.cpp" line="+95"/>
         <source>Time (seconds)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -255,7 +255,7 @@
 <context>
     <name>Aseba::FindDialog</name>
     <message>
-        <location filename="FindDialog.cpp" line="+41"/>
+        <location filename="FindDialog.cpp" line="+40"/>
         <source>Aseba Studio - Search and Replace</source>
         <translation type="unfinished"></translation>
     </message>
@@ -364,7 +364,7 @@ Occurrences</source>
 <context>
     <name>Aseba::HelpViewer</name>
     <message>
-        <location filename="HelpViewer.cpp" line="+59"/>
+        <location filename="HelpViewer.cpp" line="+58"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1307,7 +1307,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetFunctionsModel</name>
     <message>
-        <location filename="TargetModels.cpp" line="+610"/>
+        <location filename="TargetModels.cpp" line="+609"/>
         <location line="+19"/>
         <source>hidden</source>
         <translation type="unfinished"></translation>
@@ -1327,88 +1327,9 @@ event %0 : </source>
     </message>
 </context>
 <context>
-    <name>Aseba::ThymioBlockly::ThymioBlockly</name>
-    <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
-        <source>Thymio Blockly Interface</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Save as</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Load &amp; Run</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Stop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Screenshot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+61"/>
-        <source>Blockly for Thymio robot allows to program by visually assembling elements.
-Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Export program as image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Launch Blockly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+138"/>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>Aseba::ThymioVPL::Block</name>
     <message>
-        <location filename="plugins/ThymioVPL/Block.cpp" line="+131"/>
+        <location filename="plugins/ThymioVPL/Block.cpp" line="+132"/>
         <source>buttons</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1476,7 +1397,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::EventActionsSet</name>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+616"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+615"/>
         <location line="+20"/>
         <source>Loading</source>
         <translation type="unfinished"></translation>
@@ -1495,7 +1416,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
         <source>Thymio Visual Programming Language</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1638,7 +1559,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::UsageLogger</name>
     <message>
-        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+75"/>
+        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+74"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1651,7 +1572,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPLStandalone</name>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="+172"/>
+        <location filename="ThymioVPLStandalone.cpp" line="+170"/>
         <source>Connecting to Thymio...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1740,7 +1661,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>QObject</name>
     <message>
-        <location line="-466"/>
+        <location line="-468"/>
         <source>Unexpected Dashel Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1750,7 +1671,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+58"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+57"/>
         <source>Compilation success</source>
         <translation type="unfinished"></translation>
     </message>

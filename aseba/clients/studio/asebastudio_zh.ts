@@ -4,7 +4,7 @@
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
-        <location filename="AeslEditor.cpp" line="+499"/>
+        <location filename="AeslEditor.cpp" line="+500"/>
         <source>Clear breakpoint</source>
         <translation>取消断点</translation>
     </message>
@@ -30,7 +30,7 @@
 <context>
     <name>Aseba::ConfigDialog</name>
     <message>
-        <location filename="ConfigDialog.cpp" line="+275"/>
+        <location filename="ConfigDialog.cpp" line="+274"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
@@ -58,7 +58,7 @@
 <context>
     <name>Aseba::ConstantsModel</name>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="+319"/>
+        <location filename="NamedValuesVectorModel.cpp" line="+313"/>
         <source>Constant already defined</source>
         <translation>常量已定义</translation>
     </message>
@@ -101,7 +101,7 @@
         <translation type="vanished">用户</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="+87"/>
+        <location filename="DashelTarget.cpp" line="+86"/>
         <source>Discovered targets</source>
         <translation>已发现的目标</translation>
     </message>
@@ -131,7 +131,7 @@
         <translation>文档</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+28"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
@@ -275,7 +275,7 @@
 <context>
     <name>Aseba::FindDialog</name>
     <message>
-        <location filename="FindDialog.cpp" line="+41"/>
+        <location filename="FindDialog.cpp" line="+40"/>
         <source>Aseba Studio - Search and Replace</source>
         <translation>Aseba Studio - 搜索并替换</translation>
     </message>
@@ -384,7 +384,7 @@ Occurrences</source>
 <context>
     <name>Aseba::HelpViewer</name>
     <message>
-        <location filename="HelpViewer.cpp" line="+59"/>
+        <location filename="HelpViewer.cpp" line="+58"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
         <translation>帮助文档%0未加载成功.错误为:%1.帮助文件应该在系统的临时目录下.请检查你的安装,或者报告错误.</translation>
     </message>
@@ -505,7 +505,7 @@ Occurrences</source>
 <context>
     <name>Aseba::MainWindow</name>
     <message>
-        <location filename="MainWindow.cpp" line="+1443"/>
+        <location filename="MainWindow.cpp" line="+1448"/>
         <source>Event number %0</source>
         <translation>事件数量%0</translation>
     </message>
@@ -514,7 +514,7 @@ Occurrences</source>
         <translation type="vanished">&lt;h1&gt;关于Aseba&lt;/h1&gt;版本信息&lt;ul&gt;&lt;li&gt;Aseba版本: %0&lt;br/&gt;(build版本. %1/协议版本. %2)&lt;/li&gt;&lt;li&gt;Dashel版本. %3&lt;br/&gt;(支持的数据流类型: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;更多资料 &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; 以及其他参与者 (click &quot;Show details&quot; for full list)&lt;/p&gt;&lt;p&gt;Aseb为开源项目,许可证 &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL版本 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+1726"/>
+        <location line="+1733"/>
         <source>http://aseba.wikidot.com/en:start</source>
         <translation>http://aseba.wikidot.com/en:start</translation>
     </message>
@@ -523,7 +523,7 @@ Occurrences</source>
         <translation type="vanished">关于Aseba Studio</translation>
     </message>
     <message>
-        <location line="-1684"/>
+        <location line="-1691"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
         <translation>Aseba Studio是应用文字编程语言对机器人进行编程的编程环境</translation>
     </message>
@@ -533,7 +533,7 @@ Occurrences</source>
         <translation>https://www.thymio.org/zh:asebastudio</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+77"/>
         <source>Open Script</source>
         <translation>打开脚本</translation>
     </message>
@@ -647,12 +647,12 @@ Occurrences</source>
     </message>
     <message>
         <location line="+136"/>
-        <location line="+550"/>
+        <location line="+552"/>
         <source>Add a new event</source>
         <translation>添加新事件</translation>
     </message>
     <message>
-        <location line="-550"/>
+        <location line="-552"/>
         <location line="+91"/>
         <source>Name:</source>
         <translation>名称:</translation>
@@ -690,18 +690,18 @@ Occurrences</source>
     </message>
     <message>
         <location line="+53"/>
-        <location line="+393"/>
+        <location line="+395"/>
         <source>Add a new constant</source>
         <translation>添加新常量</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-395"/>
         <source>Value</source>
         <comment>Value assigned to the constant</comment>
         <translation>值</translation>
     </message>
     <message>
-        <location line="+138"/>
+        <location line="+140"/>
         <source>
 event %0 : </source>
         <translation>事件%0 :</translation>
@@ -1173,7 +1173,7 @@ event %0 : </source>
 <context>
     <name>Aseba::NewNamedValueDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="-2169"/>
+        <location filename="MainWindow.cpp" line="-2176"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
         <translation>名称</translation>
@@ -1188,18 +1188,18 @@ event %0 : </source>
 <context>
     <name>Aseba::NodeTab</name>
     <message>
-        <location line="-1089"/>
+        <location line="-1094"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
         <translation>&lt;b&gt;关键词&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+21"/>
-        <location line="+738"/>
+        <location line="+739"/>
         <source>unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location line="-736"/>
+        <location line="-737"/>
         <source>Load</source>
         <translation>加载</translation>
     </message>
@@ -1210,14 +1210,13 @@ event %0 : </source>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+315"/>
-        <location line="+561"/>
-        <location line="+14"/>
+        <location line="+879"/>
+        <location line="+15"/>
         <source>Run</source>
         <translation>运行</translation>
     </message>
     <message>
-        <location line="-888"/>
+        <location line="-891"/>
         <source>Next</source>
         <translation>下一个</translation>
     </message>
@@ -1303,12 +1302,12 @@ event %0 : </source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>step by step</source>
         <translation>一步一步执行</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>stopped</source>
         <translation>已停止</translation>
     </message>
@@ -1342,7 +1341,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetFunctionsModel</name>
     <message>
-        <location filename="TargetModels.cpp" line="+602"/>
+        <location filename="TargetModels.cpp" line="+609"/>
         <location line="+19"/>
         <source>hidden</source>
         <translation>隐藏</translation>
@@ -1351,7 +1350,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetVariablesModel</name>
     <message>
-        <location line="-441"/>
+        <location line="-445"/>
         <source>names</source>
         <translation>名称</translation>
     </message>
@@ -1364,86 +1363,66 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
         <source>Thymio Blockly Interface</source>
-        <translation>Thymio模块化界面</translation>
+        <translation type="vanished">Thymio模块化界面</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>New</source>
-        <translation>新建</translation>
+        <translation type="vanished">新建</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Open</source>
-        <translation>打开</translation>
+        <translation type="vanished">打开</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save as</source>
-        <translation>另存为</translation>
+        <translation type="vanished">另存为</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Load &amp; Run</source>
-        <translation>加载并运行</translation>
+        <translation type="vanished">加载并运行</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation type="vanished">停止</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Help</source>
-        <translation>帮助</translation>
+        <translation type="vanished">帮助</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Screenshot</source>
-        <translation>截屏</translation>
+        <translation type="vanished">截屏</translation>
     </message>
     <message>
-        <location line="+61"/>
-        <source>Blockly for Thymio robot allows to program by visually assembling elements.
-Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation>http://aseba.wikidot.com/en:blocklyprogramming</translation>
+        <translation type="vanished">http://aseba.wikidot.com/en:blocklyprogramming</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Export program as image</source>
-        <translation>将程序输出为图像</translation>
+        <translation type="vanished">将程序输出为图像</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Launch Blockly</source>
-        <translation>启动模块</translation>
+        <translation type="vanished">启动模块</translation>
     </message>
     <message>
-        <location line="+138"/>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation type="vanished">警告</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation>模块化文件已被修改.是否保存改动?</translation>
+        <translation type="vanished">模块化文件已被修改.是否保存改动?</translation>
     </message>
 </context>
 <context>
     <name>Aseba::ThymioVPL::Block</name>
     <message>
-        <location filename="plugins/ThymioVPL/Block.cpp" line="+131"/>
+        <location filename="plugins/ThymioVPL/Block.cpp" line="+132"/>
         <source>buttons</source>
         <translation>按钮</translation>
     </message>
@@ -1511,7 +1490,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::EventActionsSet</name>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+616"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+615"/>
         <location line="+20"/>
         <source>Loading</source>
         <translation>加载中</translation>
@@ -1530,7 +1509,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Thymio可视化程序设计语言</translation>
     </message>
@@ -1677,7 +1656,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::UsageLogger</name>
     <message>
-        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+75"/>
+        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+74"/>
         <source>Login</source>
         <translation>登陆</translation>
     </message>
@@ -1690,18 +1669,18 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPLStandalone</name>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="+172"/>
+        <location filename="ThymioVPLStandalone.cpp" line="+170"/>
         <source>Connecting to Thymio...</source>
         <translation>与Thymio连接中...</translation>
     </message>
     <message>
         <location line="+102"/>
-        <location line="+222"/>
+        <location line="+223"/>
         <source>Thymio VPL Error</source>
         <translation>Thymio VPL错误</translation>
     </message>
     <message>
-        <location line="-221"/>
+        <location line="-222"/>
         <source>You need to connect a Thymio II to use this application.</source>
         <translation>这个应用需要连接一个Thymio II机器人.</translation>
     </message>
@@ -1711,7 +1690,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation>保存脚本</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+70"/>
         <source>Open Script</source>
         <translation>打开脚本</translation>
     </message>
@@ -1779,7 +1758,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>QObject</name>
     <message>
-        <location line="-465"/>
+        <location line="-468"/>
         <source>Unexpected Dashel Error</source>
         <translation>异常的Dashel错误</translation>
     </message>
@@ -1789,7 +1768,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation>出现一个通讯错误:</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+58"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+57"/>
         <source>Compilation success</source>
         <translation>编译成功</translation>
     </message>

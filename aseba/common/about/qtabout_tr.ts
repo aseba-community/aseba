@@ -4,7 +4,7 @@
 <context>
     <name>Aseba::AboutBox</name>
     <message>
-        <location filename="AboutDialog.cpp" line="+85"/>
+        <location filename="AboutDialog.cpp" line="+84"/>
         <source>Version %1</source>
         <translation type="unfinished"></translation>
     </message>

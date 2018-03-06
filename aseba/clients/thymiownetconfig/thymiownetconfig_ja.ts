@@ -80,7 +80,7 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location line="+51"/>
+        <location line="+49"/>
         <source>Wireless Thymio dongle not found</source>
         <translation>ワイヤレスThymioドングルが見つかりません</translation>
     </message>

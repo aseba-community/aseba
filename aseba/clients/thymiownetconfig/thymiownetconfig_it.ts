@@ -109,7 +109,7 @@
         <translation type="obsolete">&lt;p&gt;&lt;b&gt;Plus d&apos;un dongle pour Thymio Wireless trouvés !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connectez un seul dongle à votre ordinateur et réessayez.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+49"/>
         <source>&lt;p&gt;&lt;b&gt;Cannot find a Wireless Thymio dongle!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Plug a dongle into one of your USB ports and try again.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Non riesco a trovare un Dongle Wireless Thymio!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Collega un Dongle in una delle porte USB libere e riprova.&lt;/p&gt;</translation>
     </message>

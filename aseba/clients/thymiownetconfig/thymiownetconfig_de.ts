@@ -109,7 +109,7 @@
         <translation type="obsolete">&lt;p&gt;&lt;b&gt;Plus d&apos;un dongle pour Thymio Wireless trouvés !&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Connectez un seul dongle à votre ordinateur et réessayez.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+49"/>
         <source>Wireless Thymio dongle not found</source>
         <translation>Wireless Thymio Dongle nicht gefunden</translation>
     </message>

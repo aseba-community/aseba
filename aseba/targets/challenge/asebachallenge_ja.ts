@@ -4,7 +4,7 @@
 <context>
     <name>Enki::ChallengeApplication</name>
     <message>
-        <location filename="challenge.cpp" line="+889"/>
+        <location filename="challenge.cpp" line="+904"/>
         <source>Aseba Challenge Help</source>
         <translation>Aseba Challengeのヘルプ</translation>
     </message>
@@ -42,7 +42,7 @@
 <context>
     <name>Enki::ChallengeViewer</name>
     <message>
-        <location line="-319"/>
+        <location line="-334"/>
         <source>Add a new robot</source>
         <translation>新しいロボットを追加</translation>
     </message>
@@ -55,12 +55,12 @@
 <context>
     <name>LanguageSelectionDialog</name>
     <message>
-        <location line="+486"/>
+        <location line="+501"/>
         <source>Please choose your language</source>
         <translation>言語を選ぶ</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+27"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
@@ -73,7 +73,7 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location line="-890"/>
+        <location line="-908"/>
         <source>Aseba Challenge</source>
         <translation>Aseba Challenge</translation>
     </message>

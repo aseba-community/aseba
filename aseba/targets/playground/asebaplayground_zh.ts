@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>Enki::PlaygroundViewer</name>
     <message>
@@ -119,7 +119,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="playground.cpp" line="+448"/>
+        <location filename="playground.cpp" line="+447"/>
         <source>%2 on %3</source>
         <translation>%2在%3上</translation>
     </message>

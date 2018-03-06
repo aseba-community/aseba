@@ -4,7 +4,7 @@
 <context>
     <name>Enki::ChallengeApplication</name>
     <message>
-        <location filename="challenge.cpp" line="+905"/>
+        <location filename="challenge.cpp" line="+904"/>
         <source>Aseba Challenge Help</source>
         <translation>Βοήθεια Aseba Challenge</translation>
     </message>

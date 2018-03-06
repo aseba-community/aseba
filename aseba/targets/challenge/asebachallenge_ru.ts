@@ -4,7 +4,7 @@
 <context>
     <name>Enki::ChallengeApplication</name>
     <message>
-        <location filename="challenge.cpp" line="+905"/>
+        <location filename="challenge.cpp" line="+904"/>
         <source>Aseba Challenge Help</source>
         <translation type="unfinished"></translation>
     </message>
@@ -60,7 +60,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+27"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -73,7 +73,7 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location line="-906"/>
+        <location line="-908"/>
         <source>Aseba Challenge</source>
         <translation type="unfinished"></translation>
     </message>

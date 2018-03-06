@@ -4,7 +4,7 @@
 <context>
     <name>Aseba::AeslEditor</name>
     <message>
-        <location filename="AeslEditor.cpp" line="+499"/>
+        <location filename="AeslEditor.cpp" line="+500"/>
         <source>Clear breakpoint</source>
         <translation>Azzera i breakpoint</translation>
     </message>
@@ -30,7 +30,7 @@
 <context>
     <name>Aseba::ConfigDialog</name>
     <message>
-        <location filename="ConfigDialog.cpp" line="+275"/>
+        <location filename="ConfigDialog.cpp" line="+274"/>
         <source>General</source>
         <translation>Generale</translation>
     </message>
@@ -58,7 +58,7 @@
 <context>
     <name>Aseba::ConstantsModel</name>
     <message>
-        <location filename="NamedValuesVectorModel.cpp" line="+319"/>
+        <location filename="NamedValuesVectorModel.cpp" line="+313"/>
         <source>Constant already defined</source>
         <translation>Costante già definta</translation>
     </message>
@@ -106,7 +106,7 @@
         <translation type="vanished">Personalizzato</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="+87"/>
+        <location filename="DashelTarget.cpp" line="+86"/>
         <source>Discovered targets</source>
         <translation>Target identificati</translation>
     </message>
@@ -136,7 +136,7 @@
         <translation>Documentazione</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+28"/>
         <source>Language</source>
         <translation>Lingua</translation>
     </message>
@@ -291,7 +291,7 @@
 <context>
     <name>Aseba::FindDialog</name>
     <message>
-        <location filename="FindDialog.cpp" line="+41"/>
+        <location filename="FindDialog.cpp" line="+40"/>
         <source>Aseba Studio - Search and Replace</source>
         <translation>Aseba Studio - Cerca e Sostituisci</translation>
     </message>
@@ -411,7 +411,7 @@ Occurrences</source>
 <context>
     <name>Aseba::HelpViewer</name>
     <message>
-        <location filename="HelpViewer.cpp" line="+59"/>
+        <location filename="HelpViewer.cpp" line="+58"/>
         <source>The help file %0 was not loaded successfully. The error was: %1.The help file should be available in the temporary directory of your system. Please check your installation, or report a bug.</source>
         <translation>Il file di Aiuto %0 non è stato caricato correttamente. L&apos;errore è stato: %1. Il file di aiuto dovrebbe essere disponibile nella cartella temporanea del vostro sistema. Cortesemente verificate la vostra installazione o riportate un bug.</translation>
     </message>
@@ -532,7 +532,7 @@ Occurrences</source>
 <context>
     <name>Aseba::MainWindow</name>
     <message>
-        <location filename="MainWindow.cpp" line="+1443"/>
+        <location filename="MainWindow.cpp" line="+1448"/>
         <source>Event number %0</source>
         <translation>Evento numero %0</translation>
     </message>
@@ -546,7 +546,7 @@ Occurrences</source>
         <translation type="obsolete">&lt;p&gt;Informazioni sulla versione:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Versione %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(tipi di flusso supportati: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(c) 2006-2013 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; e altri collaboratori.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%5&quot;&gt;%5&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Aseba è open-source con licenza LGPL versione 3.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+1726"/>
+        <location line="+1733"/>
         <source>http://aseba.wikidot.com/en:start</source>
         <translation>http://aseba.wikidot.com/it:start</translation>
     </message>
@@ -555,7 +555,7 @@ Occurrences</source>
         <translation type="vanished">Riguardo Aseba Studio</translation>
     </message>
     <message>
-        <location line="-1611"/>
+        <location line="-1613"/>
         <source>Open Script</source>
         <translation>Apri Script</translation>
     </message>
@@ -669,12 +669,12 @@ Occurrences</source>
     </message>
     <message>
         <location line="+136"/>
-        <location line="+550"/>
+        <location line="+552"/>
         <source>Add a new event</source>
         <translation>Aggiungi un nuovo evento</translation>
     </message>
     <message>
-        <location line="-550"/>
+        <location line="-552"/>
         <location line="+91"/>
         <source>Name:</source>
         <translation>Nome:</translation>
@@ -713,12 +713,12 @@ Occurrences</source>
     </message>
     <message>
         <location line="+53"/>
-        <location line="+393"/>
+        <location line="+395"/>
         <source>Add a new constant</source>
         <translation>Aggiungere una nuova costante</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-395"/>
         <source>Value</source>
         <comment>Value assigned to the constant</comment>
         <translation>Valore</translation>
@@ -736,7 +736,7 @@ Occurrences</source>
         <translation type="vanished">&lt;h1&gt;Informazioni su Aseba&lt;/h1&gt;Informazioni sulla versione&lt;ul&gt;&lt;li&gt;Versione. %0&lt;br/&gt;(build ver. %1/protocol ver. %2)&lt;/li&gt;&lt;li&gt;Dashel ver. %3&lt;br/&gt;(tipi di stream supportati: %4)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Per saperne di più su &lt;a href=&quot;%5&quot;&gt;aseba.wikidot.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;(c) 2006-2015 &lt;a href=&quot;http://stephane.magnenat.net&quot;&gt;Stéphane Magnenat&lt;/a&gt; e altri collaboratori (fai clic su &quot;Mostra dettagli&quot; per l&apos;elenco completo)&lt;/p&gt;&lt;p&gt;Aseba è un progetto open-source con licenza &lt;a href=&quot;https://www.gnu.org/licenses/lgpl.html&quot;&gt;LGPL versione 3&lt;/a&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+138"/>
+        <location line="+140"/>
         <source>
 event %0 : </source>
         <translation>evento %0:</translation>
@@ -1087,7 +1087,7 @@ event %0 : </source>
         <translation type="obsolete">F11</translation>
     </message>
     <message>
-        <location line="-1866"/>
+        <location line="-1873"/>
         <source>Aseba Studio is an environment for interactively programming robots with a text language.</source>
         <translation>Aseba Studio è un ambiente per la programmazione interattiva di robot utilizzando un linguaggio di testo.</translation>
     </message>
@@ -1097,7 +1097,7 @@ event %0 : </source>
         <translation>https://www.thymio.org/it:asebastudio</translation>
     </message>
     <message>
-        <location line="+1824"/>
+        <location line="+1831"/>
         <source>&amp;Go To Line...</source>
         <translation>Vai alla &amp;linea...</translation>
     </message>
@@ -1291,7 +1291,7 @@ event %0 : </source>
 <context>
     <name>Aseba::NewNamedValueDialog</name>
     <message>
-        <location filename="MainWindow.cpp" line="-2169"/>
+        <location filename="MainWindow.cpp" line="-2176"/>
         <source>Name</source>
         <comment>Name of the named value (can be a constant, event,...)</comment>
         <translation>Nome</translation>
@@ -1306,18 +1306,18 @@ event %0 : </source>
 <context>
     <name>Aseba::NodeTab</name>
     <message>
-        <location line="-1089"/>
+        <location line="-1094"/>
         <source>&lt;b&gt;Keywords&lt;/b&gt;</source>
         <translation>&lt;b&gt;Parole chiave&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+21"/>
-        <location line="+738"/>
+        <location line="+739"/>
         <source>unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location line="-736"/>
+        <location line="-737"/>
         <source>Load</source>
         <translation>Carica</translation>
     </message>
@@ -1328,14 +1328,13 @@ event %0 : </source>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+315"/>
-        <location line="+561"/>
-        <location line="+14"/>
+        <location line="+879"/>
+        <location line="+15"/>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
     <message>
-        <location line="-888"/>
+        <location line="-891"/>
         <source>Next</source>
         <translation>Successivo</translation>
     </message>
@@ -1421,12 +1420,12 @@ event %0 : </source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>step by step</source>
         <translation>passo passo</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <source>stopped</source>
         <translation>arrestato</translation>
     </message>
@@ -1464,7 +1463,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetFunctionsModel</name>
     <message>
-        <location filename="TargetModels.cpp" line="+602"/>
+        <location filename="TargetModels.cpp" line="+609"/>
         <location line="+19"/>
         <source>hidden</source>
         <translation>nascosto</translation>
@@ -1473,7 +1472,7 @@ event %0 : </source>
 <context>
     <name>Aseba::TargetVariablesModel</name>
     <message>
-        <location line="-441"/>
+        <location line="-445"/>
         <source>names</source>
         <translation>nomi</translation>
     </message>
@@ -1486,80 +1485,60 @@ event %0 : </source>
 <context>
     <name>Aseba::ThymioBlockly::ThymioBlockly</name>
     <message>
-        <location filename="plugins/ThymioBlockly/ThymioBlockly.cpp" line="+72"/>
         <source>Thymio Blockly Interface</source>
-        <translation>Interfaccia Blockly per Thymio</translation>
+        <translation type="vanished">Interfaccia Blockly per Thymio</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>New</source>
-        <translation>Nuovo</translation>
+        <translation type="vanished">Nuovo</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Open</source>
-        <translation>Apri</translation>
+        <translation type="vanished">Apri</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save</source>
-        <translation>Salva</translation>
+        <translation type="vanished">Salva</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save as</source>
-        <translation>Salva come</translation>
+        <translation type="vanished">Salva come</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Load &amp; Run</source>
-        <translation>Carica ed esegui</translation>
+        <translation type="vanished">Carica ed esegui</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Stop</source>
-        <translation>Stop</translation>
+        <translation type="vanished">Stop</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Help</source>
-        <translation>Aiuto</translation>
+        <translation type="vanished">Aiuto</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Screenshot</source>
-        <translation>Cattura di schermo</translation>
+        <translation type="vanished">Cattura di schermo</translation>
     </message>
     <message>
-        <location line="+61"/>
-        <source>Blockly for Thymio robot allows to program by visually assembling elements.
-Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;third-party software from Google&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>http://aseba.wikidot.com/en:blocklyprogramming</source>
-        <translation>http://aseba.wikidot.com/it:blocklyprogramming</translation>
+        <translation type="vanished">http://aseba.wikidot.com/it:blocklyprogramming</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Export program as image</source>
-        <translation>Esportare il programma come immagine</translation>
+        <translation type="vanished">Esportare il programma come immagine</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Launch Blockly</source>
-        <translation>Lancio Blockly</translation>
+        <translation type="vanished">Lancio Blockly</translation>
     </message>
     <message>
-        <location line="+138"/>
         <source>Warning</source>
-        <translation>Attenzione</translation>
+        <translation type="vanished">Attenzione</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>The Blockly document has been modified.&lt;p&gt;Do you want to save the changes?</source>
-        <translation>Il documento Blockly é stato modificato. Volete salvare le modifiche?</translation>
+        <translation type="vanished">Il documento Blockly é stato modificato. Volete salvare le modifiche?</translation>
     </message>
 </context>
 <context>
@@ -1647,7 +1626,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::Block</name>
     <message>
-        <location filename="plugins/ThymioVPL/Block.cpp" line="+131"/>
+        <location filename="plugins/ThymioVPL/Block.cpp" line="+132"/>
         <source>buttons</source>
         <translation>bottoni</translation>
     </message>
@@ -1715,7 +1694,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::EventActionsSet</name>
     <message>
-        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+616"/>
+        <location filename="plugins/ThymioVPL/EventActionsSet.cpp" line="+615"/>
         <location line="+20"/>
         <source>Loading</source>
         <translation>Caricamento</translation>
@@ -1767,7 +1746,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::ThymioVisualProgramming</name>
     <message>
-        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+80"/>
+        <location filename="plugins/ThymioVPL/ThymioVisualProgramming.cpp" line="+79"/>
         <source>Thymio Visual Programming Language</source>
         <translation>Thymio VPL (Linguaggio di Programmazione Visuale)</translation>
     </message>
@@ -1938,7 +1917,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
 <context>
     <name>Aseba::ThymioVPL::UsageLogger</name>
     <message>
-        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+75"/>
+        <location filename="plugins/ThymioVPL/UsageLogger.cpp" line="+74"/>
         <source>Login</source>
         <translation>Login</translation>
     </message>
@@ -1955,18 +1934,18 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation type="obsolete">Thymio VPL (Linguaggio di Programmazione Visuale)</translation>
     </message>
     <message>
-        <location filename="ThymioVPLStandalone.cpp" line="+172"/>
+        <location filename="ThymioVPLStandalone.cpp" line="+170"/>
         <source>Connecting to Thymio...</source>
         <translation>Collegamento con Thymio...</translation>
     </message>
     <message>
         <location line="+102"/>
-        <location line="+222"/>
+        <location line="+223"/>
         <source>Thymio VPL Error</source>
         <translation>Errore VPL sconosciuto</translation>
     </message>
     <message>
-        <location line="-221"/>
+        <location line="-222"/>
         <source>You need to connect a Thymio II to use this application.</source>
         <translation>È necessario collegare un Thymio per utilizzare questa applicazione.</translation>
     </message>
@@ -1976,7 +1955,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation>Salva lo Script</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+70"/>
         <source>Open Script</source>
         <translation>Apri lo Script</translation>
     </message>
@@ -2189,7 +2168,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation type="obsolete">VM Assertion fallita</translation>
     </message>
     <message>
-        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+58"/>
+        <location filename="plugins/ThymioVPL/Compiler.cpp" line="+57"/>
         <source>Compilation success</source>
         <translation>Compilazione avvenuta con successo</translation>
     </message>
@@ -2223,7 +2202,7 @@ Blockly is a &lt;a href=&quot;https://developers.google.com/blockly/&quot;&gt;th
         <translation>Errore VPL sconosciuto</translation>
     </message>
     <message>
-        <location filename="DashelTarget.cpp" line="-465"/>
+        <location filename="DashelTarget.cpp" line="-468"/>
         <source>Unexpected Dashel Error</source>
         <translation>Errore Dashel inatteso</translation>
     </message>

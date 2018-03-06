@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>Aseba::ThymioWNetConfigDialog</name>
     <message>
@@ -78,7 +78,7 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location line="+51"/>
+        <location line="+49"/>
         <source>Wireless Thymio dongle not found</source>
         <translation>找不到Thymio无线加密狗</translation>
     </message>
