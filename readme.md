@@ -1,5 +1,7 @@
 # Aseba
 
+[![Build Status](https://travis-ci.org/aseba-community/aseba.svg?branch=master)](https://travis-ci.org/aseba-community/aseba)
+
 Aseba is a set of tools which allow novices to program robots easily and efficiently.
 For these reasons, Aseba is well-suited for robotic education and research.
 Aseba is an open-source software created by [Dr. Stéphane Magnenat](http://stephane.magnenat.net) with contributions from the community.
