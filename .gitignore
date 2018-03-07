@@ -4,3 +4,5 @@
 .DS_Store
 .directory
 docs/*/_build
+dashel/
+enki/

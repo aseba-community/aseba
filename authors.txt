@@ -149,6 +149,8 @@ In addition, the following institutions have supported the development:
 
 [5]: Inria, France (https://www.inria.fr/en/)
 
+[6]: Enlightware LLC (http://enlightware.ch)
+
 # Other contributions
 
 The user manual is fetched from the Wiki at http://aseba.wikidot.com,

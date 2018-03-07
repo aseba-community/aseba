@@ -1,5 +1,5 @@
-#include "../../vm/natives.h"
-#include "../../common/consts.h"
+#include "vm/natives.h"
+#include "common/consts.h"
 
 // C++
 #include <iostream>

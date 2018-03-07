@@ -1,1 +1,6 @@
-
+[submodule "enki"]
+	path = enki
+	url = https://github.com/enki-community/enki
+[submodule "dashel"]
+	path = dashel
+	url = https://github.com/aseba-community/dashel

@@ -17,7 +17,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../../common/msg/msg.h"
+#include "common/msg/msg.h"
 #include <iostream>
 #include <functional>
 

@@ -21,8 +21,8 @@
 #include <functional>
 #include <unordered_set>
 #include <dashel/dashel.h>
-#include "../../common/utils/utils.h"
-#include "../../common/zeroconf/zeroconf-dashelhub.h"
+#include "common/utils/utils.h"
+#include "common/zeroconf/zeroconf-dashelhub.h"
 
 namespace Aseba
 {

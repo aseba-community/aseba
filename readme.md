@@ -1,5 +1,8 @@
 # Aseba
 
+[![Build Status](https://travis-ci.org/aseba-community/aseba.svg?branch=master)](https://travis-ci.org/aseba-community/aseba)
+[![Build status](https://ci.appveyor.com/api/projects/status/5vyae6rhf7qonqv2/branch/master?svg=true)](https://ci.appveyor.com/project/cor3ntin/aseba-v3obg/branch/master)
+
 Aseba is a set of tools which allow novices to program robots easily and efficiently.
 For these reasons, Aseba is well-suited for robotic education and research.
 Aseba is an open-source software created by [Dr. Stéphane Magnenat](http://stephane.magnenat.net) with contributions from the community.
@@ -9,10 +12,10 @@ Released under LGPL3, see [license.txt](license.txt) for details.
 ## Supported platforms
 
 The following platforms are supported:
-- Linux ([compilation instructions](compile.Linux.md))
-- macOS ([compilation instructions](compile.macOS.md))
-- Windows ([compilation instructions](compile.Windows.md))
-- embedded systems ([see the dependency list](compile.deps.md))
+- Linux ([compilation instructions](docs/compile.Linux.md))
+- macOS ([compilation instructions](docs/compile.macOS.md))
+- Windows ([compilation instructions](docs/compile.Windows.md))
+- embedded systems ([see the dependency list](docs/compile.deps.md))
 
 ## Use Aseba
 

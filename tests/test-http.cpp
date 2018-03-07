@@ -16,7 +16,7 @@
 // Avoid conflict from /mingw32/.../include/winerror.h */
 #undef ERROR_STACK_OVERFLOW
 #endif
-#include "../switches/http/http.h"
+#include "switches/http/http.h"
 
 class Dummy: public Dashel::Hub
 {
