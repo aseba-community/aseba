@@ -85,7 +85,7 @@ before_build:
     )
   - git submodule init
   - git submodule update --recursive --remote
-  - git clone https://github.com/aseba-community/thymio-blockly-standalone.git thymio-blockly-standalone --branch master --recurse-submodules
+  - if NOT DEFINED APPVEYOR_PULL_REQUEST_NUMBER git clone https://github.com/aseba-community/thymio-blockly-standalone.git thymio-blockly-standalone --branch master --recurse-submodules
 
 build_script:
   - cd "%APPVEYOR_BUILD_FOLDER%"
