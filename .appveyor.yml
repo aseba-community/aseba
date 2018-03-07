@@ -1,12 +1,13 @@
 version: '{build}'
 
-
 init:
 - git config --global core.autocrlf input
 #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://gist.githubusercontent.com/cor3ntin/1327dbf8aedab79f9fa305c001190268/raw/05155caad3a68c48be5f6873c3aca6ad8a30e31a/rdp.ps1'))
 
 matrix:
   fast_finish: true
+
+skip_branch_with_pr: true
 
 install:
   - mkdir C:\projects\deps
