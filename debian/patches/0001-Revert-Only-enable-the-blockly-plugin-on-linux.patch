@@ -1,0 +1,87 @@
+From a98f80fe24786d8f30d64bab402ca5e2a185cc3a Mon Sep 17 00:00:00 2001
+From: Corentin Jabot <corentin.jabot@mobsya.org>
+Date: Wed, 7 Mar 2018 11:00:27 +0100
+Subject: [PATCH 1/2] Revert "Only enable the blockly plugin on linux"
+
+This reverts commit be8058aa28a924c9b6348bd369fcc9862730daaa.
+---
+ clients/studio/CMakeLists.txt         | 5 -----
+ clients/studio/PluginRegistry.cpp     | 6 +-----
+ clients/studio/plugins/CMakeLists.txt | 9 +++------
+ 3 files changed, 4 insertions(+), 16 deletions(-)
+
+diff --git a/clients/studio/CMakeLists.txt b/clients/studio/CMakeLists.txt
+index 5bba3a28..2b476223 100644
+--- a/clients/studio/CMakeLists.txt
++++ b/clients/studio/CMakeLists.txt
+@@ -48,11 +48,6 @@ if (QT4_FOUND AND QT_QTWEBKIT_FOUND)
+ 		set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-Wl,-subsystem,console ${CMAKE_EXE_LINKER_FLAGS}")
+ 	endif (WIN32)
+ 	
+-	if(UNIX AND NOT APPLE)
+-		set(ASEBA_ENABLE_BLOCKLY_PLUGIN TRUE)
+-		add_definitions(-DASEBA_ENABLE_BLOCKLY_PLUGIN)
+-	endif(UNIX AND NOT APPLE)
+-	
+ 	if (QWT_LIBRARIES AND QWT_INCLUDE_DIR)
+ 		include_directories (${QWT_INCLUDE_DIR})
+ 		set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} ${QWT_LIBRARIES})
+diff --git a/clients/studio/PluginRegistry.cpp b/clients/studio/PluginRegistry.cpp
+index 0fef5bb1..c964b403 100644
+--- a/clients/studio/PluginRegistry.cpp
++++ b/clients/studio/PluginRegistry.cpp
+@@ -32,10 +32,8 @@
+ #include "plugins/VariablesViewPlugin.h"
+ #include "plugins/StopThymioPlugin.h"
+ #include "plugins/ThymioVPL/ThymioVisualProgramming.h"
++#include "plugins/ThymioBlockly/ThymioBlockly.h"
+ 
+-#ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
+-    #include "plugins/ThymioBlockly/ThymioBlockly.h"
+-#endif
+ namespace Aseba
+ {	
+ 	/** \addtogroup studio */
+@@ -107,9 +105,7 @@ namespace Aseba
+ 		linearCameraPids << ASEBA_PID_CHALLENGE << ASEBA_PID_PLAYGROUND_EPUCK << ASEBA_PID_EPUCK << ASEBA_PID_SMARTROB;
+ 		reg("LinearCameraViewPlugin", linearCameraPids, &createInstance<LinearCameraViewPlugin>);
+ 		reg("ThymioVisualProgramming", ASEBA_PID_THYMIO2, &createInstance<ThymioVPL::ThymioVisualProgramming>);
+-#ifdef ASEBA_ENABLE_BLOCKLY_PLUGIN
+ 		reg("ThymioBlockly", ASEBA_PID_THYMIO2, &createInstance<ThymioBlockly::ThymioBlockly>);
+-#endif
+ 		reg("StopThymioPlugin", ASEBA_PID_THYMIO2, &createInstance<StopThymioPlugin>);
+ 	}
+ 	
+diff --git a/clients/studio/plugins/CMakeLists.txt b/clients/studio/plugins/CMakeLists.txt
+index a7cf87ed..6b43b467 100644
+--- a/clients/studio/plugins/CMakeLists.txt
++++ b/clients/studio/plugins/CMakeLists.txt
+@@ -15,8 +15,8 @@ set(qt_plugins_SRCS
+ 	ThymioVPL/Style.cpp
+ 	ThymioVPL/Utils.cpp
+ 	ThymioVPL/LogSignalMapper.cpp
++	ThymioBlockly/ThymioBlockly.cpp
+ )
+-
+ qt4_wrap_cpp(qt_plugins_MOCS
+ 	VariablesViewPlugin.h
+ 	StopThymioPlugin.h
+@@ -30,13 +30,10 @@ qt4_wrap_cpp(qt_plugins_MOCS
+ 	ThymioVPL/Scene.h
+ 	ThymioVPL/UsageLogger.h
+ 	ThymioVPL/LogSignalMapper.h
++	ThymioBlockly/ThymioBlockly.h
++	ThymioBlockly/AsebaJavascriptInterface.h
+ )
+ 
+-if(ASEBA_ENABLE_BLOCKLY_PLUGIN)
+-	list(APPEND qt_plugins_SRCS ThymioBlockly/ThymioBlockly.cpp)
+-	qt4_wrap_cpp(qt_plugins_MOCS ThymioBlockly/AsebaJavascriptInterface.h ThymioBlockly/ThymioBlockly.h)
+-endif(ASEBA_ENABLE_BLOCKLY_PLUGIN)
+-
+ if (PROTOBUF_FOUND AND PROTOBUF_PROTOC_EXECUTABLE)
+ 	execute_process(COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR}/ThymioVPL -I${CMAKE_CURRENT_SOURCE_DIR}/ThymioVPL ${CMAKE_CURRENT_SOURCE_DIR}/ThymioVPL/UsageProfile.proto)
+ 	include_directories(${CMAKE_CURRENT_BINARY_DIR}/ThymioVPL)
+-- 
+2.16.1
+
