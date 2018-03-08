@@ -22,6 +22,12 @@ Welcome to Aseba's documentation!
    thymio-api
    thymio-simulator-api.rst
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Documentation:
+
+   development/building
+
 
 
 Indices and tables
