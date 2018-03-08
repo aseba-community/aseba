@@ -12,10 +12,3 @@ install(TARGETS asebavmbuffer
 
 target_link_libraries(asebavmbuffer asebavm)
 
-set (ASEBATRANSPORT_HDR_BUFFER
-	vm-buffer.h
-)
-install(FILES ${ASEBATRANSPORT_HDR_BUFFER}
-	DESTINATION include/aseba/transport/buffer
-)
-
