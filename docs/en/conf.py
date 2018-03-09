@@ -20,6 +20,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import subprocess, os
+subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 # -- General configuration ------------------------------------------------
 
@@ -31,7 +33,10 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.imgmath',
-    'sphinx.ext.githubpages', 'sphinx.ext.intersphinx']
+    'sphinx.ext.githubpages', 'sphinx.ext.intersphinx', 'sphinx.ext.imgmath', 'sphinx.ext.todo', 'breathe']
+
+breathe_projects = { "aseba": "../doxygen/doc/xml" }
+breathe_default_project = "aseba"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
