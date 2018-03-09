@@ -101,14 +101,22 @@ build_script:
   - if [%COMPILER%]==[ClangCL] (
       cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF "-DCMAKE_TOOLCHAIN_FILE=%APPVEYOR_BUILD_FOLDER%\windows\clang-cl-toolchain.cmake" "-DCMAKE_LINKER=%LLD_LINK%" "-DCMAKE_PREFIX_PATH=%QT5%;C:\Program Files\Bonjour SDK" -DCMAKE_BUILD_TYPE=Release &&
       ninja -v &&
-      ctest
+      ctest &&
+      cpack -D CPACK_GENERATOR="NSIS"
     )
 
   - if [%COMPILER%]==[MSVC] (
       cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF "-DCMAKE_TOOLCHAIN_FILE=%APPVEYOR_BUILD_FOLDER%\windows\cl-toolchain.cmake" "-DCMAKE_PREFIX_PATH=%QT5%;C:\Program Files\Bonjour SDK" -DCMAKE_BUILD_TYPE=Release &&
       ninja -v &&
-      ctest
+      ctest &&
+      cpack -D CPACK_GENERATOR="NSIS"
     )
+
+
+artifacts:
+  - path: 'aseba-*.exe'
+    name: Aseba
+
 
 cache:
   - '%MSYS_CACHE%'
