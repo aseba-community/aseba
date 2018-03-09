@@ -113,7 +113,7 @@ build_script:
     )
 
 artifacts:
-  - path: 'aseba-*.exe'
+  - path: 'build\aseba-*.exe'
     name: Aseba
 
 
