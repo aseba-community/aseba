@@ -133,13 +133,13 @@ environment:
   APPVEYOR_CACHE_ENTRY_ZIP_ARGS: "-t7z -m0=lzma -mx=5"
   matrix:
     - ARCH: x86
-      QT5: C:\Qt\5.10.0\msvc2015
+      QT5: C:\Qt\5.10\msvc2015
       COMPILER: MSVC
       USE_VS_TOOLCHAIN: true
 
     - ARCH: x64
       COMPILER: MSVC
-      QT5: C:\Qt\5.10.0\msvc2017_64
+      QT5: C:\Qt\5.10\msvc2017_64
       USE_VS_TOOLCHAIN: true
 
     #- COMPILER: MinGW
@@ -159,5 +159,18 @@ environment:
       LLVM_URL: http://prereleases.llvm.org/win-snapshots/LLVM-7.0.0-r323406-win64.exe
       LLVM_VERSION: 7.0
       USE_VS_TOOLCHAIN: true
-      QT5: C:\Qt\5.10.0\msvc2017_64
+      QT5: C:\Qt\5.10\msvc2017_64
+
+deploy:
+  tag: nightly
+  release: nightly
+  description: 'Nightly Build'
+  provider: GitHub
+  auth_token:
+    secure: Xehpz2B9WwN2wOzHfWMBQ83W31YluiEz6s9LjOi+vOjHcMxnjYCk7mNdQhSFOuE9 # your encrypted token from GitHub
+  artifact: Aseba
+  prerelease: true
+  on:
+    branch: master
+  force_update: true
 
