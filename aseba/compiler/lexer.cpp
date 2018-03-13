@@ -20,6 +20,7 @@
 
 #include "compiler.h"
 #include "common/utils/FormatableString.h"
+#include "common/utils/utils.h"
 #include <cstdlib>
 #include <sstream>
 #include <ostream>
@@ -170,26 +171,6 @@ namespace Aseba
 			oss << L" : " << sValue;
 		return oss.str();
 	}
-
-	/* //FIXME:
-	* Lacking proper unicode facilities,
-	* we rely on the locale to do the caracter categorization for us.
-	* But because we want the categorization to obey the unicode specification while the
-	* current locale may not be based on unicode, we need to force a locale.
-	*
-	* Note that this approach does not work reliably
-	*  - There is no reason for us to use wchat_t outside of win32 api calls boundaries
-	*  - A wchar_t may not encode a unicode character at all
-	*  - Even if it does, we may be dealing with a surrogate pair which would be encoded as 2 wchar_t
-	*  - Or a multiple-codepoint grapheme
-	*/
-	template <typename CharT>
-	bool is_utf8_alpha_num(CharT c) {
-		static std::locale utf8Locale("en_US.UTF-8");
-		return std::isalnum(c, utf8Locale);
-	}
-
-
 	//! Parse source and build tokens vector
 	//! \param source source code
 	void Compiler::tokenize(std::wistream& source)

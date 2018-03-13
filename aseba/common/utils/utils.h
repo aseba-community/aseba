@@ -177,6 +177,8 @@ namespace Aseba
 	//! Transform a UTF8 string into a wstring, this function is thread-safe
 	std::wstring UTF8ToWString(const std::string& s);
 
+	bool is_utf8_alpha_num(wchar_t c);
+
 	//! Update the XModem CRC (x^16 + x^12 + x^5 + 1 (0x1021)) with a wstring
 	uint16_t crcXModem(const uint16_t oldCrc, const std::wstring& s);
 
