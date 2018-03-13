@@ -5,6 +5,9 @@
 # project name
 project(aseba)
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # ensure a minimal version of CMake
 cmake_minimum_required(VERSION 3.5)
 include(FeatureSummary)
