@@ -20,6 +20,8 @@ include(CMakeModules/enki.cmake)
 include(CMakeModules/deployqt.cmake)
 include(CMakeModules/codesign.cmake)
 
+add_subdirectory(third_party/catch2)
+
 
 # testing and defines
 enable_testing()
