@@ -125,13 +125,6 @@ FunctionEnd
 !insertmacro CleanShortcuts ""
 !insertmacro CleanShortcuts "un."
 
-; Function WriteVersionFile
-; 	LogText "Writing version.txt"
-; 	FileOpen $0 "$INSTDIR\version.txt" w 	; Overwrite
-; 	FileWrite $0 "${VERSION}"
-; 	FileClose $0
-; FunctionEnd
-
   ;Default installation folder
   InstallDir "$PROGRAMFILES\AsebaStudio"
 
@@ -199,8 +192,6 @@ SectionGroup /e "-Aseba" GroupAseba
 		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\thymiowebbridge.ico"
 		File "${ASEBA_SOURCE_DIRECTORY}\menu\windows\scratchblock.ico"
 
-; 		# Version file (version.txt)
-; 		Call WriteVersionFile
 ;  		${If} $Language == '1036'
 ;  			; French
 ;  			File "README.fr.txt"

@@ -41,9 +41,6 @@
 #include <QDesktopServices>
 #include <QtConcurrentRun>
 #include <QSvgRenderer>
-
-#include <version.h>
-
 #include <iostream>
 
 using std::copy;
