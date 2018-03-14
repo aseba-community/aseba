@@ -1,3 +1,9 @@
+aseba (1.6.1) xenial; urgency=medium
+
+  * Upstream 1.6.1
+
+ -- Corentin Jabot <corentinjabot@mobsya.org>  Wed, 14 Mar 2018 10:12:45 +0100
+
 aseba (1.6.0) xenial; urgency=medium
 
   * Upstream 1.6.0
