@@ -31,8 +31,6 @@
 #include <QShortcut>
 #include <QDesktopServices>
 
-#include <version.h>
-
 namespace Aseba
 {
  	/** \addtogroup studio */
@@ -192,7 +190,7 @@ namespace Aseba
 		layout->addWidget(editor, 1);
 		const QString text = tr("Aseba ver. %0 (build %1/protocol %2); Dashel ver. %3").
 			arg(ASEBA_VERSION).
-			arg(ASEBA_BUILD_VERSION).
+			arg(ASEBA_REVISION).
 			arg(ASEBA_PROTOCOL_VERSION).
 			arg(DASHEL_VERSION);
 		QLabel* label(new QLabel(text));
