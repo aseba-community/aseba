@@ -34,7 +34,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 find_package(Threads REQUIRED)
 
 # Qt and Qwt
-find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg Test)
+find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg Test LinguistTools)
 
 find_package(Qwt)
 

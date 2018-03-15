@@ -90,31 +90,31 @@ if raw_input("\nAre you happy with your input? [y/N] ").lower() != 'y':
 print "Generating files...\n"
 os.chdir(studio_path)
 
-# lupdate / lrelease asebastudio_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("asebastudio", code, " ".join([studio_path, plugin_path, vpl_path]))
+# lupdate asebastudio_x.{ts,qm}
+translation_tools.do_lupdate("asebastudio", code, " ".join([studio_path, plugin_path, vpl_path]))
 
-# lupdate / lrelease compiler_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("compiler", code, compiler_ts_path)
+# lupdate compiler_x.{ts,qm}
+translation_tools.do_lupdate("compiler", code, compiler_ts_path)
 
 os.chdir(challenge_path)
-# lupdate / lrelease asebachallenge_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("asebachallenge", code, challenge_cpp)
+# lupdate asebachallenge_x.{ts,qm}
+translation_tools.do_lupdate("asebachallenge", code, challenge_cpp)
 
 os.chdir(playground_path)
-# lupdate / lrelease asebaplayground_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("asebaplayground", code, playground_path)
+# lupdate asebaplayground_x.{ts,qm}
+translation_tools.do_lupdate("asebaplayground", code, playground_path)
 
 os.chdir(thymioupgrader_path)
-# lupdate / lrelease thymioupgrader_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("thymioupgrader", code, thymioupgrader_path)
+# lupdate thymioupgrader_x.{ts,qm}
+translation_tools.do_lupdate("thymioupgrader", code, thymioupgrader_path)
 
 os.chdir(thymiownetconfig_path)
-# lupdate / lrelease thymiownetconfig_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("thymiownetconfig", code, thymiownetconfig_path)
+# lupdate thymiownetconfig_x.{ts,qm}
+translation_tools.do_lupdate("thymiownetconfig", code, thymiownetconfig_path)
 
 os.chdir(qtabout_path)
-# lupdate / lrelease qtabout_x.{ts,qm}
-translation_tools.do_lupdate_lrelease("qtabout", code, qtabout_path)
+# lupdate qtabout_x.{ts,qm}
+translation_tools.do_lupdate("qtabout", code, qtabout_path)
 
 
 print "Modifying source files...\n"
@@ -213,8 +213,8 @@ if wikidot_url:
     print "Done\n"
 
 
-print "We are done! Now edit the .ts files with Qt Linguist, then run lrelease on them to generate valid .qm."
-print "Finally, do not forget to commit the .ts and .qm files."
+print "We are done! Now edit the .ts files with Qt Linguist"
+print "Finally, do not forget to commit the .ts files."
 print "Have fun :-)\n"
 print "*****\n"
 

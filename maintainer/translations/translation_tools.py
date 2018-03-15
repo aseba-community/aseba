@@ -25,7 +25,6 @@ import subprocess
 import re
 
 _lupdate = ""
-_lrelease = ""
 _git = ""
 
 def _verbose_call(cmd):
@@ -47,9 +46,8 @@ def _find_cmd(possible_cmds, args):
             print "No"
     return ""
 
-def do_lupdate_lrelease(output_name, lang_code, input_files):
+def do_lupdate(output_name, lang_code, input_files):
     filename = "{}_{}.ts".format(output_name, lang_code)
-    filename_qm = "{}_{}.qm".format(output_name, lang_code)
     # _lupdate
     retcode = _verbose_call("{} -no-recursive {} -target-language {} -locations relative -ts {}".format(_lupdate, input_files, lang_code, filename))
     if retcode != 0:
@@ -57,16 +55,9 @@ def do_lupdate_lrelease(output_name, lang_code, input_files):
         exit(3)
     if _git:
         _verbose_call("{} add {}".format(_git, filename))
-    # _lrelease
-    retcode = _verbose_call("{} {} -qm {}".format(_lrelease, filename, filename_qm))
-    if retcode != 0:
-        print sys.stderr, "Ooops... Something wrong happened with lrelease {}".format(filename)
-        exit(4)
-    if _git:
-        _verbose_call("{} add {}".format(_git, filename_qm))
 
 
-def do_lupdate_lrelease_all(directory, generic_name, input_files):
+def do_lupdate_all(directory, generic_name, input_files):
     old_path = os.getcwd()
     os.chdir(directory)
     # search all the existing languages corresponding to this file
@@ -78,7 +69,7 @@ def do_lupdate_lrelease_all(directory, generic_name, input_files):
             continue
         # get the language
         lang = match.group(1)
-        do_lupdate_lrelease(generic_name, lang, input_files)
+        do_lupdate(generic_name, lang, input_files)
     os.chdir(old_path)
 
 
@@ -89,19 +80,12 @@ def do_git_add(filename):
 
 def init_commands():
     global _lupdate
-    global _lrelease
     global _git
 
     print "First, we will test for a valid lupdate binary..."
     _lupdate = _find_cmd(["lupdate"], "-version")
     if _lupdate == "":
         print sys.stderr, "No valide lupdate found :-("
-        exit(1)
-
-    print "...and for a valid lrelease..."
-    _lrelease = _find_cmd(["lrelease"], "-version")
-    if _lrelease == "":
-        print sys.stderr, "No valide lrelease found :-("
         exit(1)
 
     print "Trying to find a valid git binary (not mandatory)..."
