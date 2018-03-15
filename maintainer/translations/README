@@ -1,4 +1,3 @@
-
 In this directory, you will find a bunch of scripts to maintain the translation
 files. When you want to add a new language, it is necessary to generate several
 files, and update others as well. The script "01_new_language.py" will help
@@ -13,7 +12,7 @@ For regular updates, use the following scripts:
   |         corresponding C++ source file in Aseba Studio.
   |
   |   - 03_sync_all_translations.py
-  |         Takes all the existing .ts, then performs lupate / lrelease
+  |         Takes all the existing .ts, then performs lupate
   |
   |-- - 04_translation_statistics.py
             Gives some statistics about the current translations

@@ -92,6 +92,9 @@ codesign(asebaqtcommon)
 add_subdirectory(plugins)
 
 # resources
+file(GLOB TRANSLATIONS_SOURCES "asebastudio*.ts"  "compiler*.ts")
+set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
 qt5_add_resources(resfiles asebastudio.qrc)
 
 include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

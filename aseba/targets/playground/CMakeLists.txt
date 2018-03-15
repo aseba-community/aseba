@@ -32,6 +32,9 @@ if (Qt5Widgets_FOUND AND Qt5OpenGL_FOUND AND Qt5Xml_FOUND)
 	endif ()
 	set(CMAKE_AUTOMOC ON)
 
+	file(GLOB TRANSLATIONS_SOURCES "asebaplayground*.ts")
+	set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+	qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
 	qt5_add_resources(resfiles asebaplayground.qrc)
 
 	set(playground_SRCS

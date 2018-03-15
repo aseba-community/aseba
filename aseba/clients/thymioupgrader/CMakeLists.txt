@@ -11,6 +11,9 @@ if (Qt5Widgets_FOUND AND Qt5Concurrent_FOUND AND Qt5Network_FOUND AND Qt5Xml_FOU
 		ThymioUpgrader.h
 	)
 
+	file(GLOB TRANSLATIONS_SOURCES "thymioupgrader*.ts")
+	set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+	qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
 	qt5_add_resources(resfiles thymioupgrader.qrc)
 
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

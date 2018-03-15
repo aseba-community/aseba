@@ -24,6 +24,7 @@ matrix:
             - qtbase5-dev
             - qttools5-dev
             - qtbase5-dev-tools
+            - qttools5-dev-tools
             - libqt5help5
             - libqt5svg5-dev
             - libqt5x11extras5-dev

@@ -6,6 +6,9 @@ if (Qt5Widgets_FOUND)
  		ThymioWNetConfig.h
  	)
 
+	file(GLOB TRANSLATIONS_SOURCES "thymiownetconfig*.ts")
+	set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+	qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
 	qt5_add_resources(resfiles thymiownetconfig.qrc)
 
 	include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
