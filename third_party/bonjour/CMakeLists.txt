@@ -19,7 +19,9 @@ if(WIN32)
 		                   COMMAND ${SEVENZIP_BIN} x -y ${CMAKE_CURRENT_SOURCE_DIR}/bonjoursdksetup.exe Bonjour.msi Bonjour64.msi
 		                   COMMENT "Extracting Bonjour"
 		                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-		set(BONJOUR64_MSI "${CMAKE_CURRENT_BINARY_DIR}/Bonjour.msi" CACHE STRING "Path of Bonjour.msi")
-		set(BONJOUR_MSI   "${CMAKE_CURRENT_BINARY_DIR}/Bonjour64.msi" CACHE STRING "Path of Bonjour64.msi")
+        #This variables are meant to be used by nsis - therefore they should use \ rather than /
+        string(REPLACE "/" "\\" CMAKE_CURRENT_BINARY_DIR_WINDOWS "${CMAKE_CURRENT_BINARY_DIR}")
+        set(BONJOUR64_MSI "${CMAKE_CURRENT_BINARY_DIR_WINDOWS}\\Bonjour.msi" CACHE STRING "Path of Bonjour.msi")
+        set(BONJOUR_MSI   "${CMAKE_CURRENT_BINARY_DIR_WINDOWS}\\Bonjour64.msi" CACHE STRING "Path of Bonjour64.msi")
 	endif()
 endif()

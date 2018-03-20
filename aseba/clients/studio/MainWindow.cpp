@@ -41,9 +41,6 @@
 #include <QDesktopServices>
 #include <QtConcurrentRun>
 #include <QSvgRenderer>
-
-#include <version.h>
-
 #include <iostream>
 
 using std::copy;
@@ -743,7 +740,8 @@ namespace Aseba
 		for (SavedPlugins::const_iterator it(savedPlugins.begin()); it != savedPlugins.end(); ++it)
 		{
 			NodeToolInterface* interface(tools.getNamed(it->first));
-			interface->loadFromDom(it->second, fromFile);
+			if(interface)
+				interface->loadFromDom(it->second, fromFile);
 		}
 	}
 

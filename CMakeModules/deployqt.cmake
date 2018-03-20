@@ -33,15 +33,15 @@ find_program(WINDEPLOYQT_EXECUTABLE windeployqt.exe HINTS "${_qt_bin_dir}")
 # build and install the Qt runtime to the specified directory
 function(windeployqt target directory)
 
-    # Run windeployqt immediately after build
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E
-            env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
-                --no-compiler-runtime
-                --plugindir plugins
-                \"$<TARGET_FILE:${target}>\"
-        COMMENT "Deploying Qt..."
-    )
+#     # Run windeployqt immediately after build
+#     execute_process(TARGET ${target} POST_BUILD
+#         COMMAND "${CMAKE_COMMAND}" -E
+#             env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+#                 --no-compiler-runtime
+#                 --plugindir plugins
+#                 \"$<TARGET_FILE:${target}>\"
+#         COMMENT "Deploying Qt..."
+#     )
 
     # install(CODE ...) doesn't support generator expressions, but
     # file(GENERATE ...) does - store the path in a file
@@ -79,7 +79,9 @@ function(windeployqt target directory)
 				get_filename_component(_path \${_dest} DIRECTORY)
 				clean_win_deployqt_path(\${_src} _src)
 				message(\"-- Installing: \${CMAKE_INSTALL_PREFIX}/${directory}/\${_dest}\")
-				configure_file(\${_src} \"\${CMAKE_INSTALL_PREFIX}/${directory}/\${_dest}\" COPYONLY)
+				if(EXISTS \${_src})
+                    configure_file(\${_src} \"\${CMAKE_INSTALL_PREFIX}/${directory}/\${_dest}\" COPYONLY)
+				endif()
 			endif()
             list(REMOVE_AT _files 0 1)
         endwhile()

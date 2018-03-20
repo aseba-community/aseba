@@ -11,6 +11,10 @@ set(challenge_SRCS
 	objects/food_ring.cpp
 )
 
+file(GLOB TRANSLATIONS_SOURCES "asebachallenge*.ts")
+set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
+
 qt5_add_resources(challenge_RCC_SRCS challenge-textures.qrc)
 
 add_executable(asebachallenge WIN32 ${challenge_SRCS} ${challenge_RCC_SRCS})

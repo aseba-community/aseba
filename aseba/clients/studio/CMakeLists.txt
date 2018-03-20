@@ -92,6 +92,9 @@ codesign(asebaqtcommon)
 add_subdirectory(plugins)
 
 # resources
+file(GLOB TRANSLATIONS_SOURCES "asebastudio*.ts"  "compiler*.ts")
+set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
 qt5_add_resources(resfiles asebastudio.qrc)
 
 include_directories (${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
@@ -129,7 +132,7 @@ if (QT_QCOLLECTIONGENERATOR_EXECUTABLE)
 	qt5_add_resources(resfiles ${CMAKE_CURRENT_BINARY_DIR}/asebastudiohelp.qrc)
 endif ()
 
-add_executable(asebastudio WIN32 ${studio_SRCS} ${studio_MOCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+add_executable(asebastudio WIN32 ${studio_SRCS} ${studio_MOCS} ${resfiles})
 if (HAS_DYN_VERSION)
 	add_dependencies(asebastudio versionheader)
 endif ()
@@ -143,9 +146,9 @@ codesign(asebastudio)
 # Thymio VPL standalone
 
 if (ANDROID)
-	add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	add_library(thymiovpl SHARED ${thymiovpl_SRCS} ${resfiles})
 else ()
-	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles} ${CMAKE_BINARY_DIR}/version.h)
+	add_executable(thymiovpl WIN32 ${thymiovpl_SRCS} ${resfiles})
 endif ()
 if (HAS_DYN_VERSION)
 	add_dependencies(thymiovpl versionheader)
@@ -160,8 +163,7 @@ target_link_libraries(thymiovpl asebaqtplugins asebaqtcommon asebacompiler aseba
 codesign(thymiovpl)
 
 #renderblocks
-add_executable(rendervplblocks ${CMAKE_BINARY_DIR}/version.h)
-target_sources(rendervplblocks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/rendervplblocks.cpp ${resfiles})
+add_executable(rendervplblocks ${CMAKE_CURRENT_SOURCE_DIR}/rendervplblocks.cpp ${resfiles})
 target_link_libraries(rendervplblocks asebaqtplugins asebaqtcommon asebaqtabout asebacompiler asebacommon ${ADDITIONAL_LIBRARIES} Qt5::Xml Qt5::Svg Qt5::Widgets)
 install_qt_app(rendervplblocks)
 codesign(rendervplblocks)

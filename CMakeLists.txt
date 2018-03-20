@@ -5,6 +5,9 @@
 # project name
 project(aseba)
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # ensure a minimal version of CMake
 cmake_minimum_required(VERSION 3.5)
 include(FeatureSummary)
@@ -20,6 +23,8 @@ include(CMakeModules/enki.cmake)
 include(CMakeModules/deployqt.cmake)
 include(CMakeModules/codesign.cmake)
 
+add_subdirectory(third_party/catch2)
+
 
 # testing and defines
 enable_testing()
@@ -29,7 +34,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 find_package(Threads REQUIRED)
 
 # Qt and Qwt
-find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg Test)
+find_package(Qt5 OPTIONAL_COMPONENTS Core Gui Widgets OpenGL Network Help Concurrent Xml Svg Test LinguistTools)
 
 find_package(Qwt)
 
@@ -84,6 +89,10 @@ if(WIN32)
 	)
 
 endif()
+
+SET(CPACK_PACKAGE_VERSION_MAJOR "${ASEBA_VERSION_MAJOR}")
+SET(CPACK_PACKAGE_VERSION_MINOR "${ASEBA_VERSION_MINOR}")
+SET(CPACK_PACKAGE_VERSION_PATCH "${ASEBA_VERSION_PATCH}")
 include(CPack)
 
 

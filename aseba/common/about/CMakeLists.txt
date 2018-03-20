@@ -9,8 +9,13 @@ if (Qt5Svg_FOUND)
 	if (ENKI_FOUND)
 		add_definitions(-DHAVE_ENKI)
 	endif (ENKI_FOUND)
-	
+
 	qt5_add_resources(resfiles asebaqtabout.qrc)
+
+	file(GLOB TRANSLATIONS_SOURCES "qtabout*.ts")
+	set_source_files_properties(${TRANSLATIONS_SOURCES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
+	qt5_add_translation(TRANSLATIONS ${TRANSLATIONS_SOURCES} )
+
 	qt5_wrap_cpp(qt_about_MOCS AboutDialog.h)
 	add_library(asebaqtabout AboutDialog.cpp ${qt_about_MOCS} ${resfiles})
 	qt5_use_modules(asebaqtabout Core Widgets Svg)

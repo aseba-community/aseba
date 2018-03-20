@@ -24,11 +24,12 @@ Welcome to Aseba's documentation!
 
 .. toctree::
    :maxdepth: 1
+
    :caption: Developer Documentation:
 
    development/building
-
-
+   dev
+ 
 
 Indices and tables
 ==================
