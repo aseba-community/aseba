@@ -15,15 +15,6 @@ install(TARGETS asebazeroconf
 	INCLUDES DESTINATION include/aseba/common/zeroconf
 )
 
-set (ASEBAZEROCONF_HDR
-	zeroconf.h
-	zeroconf-thread.h
-	zeroconf-dashelhub.h
-)
-install(FILES ${ASEBAZEROCONF_HDR}
-	DESTINATION include/aseba/common/zeroconf
-)
-
 # Zeroconf with Qt
 if (Qt5Network_FOUND)
 	set(CMAKE_AUTOMOC ON)
@@ -37,13 +28,6 @@ if (Qt5Network_FOUND)
 	install(TARGETS asebazeroconfqt
 		LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 		ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-	)
-
-	set (ASEBAZEROCONFQT_HDR
-		zeroconf-qt.h
-	)
-	install(FILES ${ASEBAZEROCONFQT_HDR}
-		DESTINATION include/aseba/common/zeroconf
 	)
 endif ()
 add_feature_info(QT_ZEROCONF Qt5Network_FOUND "Qt Zeroconf library ( depend on QtNetwork )")

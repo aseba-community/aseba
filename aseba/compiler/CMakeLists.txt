@@ -24,11 +24,3 @@ install(TARGETS asebacompiler
                 LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
                 ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
-
-set (ASEBACORE_HDR_COMPILER
-	compiler.h
-	errors_code.h
-)
-install(FILES ${ASEBACORE_HDR_COMPILER}
-	DESTINATION include/aseba/compiler
-)

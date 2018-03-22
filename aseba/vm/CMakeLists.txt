@@ -15,11 +15,3 @@ install(TARGETS asebavm
                 ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 )
 
-set (ASEBAVM_HDR_COMPILER
-	vm.h
-	natives.h
-)
-install(FILES ${ASEBAVM_HDR_COMPILER}
-	DESTINATION include/aseba/vm
-)
-

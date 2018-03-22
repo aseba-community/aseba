@@ -29,18 +29,4 @@ if(LIBXML2_FOUND)
 			LIBRARY DESTINATION ${LIB_INSTALL_DIR} 
 			ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 	)
-
-	set(ASEBACORE_HDR_HTTP2
-		AeslProgram.h
-		HttpDashelTarget.h
-		HttpHandler.h
-		HttpInterface.h
-		HttpInterfaceHandlers.h
-		HttpRequest.h
-		HttpResponse.h
-	)
-	
-	install(FILES ${ASEBACORE_HDR_HTTP2}
-		DESTINATION include/aseba/switches/http2
-	)
 endif(LIBXML2_FOUND)

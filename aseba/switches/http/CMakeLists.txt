@@ -42,11 +42,4 @@ if (LIBXML2_FOUND)
 			ARCHIVE DESTINATION ${LIB_INSTALL_DIR} 
 	)
 
-	set (ASEBACORE_HDR_HTTP
-		http.h
-	)
-	install(FILES ${ASEBACORE_HDR_HTTP}
-		DESTINATION include/aseba/switches/http
-	)
-
 endif (LIBXML2_FOUND)
