@@ -102,10 +102,8 @@ pipeline {
 					}
 					steps {
 						sh 'git submodule update --init'
-						unstash 'dist-externals-windows'
 						CMake([label: 'windows', makeInstallInvocation:'true',
 							   getCmakeArgs: "-DCMAKE_PREFIX_PATH=/c/msys32/mingw32/lib"])
-						//stash includes: 'dist/**', name: 'dist-aseba-windows'
 					}
 				}
 			}
@@ -156,7 +154,6 @@ pipeline {
 			steps {
 				unstash 'dist-aseba-debian'
 				unstash 'dist-aseba-macos'
-				unstash 'dist-aseba-windows'
 				archiveArtifacts artifacts: 'dist/**', fingerprint: true, onlyIfSuccessful: true
 			}
 		}
