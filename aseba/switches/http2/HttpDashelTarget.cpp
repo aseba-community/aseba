@@ -1,20 +1,20 @@
 /*
-	Aseba - an event-based framework for distributed robot control
-	Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-	with contributions from the community.
-	Copyright (C) 2007--2018 the authors, see authors.txt for details.
+    Aseba - an event-based framework for distributed robot control
+    Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
+    with contributions from the community.
+    Copyright (C) 2007--2018 the authors, see authors.txt for details.
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, version 3 of the License.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3 of the License.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <iostream>
@@ -37,307 +37,302 @@ using std::set;
 using std::string;
 using std::vector;
 
-HttpDashelTarget::HttpDashelTarget(HttpInterface *interface_, const std::string& address_, Dashel::Stream *stream_) :
-	interface(interface_),
-	address(address_),
-	stream(stream_)
-{
+HttpDashelTarget::HttpDashelTarget(HttpInterface* interface_, const std::string& address_, Dashel::Stream* stream_)
+    : interface(interface_), address(address_), stream(stream_) {}
 
+HttpDashelTarget::~HttpDashelTarget() {}
+
+bool HttpDashelTarget::sendEvent(const std::vector<std::string>& args) {
+    if(args.empty()) {
+        return false;
+    }
+
+    size_t eventPos;
+
+    if(interface->getProgram().getCommonDefinitions().events.contains(UTF8ToWString(args[0]), &eventPos)) {
+        try {
+            // build event and emit
+            VariablesDataVector data;
+            for(size_t i = 1; i < args.size(); ++i) {
+                data.push_back(atoi(args[i].c_str()));
+            }
+            UserMessage userMessage(eventPos, data);
+            userMessage.serialize(stream);
+            stream->flush();
+        } catch(Dashel::DashelException e) {
+            if(interface->isVerbose()) {
+                cerr << "Target " << address << " failed to send event message to stream: " << e.what() << endl;
+            }
+            return false;
+        }
+
+        return true;
+    } else {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to send event: No event " << args[0] << endl;
+        }
+        return false;
+    }
 }
 
-HttpDashelTarget::~HttpDashelTarget()
-{
+bool HttpDashelTarget::sendGetVariables(unsigned globalNodeId, const std::vector<std::string>& args,
+                                        HttpRequest* request) {
+    vector<unsigned> positions;
 
+    map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
+    if(query == nodes.end()) {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to send get variables message for node " << globalNodeId
+                 << ": No such node" << endl;
+        }
+        return false;
+    }
+
+    Node& node = query->second;
+    assert(globalNodeId == node.globalId);
+
+    for(vector<string>::const_iterator it(args.begin()); it != args.end(); ++it) {
+        unsigned position;
+        unsigned size;
+
+        if(getVariableInfo(node, *it, position, size)) {
+            try {
+                // send the message
+                GetVariables getVariables(node.localId, position, size);
+                getVariables.serialize(stream);
+                stream->flush();
+            } catch(Dashel::DashelException e) {
+                if(interface->isVerbose()) {
+                    cerr << "Target " << address << " failed to send get variables message for node " << node.globalId
+                         << " (" << node.name << ") to stream: " << e.what() << endl;
+                }
+                return false;
+            }
+
+            positions.push_back(position);
+        } else {
+            return false;
+        }
+    }
+
+    if(!positions.empty()) {
+        DashelHttpRequest* dashelRequest = static_cast<DashelHttpRequest*>(request);
+        node.pendingVariables[positions[0]].insert(make_pair(dashelRequest->getStream(), dashelRequest));
+
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " scheduled variables request for node " << node.globalId << " ("
+                 << node.name << "): " << join(args, ", ") << endl;
+        }
+    }
+
+    return true;
 }
 
-bool HttpDashelTarget::sendEvent(const std::vector<std::string>& args)
-{
-	if(args.empty()) {
-		return false;
-	}
+bool HttpDashelTarget::sendSetVariable(unsigned globalNodeId, const std::vector<std::string>& args) {
+    map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
+    if(query == nodes.end()) {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to send set variables message for node " << globalNodeId
+                 << ": No such node" << endl;
+        }
+        return false;
+    }
 
-	size_t eventPos;
+    Node& node = query->second;
+    assert(globalNodeId == node.globalId);
 
-	if(interface->getProgram().getCommonDefinitions().events.contains(UTF8ToWString(args[0]), &eventPos)) {
-		try {
-			// build event and emit
-			VariablesDataVector data;
-			for(size_t i = 1; i < args.size(); ++i) {
-				data.push_back(atoi(args[i].c_str()));
-			}
-			UserMessage userMessage(eventPos, data);
-			userMessage.serialize(stream);
-			stream->flush();
-		} catch(Dashel::DashelException e) {
-			if(interface->isVerbose()) {
-				cerr << "Target " << address << " failed to send event message to stream: " << e.what() << endl;
-			}
-			return false;
-		}
+    if(args.empty()) {
+        return false;
+    }
 
-		return true;
-	} else {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to send event: No event " << args[0] << endl;
-		}
-		return false;
-	}
+    unsigned position;
+    unsigned size;
+
+    if(!getVariableInfo(node, args[0], position, size)) {
+        return false;
+    }
+
+    try {
+        // send the message
+        VariablesDataVector data;
+        for(size_t i = 1; i < args.size(); ++i) {
+            data.push_back(atoi(args[i].c_str()));
+        }
+
+        SetVariables setVariables(node.localId, position, data);
+        setVariables.serialize(stream);
+        stream->flush();
+    } catch(Dashel::DashelException e) {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to send set variables message for node " << node.globalId << " ("
+                 << node.name << ") to stream: " << e.what() << endl;
+        }
+        return false;
+    }
+
+
+    return true;
 }
 
-bool HttpDashelTarget::sendGetVariables(unsigned globalNodeId, const std::vector<std::string>& args, HttpRequest *request)
-{
-	vector<unsigned> positions;
+bool HttpDashelTarget::compileAndRunCode(unsigned globalNodeId, const std::string& code, std::string& errorString) {
+    map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
+    if(query == nodes.end()) {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to compile and run code for node " << globalNodeId
+                 << ": No such node" << endl;
+        }
+        return false;
+    }
 
-	map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
-	if(query == nodes.end()) {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to send get variables message for node " << globalNodeId << ": No such node" << endl;
-		}
-		return false;
-	}
+    Node& node = query->second;
+    assert(globalNodeId == node.globalId);
 
-	Node& node = query->second;
-	assert(globalNodeId == node.globalId);
+    // compile code
+    std::wistringstream is(UTF8ToWString(code));
+    Error error;
+    BytecodeVector bytecode;
+    unsigned allocatedVariablesCount;
 
-	for(vector<string>::const_iterator it(args.begin()); it != args.end(); ++it) {
-		unsigned position;
-		unsigned size;
+    Compiler compiler;
+    compiler.setTargetDescription(getDescription(node.localId));
+    compiler.setCommonDefinitions(&interface->getProgram().getCommonDefinitions());
 
-		if(getVariableInfo(node, *it, position, size)) {
-			try {
-				// send the message
-				GetVariables getVariables(node.localId, position, size);
-				getVariables.serialize(stream);
-				stream->flush();
-			} catch(Dashel::DashelException e) {
-				if(interface->isVerbose()) {
-					cerr << "Target " << address << " failed to send get variables message for node " << node.globalId << " (" << node.name << ") to stream: " << e.what() << endl;
-				}
-				return false;
-			}
+    if(compiler.compile(is, bytecode, allocatedVariablesCount, error)) {
+        try {
+            // send bytecode
+            sendBytecode(stream, node.localId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
 
-			positions.push_back(position);
-		} else {
-			return false;
-		}
-	}
+            // run node
+            Run msg(node.localId);
+            msg.serialize(stream);
+            stream->flush();
+        } catch(Dashel::DashelException e) {
+            errorString = e.what();
+            if(interface->isVerbose()) {
+                cerr << "Target " << address << " failed to send bytecode and run message for node " << node.globalId
+                     << " (" << node.name << ") to stream: " << e.what() << endl;
+            }
+            return false;
+        }
 
-	if(!positions.empty()) {
-		DashelHttpRequest *dashelRequest = static_cast<DashelHttpRequest *>(request);
-		node.pendingVariables[positions[0]].insert(make_pair(dashelRequest->getStream(), dashelRequest));
 
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " scheduled variables request for node " << node.globalId << " (" << node.name << "): " << join(args, ", ") << endl;
-		}
-	}
+        // retrieve user-defined variables for use in get/set
+        node.variablesMap = *compiler.getVariablesMap();
+        return true;
+    } else {
+        errorString = WStringToUTF8(error.toWString());
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to compile program for node " << globalNodeId << " (" << node.name
+                 << "): " << errorString << endl;
+        }
 
-	return true;
+        return false;
+    }
 }
 
-bool HttpDashelTarget::sendSetVariable(unsigned globalNodeId, const std::vector<std::string>& args)
-{
-	map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
-	if(query == nodes.end()) {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to send set variables message for node " << globalNodeId << ": No such node" << endl;
-		}
-		return false;
-	}
+bool HttpDashelTarget::removePendingVariable(unsigned globalNodeId, unsigned start) {
+    map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
+    if(query == nodes.end()) {
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " failed to remove pending variable for node " << globalNodeId
+                 << ": No such node" << endl;
+        }
+        return false;
+    }
 
-	Node& node = query->second;
-	assert(globalNodeId == node.globalId);
+    Node& node = query->second;
+    assert(globalNodeId == node.globalId);
 
-	if(args.empty()) {
-		return false;
-	}
-
-	unsigned position;
-	unsigned size;
-
-	if(!getVariableInfo(node, args[0], position, size)) {
-		return false;
-	}
-
-	try {
-		// send the message
-		VariablesDataVector data;
-		for(size_t i = 1; i < args.size(); ++i) {
-			data.push_back(atoi(args[i].c_str()));
-		}
-
-		SetVariables setVariables(node.localId, position, data);
-		setVariables.serialize(stream);
-		stream->flush();
-	} catch(Dashel::DashelException e) {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to send set variables message for node " << node.globalId << " (" << node.name << ") to stream: " << e.what() << endl;
-		}
-		return false;
-	}
-
-
-	return true;
+    return node.pendingVariables.erase(start) == 1;
 }
 
-bool HttpDashelTarget::compileAndRunCode(unsigned globalNodeId, const std::string& code, std::string& errorString)
-{
-	map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
-	if(query == nodes.end()) {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to compile and run code for node " << globalNodeId << ": No such node" << endl;
-		}
-		return false;
-	}
+std::set<const HttpDashelTarget::Node*> HttpDashelTarget::getNodesByName(const std::string& name) const {
+    set<const HttpDashelTarget::Node*> result;
 
-	Node& node = query->second;
-	assert(globalNodeId == node.globalId);
+    // todo: maybe make this more efficient by caching node access by name?
+    map<unsigned, Node>::const_iterator end = nodes.end();
+    for(map<unsigned, Node>::const_iterator iter = nodes.begin(); iter != end; ++iter) {
+        const Node& node = iter->second;
 
-	// compile code
-	std::wistringstream is(UTF8ToWString(code));
-	Error error;
-	BytecodeVector bytecode;
-	unsigned allocatedVariablesCount;
+        if(node.name == name) {
+            result.insert(&node);
+        }
+    }
 
-	Compiler compiler;
-	compiler.setTargetDescription(getDescription(node.localId));
-	compiler.setCommonDefinitions(&interface->getProgram().getCommonDefinitions());
-
-	if(compiler.compile(is, bytecode, allocatedVariablesCount, error)) {
-		try {
-			// send bytecode
-			sendBytecode(stream, node.localId, std::vector<uint16_t>(bytecode.begin(), bytecode.end()));
-
-			// run node
-			Run msg(node.localId);
-			msg.serialize(stream);
-			stream->flush();
-		} catch(Dashel::DashelException e) {
-			errorString = e.what();
-			if(interface->isVerbose()) {
-				cerr << "Target " << address << " failed to send bytecode and run message for node " << node.globalId << " (" << node.name << ") to stream: " << e.what() << endl;
-			}
-			return false;
-		}
-
-
-		// retrieve user-defined variables for use in get/set
-		node.variablesMap = *compiler.getVariablesMap();
-		return true;
-	} else {
-		errorString = WStringToUTF8(error.toWString());
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to compile program for node " << globalNodeId << " (" << node.name << "): " << errorString << endl;
-		}
-
-		return false;
-	}
+    return result;
 }
 
-bool HttpDashelTarget::removePendingVariable(unsigned globalNodeId, unsigned start)
-{
-	map<unsigned, Node>::iterator query = nodes.find(globalNodeId);
-	if(query == nodes.end()) {
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " failed to remove pending variable for node " << globalNodeId << ": No such node" << endl;
-		}
-		return false;
-	}
-
-	Node& node = query->second;
-	assert(globalNodeId == node.globalId);
-
-	return node.pendingVariables.erase(start) == 1;
+const HttpDashelTarget::Node* HttpDashelTarget::getNodeById(unsigned globalNodeId) const {
+    map<unsigned, Node>::const_iterator query = nodes.find(globalNodeId);
+    if(query != nodes.end()) {
+        return &query->second;
+    } else {
+        return nullptr;
+    }
 }
 
-std::set<const HttpDashelTarget::Node *> HttpDashelTarget::getNodesByName(const std::string& name) const
-{
-	set<const HttpDashelTarget::Node *> result;
-
-	// todo: maybe make this more efficient by caching node access by name?
-	map<unsigned, Node>::const_iterator end = nodes.end();
-	for(map<unsigned, Node>::const_iterator iter = nodes.begin(); iter != end; ++iter) {
-		const Node& node = iter->second;
-
-		if(node.name == name) {
-			result.insert(&node);
-		}
-	}
-
-	return result;
+const HttpDashelTarget::Node* HttpDashelTarget::getNodeByLocalId(unsigned localNodeId) const {
+    map<unsigned, unsigned>::const_iterator query = globalIds.find(localNodeId);
+    if(query != globalIds.end()) {
+        return getNodeById(query->second);
+    } else {
+        return nullptr;
+    }
 }
 
-const HttpDashelTarget::Node *HttpDashelTarget::getNodeById(unsigned globalNodeId) const
-{
-	map<unsigned, Node>::const_iterator query = nodes.find(globalNodeId);
-	if(query != nodes.end()) {
-		return &query->second;
-	} else {
-		return nullptr;
-	}
+bool HttpDashelTarget::getVariableInfo(const Node& node, const std::string& variableName, unsigned& position,
+                                       unsigned& size) {
+    VariablesMap::const_iterator query = node.variablesMap.find(UTF8ToWString(variableName));
+    if(query != node.variablesMap.end()) {
+        position = query->second.first;
+        size = query->second.second;
+        return true;
+    }
+
+    // if variable is not user-defined, check whether it is provided by this node
+    bool ok;
+    position = getVariablePos(node.localId, UTF8ToWString(variableName), &ok);
+    if(ok) {
+        size = getVariableSize(node.localId, UTF8ToWString(variableName), &ok);
+
+        if(ok) {
+            return true;
+        }
+    }
+
+    if(interface->isVerbose()) {
+        cerr << "Target " << address << " failed to find variable '" << variableName << "' address for node "
+             << node.globalId << " (" << node.name << ")" << endl;
+    }
+    return false;
 }
 
-const HttpDashelTarget::Node *HttpDashelTarget::getNodeByLocalId(unsigned localNodeId) const
-{
-	map<unsigned, unsigned>::const_iterator query = globalIds.find(localNodeId);
-	if(query != globalIds.end()) {
-		return getNodeById(query->second);
-	} else {
-		return nullptr;
-	}
+void HttpDashelTarget::sendMessage(const Message& message) {
+    message.serialize(stream);
+    stream->flush();
 }
 
-bool HttpDashelTarget::getVariableInfo(const Node& node, const std::string& variableName, unsigned& position, unsigned& size)
-{
-	VariablesMap::const_iterator query = node.variablesMap.find(UTF8ToWString(variableName));
-	if(query != node.variablesMap.end()) {
-		position = query->second.first;
-		size = query->second.second;
-		return true;
-	}
+void HttpDashelTarget::nodeDescriptionReceived(unsigned localNodeId) {
+    std::map<unsigned, unsigned>::iterator query = globalIds.find(localNodeId);
+    if(query == globalIds.end()) {
+        Node node;
+        node.localId = localNodeId;
+        node.name = WStringToUTF8(getNodeName(localNodeId));
+        node.globalId = interface->registerNode(this, localNodeId);
+        nodes[node.globalId] = node;
+        globalIds[node.localId] = node.globalId;
 
-	// if variable is not user-defined, check whether it is provided by this node
-	bool ok;
-	position = getVariablePos(node.localId, UTF8ToWString(variableName), &ok);
-	if(ok) {
-		size = getVariableSize(node.localId, UTF8ToWString(variableName), &ok);
+        if(interface->isVerbose()) {
+            cerr << "Target " << address << " received description for node " << node.globalId << " (" << node.name
+                 << ")" << endl;
+        }
 
-		if(ok) {
-			return true;
-		}
-	}
+        std::vector<int16_t> data;
+        data.push_back(node.globalId);
 
-	if(interface->isVerbose()) {
-		cerr << "Target " << address << " failed to find variable '" << variableName << "' address for node " << node.globalId << " (" << node.name << ")" << endl;
-	}
-	return false;
-}
-
-void HttpDashelTarget::sendMessage(const Message& message)
-{
-	message.serialize(stream);
-	stream->flush();
-}
-
-void HttpDashelTarget::nodeDescriptionReceived(unsigned localNodeId)
-{
-	std::map<unsigned, unsigned>::iterator query = globalIds.find(localNodeId);
-	if(query == globalIds.end()) {
-		Node node;
-		node.localId = localNodeId;
-		node.name = WStringToUTF8(getNodeName(localNodeId));
-		node.globalId = interface->registerNode(this, localNodeId);
-		nodes[node.globalId] = node;
-		globalIds[node.localId] = node.globalId;
-
-		if(interface->isVerbose()) {
-			cerr << "Target " << address << " received description for node " << node.globalId << " (" << node.name << ")" << endl;
-		}
-
-		std::vector<int16_t> data;
-		data.push_back(node.globalId);
-
-		interface->notifyEventSubscribers("connect", data);
-	} else if(interface->isVerbose()) {
-		cerr << "Target " << address << " received description for local node id " << localNodeId << ", but that node was already registered to node " << query->second << endl;
-	}
+        interface->notifyEventSubscribers("connect", data);
+    } else if(interface->isVerbose()) {
+        cerr << "Target " << address << " received description for local node id " << localNodeId
+             << ", but that node was already registered to node " << query->second << endl;
+    }
 }

@@ -1,63 +1,60 @@
-﻿---
-BasedOnStyle: Mozilla
+
+---
+BasedOnStyle: llvm
 AccessModifierOffset: '-4'
 AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
 AlignEscapedNewlinesLeft: 'true'
-AlignOperands: false
-AlignTrailingComments: 'false'
+AlignOperands: 'false'
+AlignTrailingComments: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'true'
-AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: 'false'
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: 'true'
-BinPackArguments: 'false'
+BinPackArguments: 'true'
 BinPackParameters: 'true'
 BreakBeforeBraces: Custom
-BreakBeforeTernaryOperators: 'true'
+BreakBeforeTernaryOperators: 'false'
+BreakConstructorInitializers: BeforeColon
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: 'true'
 IndentCaseLabels: 'true'
 Language: Cpp
 MaxEmptyLinesToKeep: '2'
-NamespaceIndentation: All
+NamespaceIndentation: Inner
 PointerAlignment: Left
-ReflowComments: false
+ReflowComments: 'true'
 SortIncludes: 'false'
 SpaceBeforeAssignmentOperators: 'true'
-SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: Never
 SpaceInEmptyParentheses: 'false'
 Standard: Auto
 TabWidth: 4
 IndentWidth: 4
-UseTab: Always
-ColumnLimit: 0
-#IndentPPDirectives: AfterHash
-BreakConstructorInitializers: AfterColon
-BreakBeforeInheritanceComma : false
+UseTab: Never
+ColumnLimit: 120
+IndentPPDirectives: AfterHash
+BreakConstructorInitializers: BeforeComma
 ConstructorInitializerIndentWidth: 4
-SpacesInCStyleCastParentheses: false
-SpacesBeforeTrailingComments: 1
-ExperimentalAutoDetectBinPacking: true
-AllowAllParametersOfDeclarationOnNextLine: false
-ContinuationIndentWidth: 4
+IncludeBlocks: Regroup
 BraceWrapping:
   SplitEmptyFunction: false
-  AfterEnum: true
-  AfterControlStatement: true
-  AfterStruct: true
-  AfterClass: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterUnion: true
-  #AfterExternBlock: true
-  BeforeCatch: true
-  BeforeElse: true
-  IndentBraces: false
-AlignAfterOpenBracket: DontAlign
-BreakBeforeBinaryOperators: NonAssignment
+  AfterEnum: false
+  AfterStruct: false
+  AfterClass : false
+  AfterControlStatement: false
+  AfterNamespace: false
+BreakBeforeInheritanceComma: false
+BreakStringLiterals: true
+IndentWrappedFunctionNames: false
+KeepEmptyLinesAtTheStartOfBlocks: true
+SpaceAfterCStyleCast : false
+SpaceAfterTemplateKeyword: true
+SpacesBeforeTrailingComments: 2
+SpacesInContainerLiterals: true
 ...

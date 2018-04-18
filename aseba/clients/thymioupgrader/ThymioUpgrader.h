@@ -19,105 +19,96 @@ class QGroupBox;
 class QNetworkAccessManager;
 class QNetworkReply;
 
-namespace Aseba
-{
-	/** \addtogroup thymioupdater */
-	/*@{*/
+namespace Aseba {
+/** \addtogroup thymioupdater */
+/*@{*/
 
-	class MessageHub;
+class MessageHub;
 
-	class QtBootloaderInterface:public QObject, public BootloaderInterface
-	{
-		Q_OBJECT
+class QtBootloaderInterface : public QObject, public BootloaderInterface {
+    Q_OBJECT
 
-	public:
-		QtBootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
+public:
+    QtBootloaderInterface(Dashel::Stream* stream, int dest, int bootloaderDest);
 
-	protected:
-		virtual void writeHexGotDescription(unsigned pagesCount);
-		virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple);
-		virtual void errorWritePageNonFatal(unsigned pageNumber);
+protected:
+    virtual void writeHexGotDescription(unsigned pagesCount);
+    virtual void writePageStart(unsigned pageNumber, const uint8_t* data, bool simple);
+    virtual void errorWritePageNonFatal(unsigned pageNumber);
 
-	protected:
-		unsigned pagesCount;
-		unsigned pagesDoneCount;
+protected:
+    unsigned pagesCount;
+    unsigned pagesDoneCount;
 
-	signals:
-		void flashProgress(int percentage);
-	};
+signals:
+    void flashProgress(int percentage);
+};
 
-	class ThymioUpgraderDialog : public QWidget
-	{
-		Q_OBJECT
+class ThymioUpgraderDialog : public QWidget {
+    Q_OBJECT
 
-	private:
-		struct FlashResult
-		{
-			enum Status
-			{
-				SUCCESS = 0,
-				WARNING,
-				FAILURE
-			} status;
-			QString title;
-			QString text;
+private:
+    struct FlashResult {
+        enum Status { SUCCESS = 0, WARNING, FAILURE } status;
+        QString title;
+        QString text;
 
-			FlashResult():status(SUCCESS) {}
-			FlashResult(Status status, const QString& title, const QString& text):status(status), title(title), text(text) {}
-		};
+        FlashResult() : status(SUCCESS) {}
+        FlashResult(Status status, const QString& title, const QString& text)
+            : status(status), title(title), text(text) {}
+    };
 
-	private:
-		std::string target;
+private:
+    std::string target;
 
-		unsigned currentVersion;
-		unsigned currentDevStatus;
-		unsigned officialVersion;
-		unsigned officialDevStatus;
-		QTemporaryFile  officialHexFile;
+    unsigned currentVersion;
+    unsigned currentDevStatus;
+    unsigned officialVersion;
+    unsigned officialDevStatus;
+    QTemporaryFile officialHexFile;
 
-		QGroupBox* officialGroupBox;
-		QGroupBox* fileGroupBox;
-		QVBoxLayout* mainLayout;
-		QHBoxLayout* fileLayout;
-		QHBoxLayout* flashLayout;
-		QLabel* officialFirmwareText;
-		QLabel* firmwareVersion;
-		QLabel* nodeIdText;
-		QLineEdit* lineEdit;
-		QPushButton* fileButton;
-		QProgressBar* progressBar;
-		QPushButton* flashButton;
-		QPushButton* quitButton;
-		QFuture<FlashResult> flashFuture;
-		QFutureWatcher<FlashResult> flashFutureWatcher;
-		QNetworkAccessManager *networkManager;
+    QGroupBox* officialGroupBox;
+    QGroupBox* fileGroupBox;
+    QVBoxLayout* mainLayout;
+    QHBoxLayout* fileLayout;
+    QHBoxLayout* flashLayout;
+    QLabel* officialFirmwareText;
+    QLabel* firmwareVersion;
+    QLabel* nodeIdText;
+    QLineEdit* lineEdit;
+    QPushButton* fileButton;
+    QProgressBar* progressBar;
+    QPushButton* flashButton;
+    QPushButton* quitButton;
+    QFuture<FlashResult> flashFuture;
+    QFutureWatcher<FlashResult> flashFutureWatcher;
+    QNetworkAccessManager* networkManager;
 
-	public:
-		ThymioUpgraderDialog(const std::string& target);
-		~ThymioUpgraderDialog();
+public:
+    ThymioUpgraderDialog(const std::string& target);
+    ~ThymioUpgraderDialog();
 
-	private:
-		unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
-		void readIdVersion();
-		FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
-		void networkError();
-		QString versionDevStatusToString(unsigned version, unsigned devStatus) const;
-		void selectOfficialFirmware();
-		void selectUserFirmware();
+private:
+    unsigned readId(MessageHub& hub, Dashel::Stream* stream) const;
+    void readIdVersion();
+    FlashResult flashThread(const std::string& _target, const std::string& hexFileName) const;
+    void networkError();
+    QString versionDevStatusToString(unsigned version, unsigned devStatus) const;
+    void selectOfficialFirmware();
+    void selectUserFirmware();
 
-	private slots:
-		void officialGroupChecked(bool on);
-		void fileGroupChecked(bool on);
-		void setupFlashButtonState();
-		void openFile(void);
-		void doFlash(void);
-		void flashProgress(int percentage);
-		void flashFinished();
-		void networkReplyFinished(QNetworkReply*);
-	};
+private slots:
+    void officialGroupChecked(bool on);
+    void fileGroupChecked(bool on);
+    void setupFlashButtonState();
+    void openFile(void);
+    void doFlash(void);
+    void flashProgress(int percentage);
+    void flashFinished();
+    void networkReplyFinished(QNetworkReply*);
+};
 
-	/*@}*/
-} // namespace Aseba
+/*@}*/
+}  // namespace Aseba
 
-#endif // THYMIO_FLASHER_H
-
+#endif  // THYMIO_FLASHER_H

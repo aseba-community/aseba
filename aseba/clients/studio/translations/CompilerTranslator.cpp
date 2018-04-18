@@ -2,20 +2,14 @@
 #include "CompilerTranslator.h"
 #include "compiler/errors_code.h"
 
-namespace Aseba
-{
-	CompilerTranslator::CompilerTranslator()
-	{
+namespace Aseba {
+CompilerTranslator::CompilerTranslator() {}
 
-	}
+const std::wstring CompilerTranslator::translate(ErrorCode error) {
+    QString msg;
 
-	const std::wstring CompilerTranslator::translate(ErrorCode error)
-	{
-		QString msg;
-
-		switch (error)
-		{
-			// clang-format off
+    switch(error) {
+            // clang-format off
 			case ERROR_BROKEN_TARGET:
 				msg = tr("Broken target description: not enough room for internal variables");
 				break;
@@ -574,9 +568,9 @@ namespace Aseba
 
 			default:
 				msg = tr("Unknown error");
-			// clang-format on
-		}
+            // clang-format on
+    }
 
-		return msg.toStdWString();
-	}
-};
+    return msg.toStdWString();
+}
+};  // namespace Aseba
