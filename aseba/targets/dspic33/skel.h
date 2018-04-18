@@ -1,20 +1,20 @@
 /*
-	Aseba - an event-based framework for distributed robot control
-	Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-	with contributions from the community.
-	Copyright (C) 2007--2018 the authors, see authors.txt for details.
+    Aseba - an event-based framework for distributed robot control
+    Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
+    with contributions from the community.
+    Copyright (C) 2007--2018 the authors, see authors.txt for details.
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, version 3 of the License.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3 of the License.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -37,8 +37,6 @@
 #include <skel-user.h>
 
 
-
-
 extern struct _vmVariables vmVariables;
 
 extern unsigned int events_flags;
@@ -46,15 +44,12 @@ extern unsigned int events_flags;
 extern AsebaVMState vmState;
 
 
-/*** In your code, put "SET_EVENT(EVENT_NUMBER)" when you want to trigger an 
-	 event. This macro is interrupt-safe, you can call it anywhere you want.
+/*** In your code, put "SET_EVENT(EVENT_NUMBER)" when you want to trigger an
+     event. This macro is interrupt-safe, you can call it anywhere you want.
 ***/
 #define SET_EVENT(event) atomic_or(&events_flags, 1 << event)
 #define CLEAR_EVENT(event) atomic_and(&events_flags, ~(1 << event))
 #define IS_EVENT(event) (events_flags & (1 << event))
-
-
-
 
 
 // Call this when everything is initialised and you are ready to give full control to the VM
@@ -75,7 +70,7 @@ void update_aseba_variables_read(void);
 // This function must update the microcontrolleur state to match the variables
 // It is called _AFTER_ running the VM, so it's a {Aseba Variables} -> {Microcontroller state}
 // synchronisation
-//Implement it yourself
+// Implement it yourself
 void update_aseba_variables_write(void);
 
 // This function load the settings structure from flash. Call it _AFTER_ init_aseba_and_can()

@@ -1,20 +1,20 @@
 /*
-	Aseba - an event-based framework for distributed robot control
-	Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-	with contributions from the community.
-	Copyright (C) 2007--2018 the authors, see authors.txt for details.
+    Aseba - an event-based framework for distributed robot control
+    Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
+    with contributions from the community.
+    Copyright (C) 2007--2018 the authors, see authors.txt for details.
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, version 3 of the License.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3 of the License.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef TCPTARGET_H
@@ -36,8 +36,8 @@
 #include <map>
 #include <dashel/dashel.h>
 #ifdef ZEROCONF_SUPPORT
-#include "common/zeroconf/zeroconf-qt.h"
-#endif // ZEROCONF_SUPPORT
+#    include "common/zeroconf/zeroconf-qt.h"
+#endif  // ZEROCONF_SUPPORT
 
 class QPushButton;
 class QGroupBox;
@@ -48,207 +48,206 @@ class QComboBox;
 class QTranslator;
 class QListWidgetItem;
 
-namespace Dashel
-{
-	class Stream;
+namespace Dashel {
+class Stream;
 }
 
-namespace Aseba
-{
-	/** \addtogroup studio */
-	/*@{*/
+namespace Aseba {
+/** \addtogroup studio */
+/*@{*/
 
-	class DashelConnectionDialog : public QDialog
-	{
-		Q_OBJECT
+class DashelConnectionDialog : public QDialog {
+    Q_OBJECT
 
-	protected:
-		QPushButton* connectButton;
-		QListWidget* discoveredList;
-		QLineEdit* currentTarget;
-		QComboBox* languageSelectionBox;
+protected:
+    QPushButton* connectButton;
+    QListWidget* discoveredList;
+    QLineEdit* currentTarget;
+    QComboBox* languageSelectionBox;
 #ifdef ZEROCONF_SUPPORT
-		Aseba::QtZeroconf zeroconf;
-#endif // ZEROCONF_SUPPORT
+    Aseba::QtZeroconf zeroconf;
+#endif  // ZEROCONF_SUPPORT
 
-	public:
-		DashelConnectionDialog();
-		std::string getTarget();
-		QString getLocaleName();
+public:
+    DashelConnectionDialog();
+    std::string getTarget();
+    QString getLocaleName();
 
-	protected:
-		bool updatePortList(const QString& toSelect);
-		virtual void timerEvent ( QTimerEvent * event );
+protected:
+    bool updatePortList(const QString& toSelect);
+    virtual void timerEvent(QTimerEvent* event);
 
-	protected slots:
+protected slots:
 #ifdef ZEROCONF_SUPPORT
-		void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
-		void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation& target);
-#endif // ZEROCONF_SUPPORT
-		void updateCurrentTarget();
-		void connectToItem(QListWidgetItem *item);
-		QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget, const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
+    void zeroconfTargetFound(const Aseba::Zeroconf::TargetInformation& target);
+    void zeroconfTargetRemoved(const Aseba::Zeroconf::TargetInformation& target);
+#endif  // ZEROCONF_SUPPORT
+    void updateCurrentTarget();
+    void connectToItem(QListWidgetItem* item);
+    QListWidgetItem* addEntry(const QString& title, const QString& connectionType, const QString& dashelTarget,
+                              const QString& additionalInfo = "", const QVariantList& additionalData = QVariantList());
 
-	private slots:
-		void targetTemplateSerial();
-		void targetTemplateLocalTCP();
-		void targetTemplateTCP();
-		void targetTemplateDoc();
-	};
+private slots:
+    void targetTemplateSerial();
+    void targetTemplateLocalTCP();
+    void targetTemplateTCP();
+    void targetTemplateDoc();
+};
 
-	class Message;
-	class UserMessage;
+class Message;
+class UserMessage;
 
-	class DashelInterface: public QThread, public Dashel::Hub, public NodesManager
-	{
-		Q_OBJECT
+class DashelInterface : public QThread, public Dashel::Hub, public NodesManager {
+    Q_OBJECT
 
-	public:
-		bool isRunning;
-		Dashel::Stream* stream;
-		std::string lastConnectedTarget;
-		std::string lastConnectedTargetName;
-		QString language;
+public:
+    bool isRunning;
+    Dashel::Stream* stream;
+    std::string lastConnectedTarget;
+    std::string lastConnectedTargetName;
+    QString language;
 
-	public:
-		DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget);
-		bool attemptToReconnect();
+public:
+    DashelInterface(QVector<QTranslator*> translators, const QString& commandLineTarget);
+    bool attemptToReconnect();
 
-		// from Dashel::Hub
-		virtual void stop();
+    // from Dashel::Hub
+    virtual void stop();
 
-	signals:
-		void messageAvailable(Message *message);
-		void dashelDisconnection();
-		void nodeDescriptionReceivedSignal(unsigned nodeId);
-		void nodeConnectedSignal(unsigned nodeId);
-		void nodeDisconnectedSignal(unsigned nodeId);
+signals:
+    void messageAvailable(Message* message);
+    void dashelDisconnection();
+    void nodeDescriptionReceivedSignal(unsigned nodeId);
+    void nodeConnectedSignal(unsigned nodeId);
+    void nodeDisconnectedSignal(unsigned nodeId);
 
-	protected:
-		// from QThread
-		virtual void run();
+protected:
+    // from QThread
+    virtual void run();
 
-		// from Dashel::Hub
-		virtual void incomingData(Dashel::Stream *stream);
-		virtual void connectionClosed(Dashel::Stream *stream, bool abnormal);
+    // from Dashel::Hub
+    virtual void incomingData(Dashel::Stream* stream);
+    virtual void connectionClosed(Dashel::Stream* stream, bool abnormal);
 
-		// from NodesManager
-		virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring &nodeName, uint16_t protocolVersion);
-		virtual void nodeDescriptionReceived(unsigned nodeId);
-		virtual void nodeConnected(unsigned nodeId);
-		virtual void nodeDisconnected(unsigned nodeId);
-	public:
-		// from NodesManager, now as public as we want DashelTarget to call this method
-		virtual void sendMessage(const Message& message);
-	};
+    // from NodesManager
+    virtual void nodeProtocolVersionMismatch(unsigned nodeId, const std::wstring& nodeName, uint16_t protocolVersion);
+    virtual void nodeDescriptionReceived(unsigned nodeId);
+    virtual void nodeConnected(unsigned nodeId);
+    virtual void nodeDisconnected(unsigned nodeId);
 
-	class ReconnectionDialog: public QMessageBox
-	{
-		Q_OBJECT
+public:
+    // from NodesManager, now as public as we want DashelTarget to call this method
+    virtual void sendMessage(const Message& message);
+};
 
-	public:
-		ReconnectionDialog(DashelInterface& dashelInterface);
+class ReconnectionDialog : public QMessageBox {
+    Q_OBJECT
 
-	protected:
-		virtual void timerEvent ( QTimerEvent * event );
+public:
+    ReconnectionDialog(DashelInterface& dashelInterface);
 
-		DashelInterface& dashelInterface;
-		unsigned counter;
-	};
+protected:
+    virtual void timerEvent(QTimerEvent* event);
 
-	class DashelTarget: public Target
-	{
-		Q_OBJECT
+    DashelInterface& dashelInterface;
+    unsigned counter;
+};
 
-	protected:
-		struct Node
-		{
-			Node();
+class DashelTarget : public Target {
+    Q_OBJECT
 
-			BytecodeVector debugBytecode; //!< bytecode with debug information
-			BytecodeVector::EventAddressesToIdsMap eventAddressToId; //!< map event start addresses to event identifiers
-			unsigned steppingInNext; //!< state of node when in next and stepping
-			unsigned lineInNext; //!< line of node to execute when in next and stepping
-			ExecutionMode executionMode; //!< last known execution mode if this node
-		};
+protected:
+    struct Node {
+        Node();
 
-		typedef void (DashelTarget::*MessageHandler)(Message *message);
-		typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
-		typedef std::map<unsigned, Node> NodesMap;
+        BytecodeVector debugBytecode;                             //!< bytecode with debug information
+        BytecodeVector::EventAddressesToIdsMap eventAddressToId;  //!< map event start addresses to event identifiers
+        unsigned steppingInNext;                                  //!< state of node when in next and stepping
+        unsigned lineInNext;                                      //!< line of node to execute when in next and stepping
+        ExecutionMode executionMode;                              //!< last known execution mode if this node
+    };
 
-		DashelInterface dashelInterface;
+    typedef void (DashelTarget::*MessageHandler)(Message* message);
+    typedef std::map<unsigned, MessageHandler> MessagesHandlersMap;
+    typedef std::map<unsigned, Node> NodesMap;
 
-		MessagesHandlersMap messagesHandlersMap;
+    DashelInterface dashelInterface;
 
-		QQueue<UserMessage *> userEventsQueue;
-		NodesMap nodes;
-		QTimer userEventsTimer;
-		// Note: this timer is here rather than in DashelInterface because writeBlocked is here, if wiretBlocked is removed, this timer should be moved
-		QTimer listNodesTimer;
-		bool writeBlocked; //!< true if write is being blocked by invasive plugins, false if write is allowed
+    MessagesHandlersMap messagesHandlersMap;
 
-	public:
-		friend class InvasivePlugin;
-		DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget);
-		~DashelTarget();
+    QQueue<UserMessage*> userEventsQueue;
+    NodesMap nodes;
+    QTimer userEventsTimer;
+    // Note: this timer is here rather than in DashelInterface because writeBlocked is here, if
+    // wiretBlocked is removed, this timer should be moved
+    QTimer listNodesTimer;
+    bool writeBlocked;  //!< true if write is being blocked by invasive plugins, false if write is
+                        //!< allowed
 
-		virtual QString getLanguage() const { return dashelInterface.language; }
-		virtual QList<unsigned> getNodesList() const;
+public:
+    friend class InvasivePlugin;
+    DashelTarget(QVector<QTranslator*> translators, const QString& commandLineTarget);
+    ~DashelTarget();
 
-		virtual void disconnect();
+    virtual QString getLanguage() const {
+        return dashelInterface.language;
+    }
+    virtual QList<unsigned> getNodesList() const;
 
-		virtual const TargetDescription * const getDescription(unsigned node) const;
+    virtual void disconnect();
 
-		virtual void uploadBytecode(unsigned node, const BytecodeVector &bytecode);
-		virtual void writeBytecode(unsigned node);
-		virtual void reboot(unsigned node);
+    virtual const TargetDescription* const getDescription(unsigned node) const;
 
-		virtual void sendEvent(unsigned id, const VariablesDataVector &data);
+    virtual void uploadBytecode(unsigned node, const BytecodeVector& bytecode);
+    virtual void writeBytecode(unsigned node);
+    virtual void reboot(unsigned node);
 
-		virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector &data);
-		virtual void getVariables(unsigned node, unsigned start, unsigned length);
+    virtual void sendEvent(unsigned id, const VariablesDataVector& data);
 
-		virtual void reset(unsigned node);
-		virtual void run(unsigned node);
-		virtual void pause(unsigned node);
-		virtual void next(unsigned node);
-		virtual void stop(unsigned node);
+    virtual void setVariables(unsigned node, unsigned start, const VariablesDataVector& data);
+    virtual void getVariables(unsigned node, unsigned start, unsigned length);
 
-		virtual void setBreakpoint(unsigned node, unsigned line);
-		virtual void clearBreakpoint(unsigned node, unsigned line);
-		virtual void clearBreakpoints(unsigned node);
+    virtual void reset(unsigned node);
+    virtual void run(unsigned node);
+    virtual void pause(unsigned node);
+    virtual void next(unsigned node);
+    virtual void stop(unsigned node);
 
-	protected:
-		virtual void blockWrite();
-		virtual void unblockWrite();
+    virtual void setBreakpoint(unsigned node, unsigned line);
+    virtual void clearBreakpoint(unsigned node, unsigned line);
+    virtual void clearBreakpoints(unsigned node);
 
-	protected slots:
-		void updateUserEvents();
-		void listNodes();
-		void messageFromDashel(Message *message);
-		void disconnectionFromDashel();
-		void nodeDescriptionReceived(unsigned node);
+protected:
+    virtual void blockWrite();
+    virtual void unblockWrite();
 
-	protected:
-		void receivedDescription(Message *message);
-		void receivedLocalEventDescription(Message *message);
-		void receivedNativeFunctionDescription(Message *message);
-		void receivedVariables(Message *message);
-		void receivedArrayAccessOutOfBounds(Message *message);
-		void receivedDivisionByZero(Message *message);
-		void receivedEventExecutionKilled(Message *message);
-		void receivedNodeSpecificError(Message *message);
-		void receivedExecutionStateChanged(Message *message);
-		void receivedBreakpointSetResult(Message *message);
-		void receivedBootloaderAck(Message *message);
+protected slots:
+    void updateUserEvents();
+    void listNodes();
+    void messageFromDashel(Message* message);
+    void disconnectionFromDashel();
+    void nodeDescriptionReceived(unsigned node);
 
-	protected:
-		bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
-		int getPCFromLine(unsigned node, unsigned line);
-		int getLineFromPC(unsigned node, unsigned pc);
-	};
+protected:
+    void receivedDescription(Message* message);
+    void receivedLocalEventDescription(Message* message);
+    void receivedNativeFunctionDescription(Message* message);
+    void receivedVariables(Message* message);
+    void receivedArrayAccessOutOfBounds(Message* message);
+    void receivedDivisionByZero(Message* message);
+    void receivedEventExecutionKilled(Message* message);
+    void receivedNodeSpecificError(Message* message);
+    void receivedExecutionStateChanged(Message* message);
+    void receivedBreakpointSetResult(Message* message);
+    void receivedBootloaderAck(Message* message);
 
-	/*@}*/
-} // namespace Aseba
+protected:
+    bool emitNodeConnectedIfDescriptionComplete(unsigned id, const Node& node);
+    int getPCFromLine(unsigned node, unsigned line);
+    int getLineFromPC(unsigned node, unsigned pc);
+};
+
+/*@}*/
+}  // namespace Aseba
 
 #endif

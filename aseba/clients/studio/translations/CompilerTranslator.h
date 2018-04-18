@@ -5,18 +5,15 @@
 #include <QtCore>
 #include <string>
 
-namespace Aseba
-{
-	class CompilerTranslator: public QObject
-	{
-		Q_OBJECT
+namespace Aseba {
+class CompilerTranslator : public QObject {
+    Q_OBJECT
 
-		public:
-			CompilerTranslator();
+public:
+    CompilerTranslator();
 
-			static const std::wstring translate(ErrorCode error);
-	};
+    static const std::wstring translate(ErrorCode error);
 };
+};  // namespace Aseba
 
-#endif // _TRANSLATOR_H
-
+#endif  // _TRANSLATOR_H

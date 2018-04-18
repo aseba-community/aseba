@@ -1,20 +1,20 @@
 /*
-	Aseba - an event-based framework for distributed robot control
-	Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-	with contributions from the community.
-	Copyright (C) 2007--2018 the authors, see authors.txt for details.
+    Aseba - an event-based framework for distributed robot control
+    Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
+    with contributions from the community.
+    Copyright (C) 2007--2018 the authors, see authors.txt for details.
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, version 3 of the License.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3 of the License.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <enki/PhysicalEngine.h>
@@ -25,41 +25,36 @@
 #include <QtGui>
 #include <QtDebug>
 
-namespace Enki
-{
-	class MarxbotViewer: public ViewerWidget
-	{
-	public:
-		MarxbotViewer(World* world) : ViewerWidget(world) {}
+namespace Enki {
+class MarxbotViewer : public ViewerWidget {
+public:
+    MarxbotViewer(World* world) : ViewerWidget(world) {}
 
-		void renderObjectsTypesHook()
-		{
-			managedObjectsAliases[&typeid(AsebaMarxbot)] = &typeid(Marxbot);
-		}
-	};
+    void renderObjectsTypesHook() {
+        managedObjectsAliases[&typeid(AsebaMarxbot)] = &typeid(Marxbot);
+    }
+};
+}  // namespace Enki
+
+
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
+
+    // Create the world
+    Enki::World world(200, 200);
+
+    // Create viewer
+    Enki::MarxbotViewer viewer(&world);
+
+    // Create a Khepera and position it
+    Enki::AsebaMarxbot* marXbot = new Enki::AsebaMarxbot();
+    marXbot->pos = Enki::Point(100, 100);
+
+    // objects are garbage collected by the world on destruction
+    world.addObject(marXbot);
+
+    viewer.setWindowTitle("Aseba Enki");
+    viewer.show();
+
+    return app.exec();
 }
-
-
-int main(int argc, char *argv[])
-{
-	QApplication app(argc, argv);
-
-	// Create the world
-	Enki::World world(200, 200);
-
-	// Create viewer
-	Enki::MarxbotViewer viewer(&world);
-
-	// Create a Khepera and position it
-	Enki::AsebaMarxbot *marXbot = new Enki::AsebaMarxbot();
-	marXbot->pos = Enki::Point(100, 100);
-
-	// objects are garbage collected by the world on destruction
-	world.addObject(marXbot);
-
-	viewer.setWindowTitle("Aseba Enki");
-	viewer.show();
-
-	return app.exec();
-}
-

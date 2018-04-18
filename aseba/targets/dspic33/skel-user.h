@@ -1,20 +1,20 @@
 /*
-	Aseba - an event-based framework for distributed robot control
-	Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
-	with contributions from the community.
-	Copyright (C) 2007--2018 the authors, see authors.txt for details.
+    Aseba - an event-based framework for distributed robot control
+    Created by Stéphane Magnenat <stephane at magnenat dot net> (http://stephane.magnenat.net)
+    with contributions from the community.
+    Copyright (C) 2007--2018 the authors, see authors.txt for details.
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, version 3 of the License.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3 of the License.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -25,7 +25,7 @@
 #define DMA_CAN_TX DMA_CHANNEL_1
 
 // GPIO to use to set CAN speed
-#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD,11)
+#define CAN_SELECT_MODE GPIO_MAKE_ID(GPIO_PORTD, 11)
 
 // CAN interrupt priority
 #define PRIO_CAN 5
@@ -53,34 +53,32 @@
 #define VM_STACK_SIZE 32
 
 
-
 struct _vmVariables {
-	// NodeID
-	int16_t id;
-	// source
-	int16_t source;
-		// args
-	int16_t args[VM_VARIABLES_ARG_SIZE];
+    // NodeID
+    int16_t id;
+    // source
+    int16_t source;
+    // args
+    int16_t args[VM_VARIABLES_ARG_SIZE];
 
-	/****
+    /****
     ---> PUT YOUR VARIABLES HERE <---
     ****/
 
 
-	// free space
-	int16_t freeSpace[VM_VARIABLES_FREE_SPACE];
+    // free space
+    int16_t freeSpace[VM_VARIABLES_FREE_SPACE];
 };
 
 
-enum Events
-{
-	YOUR_FIRST_EVENT = 0,
-	YOUR_SECOND_EVENT,
-	/****
-	---> PUT YOUR EVENT NUMBER HERE <---
-	Must be in the same order as in skel.c
-	****/
-	EVENTS_COUNT // Do not touch
+enum Events {
+    YOUR_FIRST_EVENT = 0,
+    YOUR_SECOND_EVENT,
+    /****
+    ---> PUT YOUR EVENT NUMBER HERE <---
+    Must be in the same order as in skel.c
+    ****/
+    EVENTS_COUNT  // Do not touch
 };
 
 // The content of this structure is implementation-specific.
@@ -88,9 +86,9 @@ enum Events
 // The only way to write it is to do it from inside the VM (native function)
 // The native function access it as a integer array. So, use only int inside this structure
 struct private_settings {
-	/* ADD here the settings to save into flash */
-	/* The minimum size is one integer, the maximum size is 95 integer (Check done at compilation) */
-	int first_setting;
-	int second_setting;
+    /* ADD here the settings to save into flash */
+    /* The minimum size is one integer, the maximum size is 95 integer (Check done at compilation)
+     */
+    int first_setting;
+    int second_setting;
 };
-

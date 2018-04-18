@@ -10,69 +10,61 @@
 class QLabel;
 class QComboBox;
 
-namespace Aseba
-{
-	/** \addtogroup studio */
-	/*@{*/
+namespace Aseba {
+/** \addtogroup studio */
+/*@{*/
 
-	class TargetVariablesModel;
+class TargetVariablesModel;
 
-	class LinearCameraViewVariablesDialog : public QDialog
-	{
-		Q_OBJECT
+class LinearCameraViewVariablesDialog : public QDialog {
+    Q_OBJECT
 
-	public:
-		QComboBox* redVariable;
-		QComboBox* greenVariable;
-		QComboBox* blueVariable;
-		QComboBox* valuesRanges;
+public:
+    QComboBox* redVariable;
+    QComboBox* greenVariable;
+    QComboBox* blueVariable;
+    QComboBox* valuesRanges;
 
-		LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel);
-		virtual ~LinearCameraViewVariablesDialog() {}
-	};
+    LinearCameraViewVariablesDialog(TargetVariablesModel* variablesModel);
+    virtual ~LinearCameraViewVariablesDialog() {}
+};
 
-	class LinearCameraViewPlugin: public QWidget, public NodeToolInterface, public VariableListener
-	{
-		Q_OBJECT
+class LinearCameraViewPlugin : public QWidget, public NodeToolInterface, public VariableListener {
+    Q_OBJECT
 
-	public:
-		LinearCameraViewPlugin(DevelopmentEnvironmentInterface *_de);
+public:
+    LinearCameraViewPlugin(DevelopmentEnvironmentInterface* _de);
 
-		virtual QWidget* createMenuEntry();
-		virtual void closeAsSoonAsPossible();
+    virtual QWidget* createMenuEntry();
+    virtual void closeAsSoonAsPossible();
 
-	signals:
-		void dialogBoxResult(bool ok);
+signals:
+    void dialogBoxResult(bool ok);
 
-	private slots:
-		void setEnabled(bool enabled);
+private slots:
+    void setEnabled(bool enabled);
 
-	private:
-		void enablePlugin();
-		void disablePlugin();
+private:
+    void enablePlugin();
+    void disablePlugin();
 
-		virtual void timerEvent ( QTimerEvent * event );
-		virtual void closeEvent ( QCloseEvent * event );
-		virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
+    virtual void timerEvent(QTimerEvent* event);
+    virtual void closeEvent(QCloseEvent* event);
+    virtual void variableValueUpdated(const QString& name, const VariablesDataVector& values);
 
-	private:
-		std::unique_ptr<DevelopmentEnvironmentInterface> de;
-		enum ValuesRange
-		{
-			VALUES_RANGE_AUTO = 0,
-			VALUES_RANGE_8BITS,
-			VALUES_RANGE_PERCENT
-		} valuesRange;
-		QLabel *image;
-		QString redName, greenName, blueName;
-		unsigned redPos, greenPos, bluePos;
-		unsigned redSize, greenSize, blueSize;
-		VariablesDataVector red, green, blue;
-		unsigned componentsReceived;
-		int timerId;
-	};
+private:
+    std::unique_ptr<DevelopmentEnvironmentInterface> de;
+    enum ValuesRange { VALUES_RANGE_AUTO = 0, VALUES_RANGE_8BITS, VALUES_RANGE_PERCENT } valuesRange;
+    QLabel* image;
+    QString redName, greenName, blueName;
+    unsigned redPos, greenPos, bluePos;
+    unsigned redSize, greenSize, blueSize;
+    VariablesDataVector red, green, blue;
+    unsigned componentsReceived;
+    int timerId;
+};
 
-	/*@}*/
-} // namespace Aseba
+/*@}*/
+}  // namespace Aseba
 
 #endif
