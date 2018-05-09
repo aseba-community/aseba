@@ -30,6 +30,14 @@ If you use Aseba in an academic project leading to a publication, please cite:
     
 [full text document](https://infoscience.epfl.ch/record/144059/files/aseba-ieee-tr.pdf)
 
+## Thymio and Mobsya fork
+
+[Thymio](https://www.thymio.org) is an educational robot which goal is to let children discover programming. [Mobsya](http://www.mobsya.org) is a non-profit association which goal is to create products and service to help children to discover digital technology and sciences. It is at the heart of Thymio's development and takes care of its production and distribution.
+
+Up to April 2018, Mobsya was working as part of the Aseba community in the Aseba repository to develop Thymio software tools in an integrated manner. After this date, Mobsya decided to fork the Aseba repository and to keep developping Thymio software tools in [its own repository](https://github.com/Mobsya/aseba). 
+
+[Access the complete public message from Mobsya](https://docs.google.com/document/d/1ijY2dZR2TbSySMqFfbCgG_ifZPGoxrAQaVuZVQZHKlY/edit#)
+
 ## Hack and contribute
 
 If you found a bug with Aseba, please look at the [existing issues](https://github.com/aseba-community/aseba/issues) to see if your problem has already been reported.
