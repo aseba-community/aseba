@@ -4,11 +4,11 @@ Building Aseba
 Requierements & Dependencies
 ----------------------------
 
-Aseba requieres a C++14 compatible compiler. We recommand ``GCC 6``,
+Aseba requires a C++14 compatible compiler. We recommand ``GCC 6``,
 ``Clang 5`` or ``MSVC 19`` (Visual Studio 17).
 
 Aseba depends on Qt5.9 or greater. You will also need ``cmake`` 3.1 or
-greater, we recommend you use the latest version available.
+greater, we recommend you to use the latest version available.
 
 Getting the source code
 -----------------------
@@ -187,4 +187,4 @@ Ninja
 ~~~~~
 
 The compilation of Aseba can be significantly speed up using ``ninja``
-insteadf of make. Refer to the documentation of ``cmake`` and ``ninja``.
+instead of make. Refer to the documentation of ``cmake`` and ``ninja``.
