@@ -1,7 +1,7 @@
 Building Aseba
 ==============
 
-Requierements & Dependencies
+Requirements & Dependencies
 ----------------------------
 
 Aseba requires a C++14 compatible compiler. We recommand ``GCC 6``,
