@@ -134,8 +134,10 @@ Dependencies On Ubuntu & Debian
 ::
 
     sudo apt-get install qttools5-dev-tools \
+                         qttools5-dev \
                          qtbase5-dev \
                          qt5-qmake \
+                         libqt5help5 \
                          libqt5opengl5-dev \
                          libqt5svg5-dev \
                          libqt5x11extras5-dev \
@@ -144,11 +146,14 @@ Dependencies On Ubuntu & Debian
                          libxml2-dev \
                          libsdl2-dev \
                          libavahi-compat-libdnssd-dev \
+                         python-dev \
+                         libboost-python-dev \
+                         doxygen \
                          cmake \
                          g++ \
                          git \
                          make \
-
+ 
 Building Aseba
 ~~~~~~~~~~~~~~
 
