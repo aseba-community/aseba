@@ -47,6 +47,8 @@ If you want to help us translating Aseba or its documentation, please read the [
 
 If you are interested in contributing to programming Aseba, please read the [contributor guide](contributing.md).
 
+Aseba is not actively maintained, but if you send a reasonable pull request that solves a bug, it will likely get merged.
+
 Enjoy Aseba!
 
 The developers
