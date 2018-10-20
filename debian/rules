@@ -5,7 +5,7 @@ VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*/
 
 build:
 	mkdir -p debian/build
-	cd debian/build && cmake -D USER_BUILD_VERSION=${DEBVERS} -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=../tmp/usr ../..
+	cd debian/build && cmake -D USER_BUILD_VERSION=${DEBVERS} -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=../tmp/usr ../.. -DBUILD_SHARED_LIBS=OFF
 	cd debian/build && $(MAKE)
 
 clean:
