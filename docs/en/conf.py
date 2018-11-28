@@ -20,7 +20,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import subprocess, os
+import subprocess
+
 subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 # -- General configuration ------------------------------------------------
@@ -32,10 +33,12 @@ subprocess.call('cd ../doxygen; doxygen', shell=True)
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.imgmath',
-    'sphinx.ext.githubpages', 'sphinx.ext.intersphinx', 'sphinx.ext.imgmath', 'sphinx.ext.todo', 'breathe']
+extensions = [
+    'sphinx.ext.imgmath', 'sphinx.ext.githubpages', 'sphinx.ext.intersphinx', 'sphinx.ext.imgmath', 'sphinx.ext.todo',
+    'breathe'
+]
 
-breathe_projects = { "aseba": "../doxygen/doc/xml" }
+breathe_projects = {"aseba": "../doxygen/doc/xml"}
 breathe_default_project = "aseba"
 
 # Add any paths that contain templates here, relative to this directory.
@@ -82,7 +85,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -90,10 +92,12 @@ todo_include_todos = False
 #
 html_theme = 'sphinx_rtd_theme'
 
+
 # Use a style similar to the Linux Kernel documentation. as
 # it is more usable than the default RTD theme
 def setup(app):
     app.add_stylesheet('theme_overrides.css')
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -111,17 +115,12 @@ html_static_path = ['_static']
 #
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-html_sidebars = {
-    '**': [
-    ]
-}
-
+html_sidebars = {'**': []}
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Asebadoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -147,20 +146,14 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Aseba.tex', u'Aseba Documentation',
-     u'Stéphane Magnenat and other contributors', 'manual'),
+    (master_doc, 'Aseba.tex', u'Aseba Documentation', u'Stéphane Magnenat and other contributors', 'manual'),
 ]
-
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'aseba', u'Aseba Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'aseba', u'Aseba Documentation', [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -168,10 +161,6 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Aseba', u'Aseba Documentation',
-     author, 'Aseba', 'A set of tools which allow beginners to program robots easily and efficiently.',
-     'Miscellaneous'),
+    (master_doc, 'Aseba', u'Aseba Documentation', author, 'Aseba',
+     'A set of tools which allow beginners to program robots easily and efficiently.', 'Miscellaneous'),
 ]
-
-
-

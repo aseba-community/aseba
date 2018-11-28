@@ -18,15 +18,15 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os.path
+import sys
 
 SCRIPT_DIRECTORY = sys.path[0]
 SOURCES_DIRECTORY = os.path.join(SCRIPT_DIRECTORY, "..", "..", "aseba")
 
-QTABOUT_PATH   = os.path.join(SOURCES_DIRECTORY, "common", "about")
-STUDIO_PATH    = os.path.join(SOURCES_DIRECTORY, "clients", "studio")
-COMPILER_PATH  = os.path.join(SOURCES_DIRECTORY, "compiler")
+QTABOUT_PATH = os.path.join(SOURCES_DIRECTORY, "common", "about")
+STUDIO_PATH = os.path.join(SOURCES_DIRECTORY, "clients", "studio")
+COMPILER_PATH = os.path.join(SOURCES_DIRECTORY, "compiler")
 PLAYGROUND_PATH = os.path.join(SOURCES_DIRECTORY, "targets", "playground")
 CHALLENGE_PATH = os.path.join(SOURCES_DIRECTORY, "targets", "challenge")
 THYMIOUPGRADER_PATH = os.path.join(SOURCES_DIRECTORY, "clients", "thymioupgrader")

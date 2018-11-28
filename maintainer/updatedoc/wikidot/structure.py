@@ -16,31 +16,35 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import pickle
+import sys
 
-from wikidot.urltoname import urltoname
 from wikidot.tree import WikiNode
+from wikidot.urltoname import urltoname
 
 # Global variables used to build the wiki's structure
 __structure__ = dict()
 __lang__ = ''
+
 
 def add_language(lang):
     """Create a new entry for this language in the dictionary"""
     global __structure__
     __structure__[lang] = WikiNode('root_' + lang, '')
 
+
 def set_current_language(lang):
     """Set the current language, for future insertions"""
     global __lang__
     __lang__ = lang
 
+
 def get_structure(lang):
     """Return the tree corresponding to a specific language"""
     return __structure__[lang]
 
-def insert(title, url, breadcrumbs = set()):
+
+def insert(title, url, breadcrumbs=set()):
     """Insert a page into the current tree
 
     Set the current language using the 'set_current_language()' function."""
@@ -54,15 +58,19 @@ def insert(title, url, breadcrumbs = set()):
         page_breadcrumbs.append(urltoname(x))
     if __lang__ != '':
         __structure__[__lang__].insert(title, page_link, page_breadcrumbs)
+
+
 #        print >> sys.stderr, "**** Dump after insert:"
 #        __structure__[__lang__].dump()
     else:
         print >> sys.stderr, "*** Error in wikidot.structure.insert: set the language beforehand"
 
+
 def serialize(f):
     pickler = pickle.Pickler(f)
     pickler.dump(__lang__)
     pickler.dump(__structure__)
+
 
 def unserialize(f):
     global __lang__
@@ -70,4 +78,3 @@ def unserialize(f):
     pickler = pickle.Unpickler(f)
     __lang__ = pickler.load()
     __structure__ = pickler.load()
-

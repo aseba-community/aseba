@@ -16,20 +16,22 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
+import mimetypes
 # System lib
 import os
 import os.path
+import subprocess
 import sys
 import urllib2
-import mimetypes
-import subprocess
 
 # Custom lib
 import wikidot.debug
 import wikidot.structure
-from wikidot.urltoname import urltoname
-from wikidot.parser import WikidotParser
 import wikidot.tex2png
+from wikidot.parser import WikidotParser
+
 
 def __fix_breadcrumbs__(breadcrumbs, toplevel):
     # check if toplevel is part of the breadcrumbs,
@@ -45,7 +47,8 @@ def __fix_breadcrumbs__(breadcrumbs, toplevel):
             output_enable = True
     return output
 
-def fetchurl(page, offline_name, breadcrumbs = ''):
+
+def fetchurl(page, offline_name, breadcrumbs=''):
     """Given a wikidot URL, fetch it, convert it and store it locally.
 
     Inputs:
@@ -60,17 +63,17 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
         # Get the page
         print >> sys.stderr, "Connecting to {}...".format(page)
         response = urllib2.urlopen(page)
-    except urllib2.HTTPError, e:
-        print >> sys.stderr, e.code
-    except urllib2.URLError, e:
-        print >> sys.stderr, e.reason
+    except urllib2.HTTPError as e:
+        print(e.code, file=sys.stderr)
+    except urllib2.URLError as e:
+        print(e.reason, file=sys.stderr)
     else:
         retval = dict()
         retval['links'] = set()
         retval['breadcrumbs'] = list()
         # Check MIME type
         mime = mimetypes.guess_type(page)[0]
-        if (mime == None) or ('html' in mime):
+        if (mime is None) or ('html' in mime):
             # HTML or unknown type
             # Convert the wikidot page and check the breakcrumbs
             print >> sys.stderr, "Parsing..."
@@ -94,7 +97,7 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
             data = response.read()
         else:
             # Type is not supported
-            if wikidot.debug.ENABLE_DEBUG == True:
+            if wikidot.debug.ENABLE_DEBUG:
                 print >> sys.stderr, "*** This is not a supported type of file. File skipped."
             return retval
         # Save
@@ -102,9 +105,10 @@ def fetchurl(page, offline_name, breadcrumbs = ''):
         f = open(offline_name, 'w')
         f.write(data)
         f.close()
-        if wikidot.debug.ENABLE_DEBUG == True:
-            print >> sys.stderr, "***DEBUG: links: ", reval['links']
+        if wikidot.debug.ENABLE_DEBUG:
+            print("***DEBUG: links: ", retval['links'], file=sys.stderr)
         return retval
+
 
 def tidy(directory):
     html_files = [x for x in os.listdir(directory) if '.html' in x]
@@ -112,7 +116,8 @@ def tidy(directory):
     for x in html_files:
         filename = os.path.join(directory, x)
         print >> sys.stderr, "Processing ", filename
-        retcode = subprocess.call(["tidy","-config", "wikidot/tidy.config", "-q", "-o", filename, filename])
+        subprocess.call(["tidy", "-config", "wikidot/tidy.config", "-q", "-o", filename, filename])
+
 
 def fix_latex(directory):
     """Given a directory, convert LaTeX code to PNG images for every HTML file.
@@ -129,4 +134,3 @@ def fix_latex(directory):
         filename = os.path.join(directory, x)
         print >> sys.stderr, "Processing ", filename
         wikidot.tex2png.from_html(filename, os.path.splitext(filename)[0])
-

@@ -19,35 +19,29 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import os.path
-import sys
-
-from path import *
+import path
 import translation_tools
 
 translation_tools.init_commands()
 
 # qtabout
-translation_tools.do_lupdate_all(qtabout_path, "qtabout", qtabout_path)
+translation_tools.do_lupdate_all(path.qtabout_path, "qtabout", path.qtabout_path)
 
 # asebastudio
-translation_tools.do_lupdate_all(studio_path, "asebastudio", " ".join([studio_path, plugin_path, vpl_path]))
+translation_tools.do_lupdate_all(path.studio_path, "asebastudio",
+                                 " ".join([path.studio_path, path.plugin_path, path.vpl_path]))
 
 # compiler
-translation_tools.do_lupdate_all(studio_path, "compiler", compiler_ts_path)
+translation_tools.do_lupdate_all(path.studio_path, "compiler", path.compiler_ts_path)
 
 # playground
-translation_tools.do_lupdate_all(playground_path, "asebaplayground", playground_path)
+translation_tools.do_lupdate_all(path.playground_path, "asebaplayground", path.playground_path)
 
 # challenge
-translation_tools.do_lupdate_all(challenge_path, "asebachallenge", challenge_cpp)
+translation_tools.do_lupdate_all(path.challenge_path, "asebachallenge", path.challenge_cpp)
 
 # upgrader
-translation_tools.do_lupdate_all(thymioupgrader_path, "thymioupgrader", thymioupgrader_path)
+translation_tools.do_lupdate_all(path.thymioupgrader_path, "thymioupgrader", path.thymioupgrader_path)
 
 # wnetconfig
-translation_tools.do_lupdate_all(thymiownetconfig_path, "thymiownetconfig", thymiownetconfig_path)
-
-
-
+translation_tools.do_lupdate_all(path.thymiownetconfig_path, "thymiownetconfig", path.thymiownetconfig_path)

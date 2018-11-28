@@ -1,10 +1,9 @@
-
 class OrderedSet(list):
     """Naive and minimalist implementation of an ordered set"""
 
     def __init__(self, iterable=None):
         """x.__init__(...) initializes x."""
-        if iterable != None:
+        if iterable is not None:
             self.update(iterable)
 
     def __sub__(self, orderedset):

@@ -17,16 +17,17 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 import os.path
-import shutil
-import sys
 import re
-from string import Template
+import shutil
 import subprocess
+import sys
+from string import Template
 
-tex_file = \
-r"""
+tex_file = r"""
 \documentclass{article}
 \pagestyle{empty}
 \begin{document}
@@ -37,9 +38,10 @@ ${formula}
 tex_file_template = Template(tex_file)
 tex_math_re = re.compile(r"<span class=\"math-inline\">(.*?)</span>")
 
-def from_tex(tex_code, filename, density = 100):
+
+def from_tex(tex_code, filename, density=100):
     """Given a LaTeX string, generates a PNG file at a given density.
-    Temporary files are generated in the current folder, prefixed by filename, 
+    Temporary files are generated in the current folder, prefixed by filename,
     then erased.
 
     Inputs:
@@ -50,14 +52,15 @@ def from_tex(tex_code, filename, density = 100):
     Output:
         No output."""
 
-    basename = os.path.basename(filename)   # process in the current folder, result will be copied later
-    f = open("{0}.tex".format(basename),'w')
+    basename = os.path.basename(filename)  # process in the current folder, result will be copied later
+    f = open("{0}.tex".format(basename), 'w')
     f.write(tex_file_template.substitute(formula=tex_code))
     f.close()
     devnull = open(os.devnull)
-    retcode = subprocess.call(["texi2dvi","{0}.tex".format(basename)], stdout=devnull, stderr=devnull)
-    retcode = subprocess.call(["dvips","-E","{0}.dvi".format(basename)], stdout=devnull, stderr=devnull)
-    retcode = subprocess.call(["convert","-density","{0}x{0}".format(density),"{0}.ps".format(basename),"{0}.png".format(basename)])
+    subprocess.call(["texi2dvi", "{0}.tex".format(basename)], stdout=devnull, stderr=devnull)
+    subprocess.call(["dvips", "-E", "{0}.dvi".format(basename)], stdout=devnull, stderr=devnull)
+    subprocess.call(
+        ["convert", "-density", "{0}x{0}".format(density), "{0}.ps".format(basename), "{0}.png".format(basename)])
     # copy the result to the final file (if directory differes)
     if basename != filename:
         local_png = "{0}.png".format(basename)
@@ -69,6 +72,7 @@ def from_tex(tex_code, filename, density = 100):
     os.remove("{0}.dvi".format(basename))
     os.remove("{0}.log".format(basename))
     os.remove("{0}.ps".format(basename))
+
 
 def from_html(source_html_file, output_basename):
     """Given an HTML file, convert all LaTeX codes enclosed between <span class="math-inline"> tags.
@@ -102,18 +106,18 @@ def from_html(source_html_file, output_basename):
         match = tex_math_re.search(html, pos)
         if match:
             tex_expr = match.group(1)
-            if tex_lookup.has_key(tex_expr):
+            if tex_expr in tex_lookup:
                 # already encountered this expression, retrive the file
                 filename = tex_lookup[tex_expr]
             else:
                 # we must convert to png
                 filename = output_basename + "-eq" + str(i)
                 i += 1
-                print "   " + filename + ".png"
+                print("   " + filename + ".png")
                 from_tex(tex_expr, filename)
                 # register into the lookup
                 tex_lookup[tex_expr] = filename
-            #html = tex_math_re.sub("<img class=inline-math src=\"" + os.path.basename(filename) + ".png\">", html, 1)
+            # html = tex_math_re.sub("<img class=inline-math src=\"" + os.path.basename(filename) + ".png\">", html, 1)
             html = tex_math_re.sub("<img src=\"" + os.path.basename(filename) + ".png\">", html, 1)
         else:
             break
@@ -123,14 +127,15 @@ def from_html(source_html_file, output_basename):
     try:
         f = open(output_html, 'w')
     except IOError:
-        print >> sys.stderr, "Unable to write the result to: {0}".format(output_html)
+        print("Unable to write the result to: {0}".format(output_html), file=sys.stderr)
         return
     else:
         f.write(html)
         f.close()
 
+
 # Test the module
 if __name__ == "__main__":
-#    from_tex(r"$\frac{a}{b} = c$", "test", 200)
-#    from_html("test.html", "test-out")
+    #    from_tex(r"$\frac{a}{b} = c$", "test", 200)
+    #    from_html("test.html", "test-out")
     from_html("en_asebastdnative.html", "test-out")

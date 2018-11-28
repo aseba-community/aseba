@@ -46,8 +46,8 @@ class FixURL(MyParser):
 
     def reset(self):
         MyParser.reset(self)
-        self.local_set = set()      # Set of local links
-        self.remote_set = set()     # Set of remote links
+        self.local_set = set()  # Set of local links
+        self.remote_set = set()  # Set of remote links
 
     # Public functions
     def get_local_links(self):
@@ -83,11 +83,11 @@ class FixURL(MyParser):
         """Private - Take a link and convert it,
         either as a local link, either as a link pointing
         to the remote host."""
-        if self.__is_link_toc__(link) == True:
+        if self.__is_link_toc__(link):
             # don't touch it!
             return link
 
-        if self.__is_link_local__(link) == True:
+        if self.__is_link_local__(link):
             # Convert link
             new_link = urltoname(link)
             self.local_set.add(new_link)
@@ -96,7 +96,6 @@ class FixURL(MyParser):
             new_link = urlparse.urljoin(self.remote_host, link)
             self.remote_set.add(new_link)
         return new_link
-
 
     # Inherited functions
     def handle_starttag(self, tag, attrs):
@@ -117,7 +116,6 @@ class FixURL(MyParser):
                     break
 
         MyParser.handle_starttag(self, tag, attrs)
-
 
 
 def fixurls(directory, base_url):
@@ -153,5 +151,3 @@ def fixurls(directory, base_url):
     print >> sys.stderr, "\nRemote URLs: "
     for x in sorted(remote_set):
         print >> sys.stderr, "  ", x
-
-

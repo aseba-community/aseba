@@ -1,12 +1,12 @@
+from __future__ import print_function
+
 import os
 import sys
 from string import Template
 
 import wikidot.structure
-from wikidot.tree import WikiNode
 
-qhp_template = \
-"""<?xml version="1.0" encoding="UTF-8"?>
+qhp_template = """<?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
         <namespace>aseba.main</namespace>
         <virtualFolder>doc</virtualFolder>
@@ -18,14 +18,12 @@ ${filter_section}
 </QtHelpProject>
 """
 
-filter_def_template = \
-"""        <customFilter name="${lang}">
+filter_def_template = """        <customFilter name="${lang}">
                 <filterAttribute>lang-${lang}</filterAttribute>
         </customFilter>
 """
 
-filter_section_template = \
-"""
+filter_section_template = """
         <filterSection>
                 <filterAttribute>lang-${lang}</filterAttribute>
                 <toc>
@@ -38,27 +36,21 @@ ${files}
         </filterSection>
 """
 
-
-section_root_template = \
-"""                        <section title="${title}" ref = "${ref}">
+section_root_template = """                        <section title="${title}" ref = "${ref}">
 ${subsection}
                         </section>
 """
 section_root = Template(section_root_template)
 
-
-section_leaf_template = \
-"""                                <section title="${title}" ref="${ref}"></section>
+section_leaf_template = """                                <section title="${title}" ref="${ref}"></section>
 """
 section_leaf = Template(section_leaf_template)
 
-
-file_element_template = \
-"""                        <file>${filename}</file>
+file_element_template = """                        <file>${filename}</file>
 """
 
-
 item_template = """	<file>${filename}</file>\n"""
+
 
 def __generate_sections__(node, output_directory):
     result = ""
@@ -79,12 +71,13 @@ def __generate_sections__(node, output_directory):
         result += section_root.substitute(title=node.title, ref=filename, subsection=subsections)
         return result
 
+
 def generate(source_directories, output_directory, languages, qhp_file):
     """
     directory / language should be lists
     """
 
-    print >> sys.stderr, "\nCreating {}, based on the content of {}...".format(qhp_file, source_directories)
+    print("\nCreating {}, based on the content of {}...".format(qhp_file, source_directories), file=sys.stderr)
 
     qhp = Template(qhp_template)
     filterdefs = ""
@@ -105,7 +98,7 @@ def generate(source_directories, output_directory, languages, qhp_file):
         fileitem = Template(file_element_template)
         for x in files:
             filename = os.path.join(output_directory, x)
-            #print >> sys.stderr, "Processing ", filename
+            # print ("Processing ", filename, file=sys.stderr)
             filelist += fileitem.substitute(filename=filename)
         # Generate the chunk for the current language
         filtersections += filtersection.substitute(lang=lang, files=filelist, sections=sections)
@@ -113,5 +106,4 @@ def generate(source_directories, output_directory, languages, qhp_file):
     f = open(qhp_file, 'w')
     f.write(qhp.substitute(filter_def=filterdefs, filter_section=filtersections))
     f.close
-    print >> sys.stderr, "Done."
-
+    print("Done.", file=sys.stderr)
