@@ -22,24 +22,22 @@
 import os
 import os.path
 import sys
-from shutil import rmtree
-from shutil import copytree
-from shutil import copy
+from shutil import copy, copytree, rmtree
 
+import qthelp
+import wikidot.structure
 # Custom lib
 from wikidot.fetch import fetchwikidot
-import wikidot.structure
-import qthelp
 
 complete_language_map = {
-                'en':'http://aseba.wikidot.com/en:asebausermanual',
-                'fr':'http://aseba.wikidot.com/fr:asebausermanual',
-                'de':'http://aseba.wikidot.com/de:asebausermanual',
-                'es':'http://aseba.wikidot.com/es:asebausermanual',
-                'it':'http://aseba.wikidot.com/it:asebausermanual'
-                # insert translation here (DO NOT REMOVE -> used by automated script)
-                }                       # used for updating help index
-language_map = complete_language_map.copy()    # used for fetching
+    'en': 'http://aseba.wikidot.com/en:asebausermanual',
+    'fr': 'http://aseba.wikidot.com/fr:asebausermanual',
+    'de': 'http://aseba.wikidot.com/de:asebausermanual',
+    'es': 'http://aseba.wikidot.com/es:asebausermanual',
+    'it': 'http://aseba.wikidot.com/it:asebausermanual'
+    # insert translation here (DO NOT REMOVE -> used by automated script)
+}  # used for updating help index
+language_map = complete_language_map.copy()  # used for fetching
 OUTPUT_DIR = 'doc'
 QHP_FILE = './aseba-doc.qhp'
 CSS_FILE = './css/aseba.css'

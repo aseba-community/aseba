@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import sys
+from __future__ import print_function
+
 import os
-import tempfile
 import subprocess
+import sys
+import tempfile
 
 # When executed from the command line
 if __name__ == "__main__":
@@ -14,15 +16,15 @@ if __name__ == "__main__":
         asebatest_bin = sys.argv[1]
         input_script = sys.argv[2]
     else:
-        print >> sys.stderr, "Wrong number of arguments.\n"
-        print >> sys.stderr, "Usage:"
-        print >> sys.stderr, "  {} asebatest_bin input_script".format(sys.argv[0])
+        print("Wrong number of arguments.\n", file=sys.stderr)
+        print("Usage:", file=sys.stderr)
+        print("  {} asebatest_bin input_script".format(sys.argv[0]), file=sys.stderr)
         exit(1)
 
 try:
     f = open(input_script, 'rb')
-except IOError, e:
-    print "Can not find the script file {}. Error.".format(input_script)
+except IOError:
+    print("Can not find the script file {}. Error.".format(input_script))
     exit(2)
 
 # read the script
@@ -38,7 +40,7 @@ tmp_script = ''
 failed = False
 for c in script:
     # generate the incremental script
-    tmp_script += c
+    tmp_script += str(c)
     # write to temp file
     tmp = open(tmp.name, 'wb')
     tmp.write(script)
@@ -47,16 +49,15 @@ for c in script:
     retcode = subprocess.call([asebatest_bin, tmp.name], stdout=open(os.devnull), stderr=open(os.devnull))
     if retcode < 0:
         # oops, received a signal (sigsev?)
-        print >> sys.stderr, "Compiler crached for the following code:"
-        print >> sys.stderr, tmp_script
+        print("Compiler crached for the following code:", file=sys.stderr)
+        print(tmp_script, file=sys.stderr)
         failed = True
         break
 
 # remove the temp file
 os.unlink(tmp.name)
 
-if failed == True:
+if failed:
     exit(retcode)
 else:
     exit(0)
-

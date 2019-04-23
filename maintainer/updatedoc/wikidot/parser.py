@@ -18,15 +18,14 @@
 
 # Python lib
 import sys
-from myparser import MyParser
 from string import Template
 
 # Local module
 import wikidot.debug
+from myparser import MyParser
 from wikidot.orderedset import OrderedSet
 
-header = \
-"""
+header = """
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -44,32 +43,29 @@ header = \
 ${toc}
 """
 
-footer = \
-"""
+footer = """
 </body>
 </html>
 """
 
+
 class WikidotParser(MyParser):
     """WikidotParser is used to clean a page from www.wikidot.com,
     keeping only the interesting content."""
+
     def __init__(self):
         """Intialize internal variables"""
         MyParser.__init__(self)
         self.div_level = 0
-        self.div_bookmark = [-1]    # List managed as a stack
-        self.state = ["none"]       # List managed as a stack
-        self.current_state = "none" # Point to the top of the stack
+        self.div_bookmark = [-1]  # List managed as a stack
+        self.state = ["none"]  # List managed as a stack
+        self.current_state = "none"  # Point to the top of the stack
         # map for div tag attribute -> state
         # (attribute name, attribute property, state)
-        self.div_state_map = \
-            [
-            ('id', 'page-title', 'title'),
-            ('id', 'breadcrumbs', 'breadcrumbs'),
-            ('id', 'page-content', 'body'),
-            ('id', 'toc-action-bar', 'useless'),
-            ('id', 'toc', 'toc'),
-            ('style','position:absolute', 'useless')]
+        self.div_state_map = [('id', 'page-title', 'title'), ('id', 'breadcrumbs', 'breadcrumbs'),
+                              ('id', 'page-content', 'body'), ('id', 'toc-action-bar', 'useless'), ('id', 'toc',
+                                                                                                    'toc'),
+                              ('style', 'position:absolute', 'useless')]
         self.page_title = ""
         self.toc = ""
         self.links = OrderedSet()
@@ -111,13 +107,13 @@ class WikidotParser(MyParser):
         Depending on the current state, the start tag is queued for output,
         or not."""
         # Debug
-        if wikidot.debug.ENABLE_DEBUG == True:
+        if wikidot.debug.ENABLE_DEBUG:
             print >> sys.stderr, "<{}> {}".format(tag, attrs)
 
         # Update the state machine
         state_changed = self.__update_state_machine_start__(tag, attrs)
 
-        if (state_changed == True) and (self.current_state == "body"):
+        if state_changed and (self.current_state == "body"):
             # We have just entered the body, don't output this <div> tag
             return
         if self.current_state == "body":
@@ -147,7 +143,7 @@ class WikidotParser(MyParser):
 
         # Update the state machine
         state_changed = self.__update_state_machine_end__(tag)
-        if state_changed == True:
+        if state_changed:
             return
 
         if self.current_state == "body":
@@ -214,7 +210,7 @@ class WikidotParser(MyParser):
         state_changed = False
 
         if tag == 'div':
-            if wikidot.debug.ENABLE_DEBUG == True:
+            if wikidot.debug.ENABLE_DEBUG:
                 print >> sys.stderr, self.state, self.div_bookmark
             # Look for the id = xyz attribute
             for attr in attrs:
@@ -236,7 +232,7 @@ class WikidotParser(MyParser):
         state_changed = False
 
         if tag == 'div':
-            if wikidot.debug.ENABLE_DEBUG == True:
+            if wikidot.debug.ENABLE_DEBUG:
                 print >> sys.stderr, self.state, self.div_bookmark
             self.div_level -= 1
             if self.div_level == self.div_bookmark[-1]:
@@ -272,4 +268,3 @@ class WikidotParser(MyParser):
                     pos = attr[1].find('px')
                     if pos >= 0:
                         attrs[index] = (attr[0], attr[1][0:pos])
-

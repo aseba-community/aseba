@@ -16,8 +16,9 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import urlparse
 import os.path
+import urlparse
+
 
 def urltoname(page):
     o = urlparse.urlparse(page)
@@ -28,5 +29,3 @@ def urltoname(page):
     if os.path.splitext(name)[1] == '':
         name += '.html'
     return name
-
-

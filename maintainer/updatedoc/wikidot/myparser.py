@@ -18,6 +18,7 @@
 
 from HTMLParser import HTMLParser
 
+
 class MyParser(HTMLParser):
     """Custom HTML parser, derived from HTMLParser lib.
 
@@ -84,4 +85,3 @@ class MyParser(HTMLParser):
     def handle_decl(self, decl):
         """Overidden - Called when a SGML declaration (<!) is parsed"""
         self.out_doc += ("<!" + decl + ">")
-

@@ -18,6 +18,7 @@
 
 import sys
 
+
 class WikiNode:
     """Build a tree, mirroring the structure of a wikidot-based wiki"""
 
@@ -75,4 +76,3 @@ class WikiNode:
         level += 1
         for x in self.children:
             x.dump(level)
-

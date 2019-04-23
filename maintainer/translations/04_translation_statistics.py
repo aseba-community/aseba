@@ -19,20 +19,23 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+from __future__ import print_function
+
+import glob
 import os
 import os.path
 import re
-import glob
+import sys
 
-from path import *
+from . import path
 
 translated_re = re.compile(r"""<translation>""")
 type_re = re.compile(r"""<translation type="(\w+?)">""")
 file_re = re.compile(r"""(\S+?)_(\w+).ts""")
 
+
 def file_statistics(f):
-#    print "\n*** {} ***\n".format(f)
+    #    print "\n*** {} ***\n".format(f)
     fd = open(f)
     stat = dict()
     stat['translated'] = 0
@@ -47,16 +50,17 @@ def file_statistics(f):
         # search untransalted / obsolete entries
         s = type_re.search(line)
         if s:
-            #print s.group(1)
+            # print s.group(1)
             state = s.group(1)
             if state == "unfinished":
                 stat['unfinished'] += 1
             elif state == "obsolete":
                 stat['obsolete'] += 1
             else:
-                print sys.stderr, "Unknown type: ", state
+                print("Unknown type: ", state, file=sys.stderr)
             continue
     return stat
+
 
 def directory_statistics(directory, stats):
     os.chdir(directory)
@@ -75,21 +79,21 @@ def directory_statistics(directory, stats):
 
     return stats
 
-print "*****"
-print "Statistics for translation files..."
-print "*****"
-print ""
+
+print("*****")
+print("Statistics for translation files...")
+print("*****")
+print("")
 
 stats = dict()
 
-stats = directory_statistics(studio_path, stats)
-stats = directory_statistics(challenge_path, stats)
+stats = directory_statistics(path.studio_path, stats)
+stats = directory_statistics(path.challenge_path, stats)
 
-
-print "       \t{:*^20}\t{:*^20}\t{:*^20}\t{:*^20}".format("Translated", "Total", "Percent", "Obsolete")
+print("       \t{:*^20}\t{:*^20}\t{:*^20}\t{:*^20}".format("Translated", "Total", "Percent", "Obsolete"))
 # loop on files
 for f in stats.keys():
-    print "\n[{}]\n".format(f)
+    print("\n[{}]\n".format(f))
     # loop on languages
     lang = stats[f].keys()
     lang.sort()
@@ -97,5 +101,5 @@ for f in stats.keys():
         stat = stats[f][l]
         total = stat["translated"] + stat["unfinished"]
         percent = float(stat["translated"]) / total * 100
-        print "--> {}:\t{:^20}\t{:^20}\t{:^20.1f}%\t{:^20}".format(l, stat["translated"], total, percent, stat["obsolete"])
-
+        print("--> {}:\t{:^20}\t{:^20}\t{:^20.1f}%\t{:^20}".format(l, stat["translated"], total, percent,
+                                                                   stat["obsolete"]))
