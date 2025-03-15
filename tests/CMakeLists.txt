@@ -11,7 +11,7 @@ endif()
 
 
 #add_subdirectory(e2e-http)
-
+add_subdirectory(e2e-playground)
 
 # test asebahttp
 # FIXME: port to asebahttp2

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+[ "$MSYSTEM" = "MINGW32" ] && TCP="tcp:127.0.0.1" || TCP="tcp:"
+
+# clean up previous session
+which killall >/dev/null 2>&1 \
+    && killall aseba{playground,switch,massloader,dump} \
+    || ps | egrep 'aseba(playground|switch|massloader|dump)' | while read pid rest; do kill $pid; done
+
+# start Playground with specified file
+playground=${1:-test.playground}
+@ASEBAPLAYGROUND@ ${playground} &
+sleep 10
+
+# check each network for node beacons
+@ASEBADUMP@ $TCP';port=33301' | head -6 | grep -m1 '0000 user message from 1 : user message of size 1 :    1' &&
+@ASEBADUMP@ $TCP';port=33313' | head -6 | grep -m1 '0000 user message from 1 : user message of size 1 :    1' && sleep 2 &&
+@ASEBADUMP@ $TCP';port=33313' | head -6 | grep -m1 '0000 user message from 2 : user message of size 1 :    2' &&
+@ASEBADUMP@ $TCP';port=33323' | head -20 | grep -m1 '0000 user message from 1 : user message of size 1 :    1' && sleep 2 &&
+@ASEBADUMP@ $TCP';port=33323' | head -20 | grep -m1 '0000 user message from 2 : user message of size 1 :    2'
+status=$?
+
+# clean up
+[ -z "$(jobs -p)" ] || kill %%
+
+exit $status

@@ -1,0 +1,27 @@
+<!DOCTYPE aseba-playground>
+<!-- Aseba playground for testing creation of multi-node networks. -->
+<!-- 1. Solo node with a program loaded from an Aesl file -->
+<!-- 2. Two-node network with separate programs loaded from an Aesl file -->
+<!-- 3. Two-node network with separate programs specified from an inlined Aesl network -->
+
+<!-- Test 1: Load programs using Aseba utilities running in separate processes -->
+<!-- The test succeeds if the nodes in the three networks emit an alive event every 3 seconds -->
+
+<aseba-playground>
+	<world w="60" h="80" />
+
+	<robot type="thymio2" port="33301" x="20" y="20" nodeId="1" id="T1" name="Test Solo Single" />
+	<process command=":asebamassloader --once beacon-solo.aesl tcp:localhost;33301" />
+
+	<robot type="thymio2" port="33311" x="20" y="40" nodeId="1" id="T2" name="Test Net File 1" />
+	<robot type="thymio2" port="33312" x="40" y="40" nodeId="2" id="T3" name="Test Net File 2" />
+	<process command=":asebaswitch -p 33313 -n Network-Aesl-File tcp:localhost;33311 tcp:localhost;33312" />
+	<process command=":asebamassloader --once beacon-net.aesl tcp:localhost;33313" />
+
+	<robot type="thymio2" port="33321" x="20" y="60" nodeId="1" id="T4" name="Test Net Inline 1" />
+	<robot type="thymio2" port="33322" x="40" y="60" nodeId="2" id="T5" name="Test Net Inline 2" />
+	<process command=":asebaswitch -p 33323 -n Network-Aesl-Inline tcp:localhost;33321 tcp:localhost;33322" />
+	<process command=":asebahttp --autorestart --http 3002 tcp:localhost;33323" />
+	<process command="curl --retry 3 --header Content-Type:&#9;application/octet-stream --data-ascii &lt;!DOCTYPE&#9;aesl-source&gt;&#9;&lt;network&gt;&#9;&lt;event&#9;size=&quot;1&quot;&#9;name=&quot;alive&quot;/&gt;&#9;&lt;node&#9;nodeId=&quot;1&quot;&#9;name=&quot;thymio-II&quot;&gt;&#9;timer.period=[3000,0]&#9;onevent&#9;timer0&#9;emit&#9;alive([1])&#9;&lt;/node&gt;&#9;&lt;/network&gt;&#9; -X PUT http://127.0.0.1:3002/nodes/1" />
+	<process command="curl --retry 3 --header Content-Type:&#9;application/octet-stream --data-ascii &lt;!DOCTYPE&#9;aesl-source&gt;&#9;&lt;network&gt;&#9;&lt;event&#9;size=&quot;1&quot;&#9;name=&quot;alive&quot;/&gt;&#9;&lt;node&#9;nodeId=&quot;1&quot;&#9;name=&quot;thymio-II&quot;&gt;&#9;timer.period=[3000,0]&#9;onevent&#9;timer0&#9;emit&#9;alive([2])&#9;&lt;/node&gt;&#9;&lt;/network&gt;&#9; -X PUT http://127.0.0.1:3002/nodes/2" />
+</aseba-playground>

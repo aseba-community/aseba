@@ -1,0 +1,38 @@
+<!DOCTYPE aseba-playground>
+<!-- Aseba playground for testing creation of multi-node networks. -->
+<!-- 1. Solo node with a program loaded from an Aesl file -->
+<!-- 2. Two-node network with separate programs loaded from an Aesl file -->
+<!-- 3. Two-node network with separate programs specified from an inlined Aesl network -->
+
+<!-- Test 2: Load programs declared in a <networks> tag using Playground itself -->
+<!-- The test succeeds if the nodes in the three networks emit an alive event every 3 seconds -->
+
+<aseba-playground>
+	<world w="60" h="80" />
+
+	<robot type="thymio2" port="33301" x="20" y="20" nodeId="1" id="T1" name="Test Solo Single" />
+
+	<robot type="thymio2" port="33311" x="20" y="40" nodeId="1" id="T2" name="Test Net File 1" />
+	<robot type="thymio2" port="33312" x="40" y="40" nodeId="2" id="T3" name="Test Net File 2" />
+
+	<robot type="thymio2" port="33321" x="20" y="60" nodeId="1" id="T4" name="Test Net Inline 1" />
+	<robot type="thymio2" port="33322" x="40" y="60" nodeId="2" id="T5" name="Test Net Inline 2" />
+
+	<networks>
+		<network name="Solo-Aesl-File" robots="T1" aeslFile="beacon-solo.aesl" />
+		<network name="Network-Aesl-File" robots="T2 T3" aeslFile="beacon-net.aesl" />
+		<network name="Network-Aesl-Inline" robots="T4 T5">
+			<event size="1" name="alive"/>
+			<node nodeId="1" name="thymio-II">
+			timer.period=[3000,0]
+			onevent timer0
+			emit alive([1])
+			</node>
+			<node nodeId="2" name="thymio-II">
+			timer.period=[3000,0]
+			onevent timer0
+			emit alive([2])
+			</node>
+		</network>
+	</networks>
+</aseba-playground>

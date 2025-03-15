@@ -1,0 +1,9 @@
+<!DOCTYPE aesl-source>
+<network>
+<event size="1" name="alive"/>
+<node nodeId="1" name="thymio-II">
+timer.period=[3000,0]
+onevent timer0
+emit alive([1])
+</node>
+</network>
